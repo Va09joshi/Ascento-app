@@ -1,0 +1,7 @@
+{
+  "envName": "production",
+  "apiBaseUrl": "https://ascento-backend-private.onrender.com/api/v1",
+  "connectTimeoutMs": 15000,
+  "receiveTimeoutMs": 15000,
+  "enableLogging": false
+}
