@@ -108,7 +108,7 @@ class _EnquiryViewState extends State<EnquiryView> {
     final isMobile = ResponsiveBuilder.isMobile(context);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.creamBg,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       body: SingleChildScrollView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         child: ResponsiveContent(

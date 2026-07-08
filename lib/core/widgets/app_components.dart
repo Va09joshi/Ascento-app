@@ -118,7 +118,7 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
           ? (leading ??
               IconButton(
                 icon: Icon(Icons.arrow_back_ios_new_rounded,
-                    color: isDark ? Colors.white : AppColors.textCharcoal),
+                    color: isDark ? Colors.white : AppColors.textPrimary),
                 onPressed: onBack ?? () => Navigator.maybePop(context),
               ))
           : null,
@@ -158,11 +158,11 @@ class EmptyStateWidget extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(24.w),
               decoration: BoxDecoration(
-                color: (isDark ? AppColors.darkPrimary : AppColors.primaryClay).withValues(alpha: 0.08),
+                color: (isDark ? AppColors.darkPrimary : AppColors.primary).withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, size: 56.r,
-                  color: isDark ? AppColors.darkPrimary : AppColors.primaryClay),
+                  color: isDark ? AppColors.darkPrimary : AppColors.primary),
             ),
             SizedBox(height: 24.h),
             Text(title, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
@@ -175,7 +175,7 @@ class EmptyStateWidget extends StatelessWidget {
               TextButton(
                 onPressed: onAction,
                 child: Text(actionText!, style: TextStyle(
-                  color: isDark ? AppColors.darkPrimary : AppColors.primaryClay,
+                  color: isDark ? AppColors.darkPrimary : AppColors.primary,
                   fontWeight: FontWeight.bold,
                 )),
               ),

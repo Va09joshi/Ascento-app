@@ -8,92 +8,90 @@ import 'package:ascento_abacus/core/theme/app_typography.dart';
 class AppTheme {
   AppTheme._();
 
-  // --- WHITE CREAM EDUCATIONAL LIGHT THEME ---
   static ThemeData lightTheme() {
     final baseTheme = ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
       colorScheme: const ColorScheme(
         brightness: Brightness.light,
-        primary: AppColors.primaryClay,
-        onPrimary: AppColors.white,
-        primaryContainer: AppColors.creamSurface,
-        onPrimaryContainer: AppColors.primaryClay,
-        secondary: AppColors.secondarySage,
-        onSecondary: AppColors.white,
-        tertiary: AppColors.tertiaryHoney,
+        primary: AppColors.primary,
+        onPrimary: AppColors.onPrimary,
+        primaryContainer: AppColors.surface,
+        onPrimaryContainer: AppColors.primary,
+        secondary: AppColors.secondary,
+        onSecondary: AppColors.onSecondary,
+        tertiary: AppColors.info,
         onTertiary: AppColors.white,
-        error: AppColors.errorRed,
+        error: AppColors.error,
         onError: AppColors.white,
-        surface: AppColors.creamBg,
-        onSurface: AppColors.textCharcoal,
-        outline: AppColors.creamBorder,
+        surface: AppColors.background,
+        onSurface: AppColors.textPrimary,
+        outline: AppColors.border,
       ),
-      scaffoldBackgroundColor: AppColors.creamBg,
-      dividerColor: AppColors.creamBorder,
+      scaffoldBackgroundColor: AppColors.background,
+      dividerColor: AppColors.border,
     );
 
     return baseTheme.copyWith(
       textTheme: AppTypography.lightTextTheme,
       
-      // Theme extensions registration
       extensions: [
-        ScholasticThemeExtension.light,
+        ScholasticThemeExtension.light, // Future SaaS refactoring placeholder
       ],
 
       cardTheme: CardThemeData(
-        color: AppColors.creamSurface,
+        color: AppColors.surface,
         elevation: 0,
-        shape: AppRadius.shape16.copyWith(
-          side: const BorderSide(color: AppColors.creamBorder, width: 1.5),
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(color: AppColors.border, width: 1.0),
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
 
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.creamBg,
+        backgroundColor: AppColors.surface,
         elevation: 0,
-        centerTitle: true,
-        titleTextStyle: AppTypography.lightTextTheme.titleLarge?.copyWith(
-          fontWeight: FontWeight.bold,
-        ),
-        iconTheme: const IconThemeData(color: AppColors.textCharcoal),
+        scrolledUnderElevation: 0,
+        centerTitle: false,
+        titleTextStyle: AppTypography.lightTextTheme.titleLarge,
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        shape: const Border(bottom: BorderSide(color: AppColors.border, width: 1.0)),
       ),
 
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryClay,
-          foregroundColor: AppColors.white,
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.onPrimary,
           elevation: 0,
           padding: EdgeInsets.symmetric(horizontal: AppSpacing.p24, vertical: AppSpacing.p16),
-          shape: AppRadius.shape12,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           textStyle: AppTypography.lightTextTheme.labelLarge,
         ),
       ),
 
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primaryClay,
-          side: const BorderSide(color: AppColors.primaryClay, width: 1.8),
+          foregroundColor: AppColors.primary,
+          side: const BorderSide(color: AppColors.border, width: 1.5),
           padding: EdgeInsets.symmetric(horizontal: AppSpacing.p24, vertical: AppSpacing.p16),
-          shape: AppRadius.shape12,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           textStyle: AppTypography.lightTextTheme.labelLarge?.copyWith(
-            color: AppColors.primaryClay,
+            color: AppColors.primary,
           ),
         ),
       ),
 
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.secondarySage,
+          foregroundColor: AppColors.textSecondary,
           textStyle: AppTypography.lightTextTheme.titleMedium?.copyWith(
-            fontSize: 15,
+            fontSize: 14,
           ),
         ),
       ),
     );
   }
 
-  // --- MIDNIGHT CHARCOAL SLATE DARK THEME ---
   static ThemeData darkTheme() {
     final baseTheme = ThemeData(
       useMaterial3: true,
@@ -101,27 +99,26 @@ class AppTheme {
       colorScheme: const ColorScheme(
         brightness: Brightness.dark,
         primary: AppColors.darkPrimary,
-        onPrimary: AppColors.darkBg,
+        onPrimary: AppColors.darkOnPrimary,
         primaryContainer: AppColors.darkSurface,
         onPrimaryContainer: AppColors.darkPrimary,
         secondary: AppColors.darkSecondary,
-        onSecondary: AppColors.darkBg,
-        tertiary: AppColors.darkTertiary,
-        onTertiary: AppColors.darkBg,
-        error: AppColors.errorRed,
+        onSecondary: AppColors.darkOnSecondary,
+        tertiary: AppColors.info,
+        onTertiary: AppColors.white,
+        error: AppColors.error,
         onError: AppColors.white,
-        surface: AppColors.darkBg,
-        onSurface: AppColors.darkText,
+        surface: AppColors.darkBackground,
+        onSurface: AppColors.darkTextPrimary,
         outline: AppColors.darkBorder,
       ),
-      scaffoldBackgroundColor: AppColors.darkBg,
+      scaffoldBackgroundColor: AppColors.darkBackground,
       dividerColor: AppColors.darkBorder,
     );
 
     return baseTheme.copyWith(
       textTheme: AppTypography.darkTextTheme,
 
-      // Theme extensions registration
       extensions: [
         ScholasticThemeExtension.dark,
       ],
@@ -129,28 +126,29 @@ class AppTheme {
       cardTheme: CardThemeData(
         color: AppColors.darkSurface,
         elevation: 0,
-        shape: AppRadius.shape16.copyWith(
-          side: const BorderSide(color: AppColors.darkBorder, width: 1.5),
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(color: AppColors.darkBorder, width: 1.0),
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
 
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.darkBg,
+        backgroundColor: AppColors.darkSurface,
         elevation: 0,
-        centerTitle: true,
-        titleTextStyle: AppTypography.darkTextTheme.titleLarge?.copyWith(
-          fontWeight: FontWeight.bold,
-        ),
-        iconTheme: const IconThemeData(color: AppColors.darkText),
+        scrolledUnderElevation: 0,
+        centerTitle: false,
+        titleTextStyle: AppTypography.darkTextTheme.titleLarge,
+        iconTheme: const IconThemeData(color: AppColors.darkTextPrimary),
+        shape: const Border(bottom: BorderSide(color: AppColors.darkBorder, width: 1.0)),
       ),
 
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.darkPrimary,
-          foregroundColor: AppColors.darkBg,
+          foregroundColor: AppColors.darkOnPrimary,
           elevation: 0,
           padding: EdgeInsets.symmetric(horizontal: AppSpacing.p24, vertical: AppSpacing.p16),
-          shape: AppRadius.shape12,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           textStyle: AppTypography.darkTextTheme.labelLarge,
         ),
       ),
@@ -158,9 +156,9 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.darkPrimary,
-          side: const BorderSide(color: AppColors.darkPrimary, width: 1.8),
+          side: const BorderSide(color: AppColors.darkBorder, width: 1.5),
           padding: EdgeInsets.symmetric(horizontal: AppSpacing.p24, vertical: AppSpacing.p16),
-          shape: AppRadius.shape12,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           textStyle: AppTypography.darkTextTheme.labelLarge?.copyWith(
             color: AppColors.darkPrimary,
           ),
@@ -169,9 +167,9 @@ class AppTheme {
 
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.darkSecondary,
+          foregroundColor: AppColors.darkTextSecondary,
           textStyle: AppTypography.darkTextTheme.titleMedium?.copyWith(
-            fontSize: 15,
+            fontSize: 14,
           ),
         ),
       ),

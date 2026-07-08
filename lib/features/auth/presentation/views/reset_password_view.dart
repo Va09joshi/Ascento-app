@@ -45,11 +45,11 @@ class _ResetPasswordViewState extends ConsumerState<ResetPasswordView> {
               return AlertDialog(
                 backgroundColor: Theme.of(context).brightness == Brightness.dark 
                     ? AppColors.darkSurface 
-                    : AppColors.creamSurface,
+                    : AppColors.surface,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                 title: const Row(
                   children: [
-                    Icon(Icons.check_circle_rounded, color: AppColors.secondarySage),
+                    Icon(Icons.check_circle_rounded, color: AppColors.secondary),
                     SizedBox(width: 8),
                     Text('Password Updated'),
                   ],
@@ -88,7 +88,7 @@ class _ResetPasswordViewState extends ConsumerState<ResetPasswordView> {
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_rounded,
-            color: isDark ? Colors.white : AppColors.textCharcoal,
+            color: isDark ? Colors.white : AppColors.textPrimary,
           ),
           onPressed: () => context.pop(),
         ),
@@ -157,14 +157,14 @@ class _ResetPasswordViewState extends ConsumerState<ResetPasswordView> {
                               height: 80.r,
                               decoration: BoxDecoration(
                                 color: isDark 
-                                    ? AppColors.tertiaryHoney.withValues(alpha: 0.15) 
-                                    : AppColors.tertiaryHoney.withValues(alpha: 0.1),
+                                    ? AppColors.info.withValues(alpha: 0.15) 
+                                    : AppColors.info.withValues(alpha: 0.1),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
                                 Icons.key_rounded,
                                 size: 40.r,
-                                color: isDark ? AppColors.tertiaryHoney : AppColors.tertiaryHoney,
+                                color: isDark ? AppColors.info : AppColors.info,
                               ),
                             ),
                           ),
@@ -176,7 +176,7 @@ class _ResetPasswordViewState extends ConsumerState<ResetPasswordView> {
                           'Setup Password',
                           style: theme.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.w900,
-                            color: isDark ? Colors.white : AppColors.textCharcoal,
+                            color: isDark ? Colors.white : AppColors.textPrimary,
                             letterSpacing: -0.5,
                             fontSize: 32.sp,
                           ),
@@ -198,9 +198,9 @@ class _ResetPasswordViewState extends ConsumerState<ResetPasswordView> {
                           Container(
                             padding: EdgeInsets.all(AppSpacing.p16),
                             decoration: BoxDecoration(
-                              color: AppColors.errorRed.withValues(alpha: 0.1),
+                              color: AppColors.error.withValues(alpha: 0.1),
                               border: Border.all(
-                                color: AppColors.errorRed.withValues(alpha: 0.3),
+                                color: AppColors.error.withValues(alpha: 0.3),
                                 width: 1.5,
                               ),
                               borderRadius: BorderRadius.circular(AppRadius.r12),
@@ -210,12 +210,12 @@ class _ResetPasswordViewState extends ConsumerState<ResetPasswordView> {
                                 Container(
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
-                                    color: AppColors.errorRed.withValues(alpha: 0.2),
+                                    color: AppColors.error.withValues(alpha: 0.2),
                                     shape: BoxShape.circle,
                                   ),
                                   child: const Icon(
                                     Icons.warning_amber_rounded,
-                                    color: AppColors.errorRed,
+                                    color: AppColors.error,
                                     size: 20,
                                   ),
                                 ),
@@ -224,7 +224,7 @@ class _ResetPasswordViewState extends ConsumerState<ResetPasswordView> {
                                   child: Text(
                                     authState.errorMessage!,
                                     style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: AppColors.errorRed,
+                                      color: AppColors.error,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),

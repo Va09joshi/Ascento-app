@@ -53,7 +53,7 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_rounded,
-            color: isDark ? Colors.white : AppColors.textCharcoal,
+            color: isDark ? Colors.white : AppColors.textPrimary,
           ),
           onPressed: () => context.pop(),
         ),
@@ -123,13 +123,13 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
                               decoration: BoxDecoration(
                                 color: isDark 
                                     ? AppColors.darkPrimary.withValues(alpha: 0.15) 
-                                    : AppColors.primaryClay.withValues(alpha: 0.1),
+                                    : AppColors.primary.withValues(alpha: 0.1),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
                                 Icons.lock_reset_rounded,
                                 size: 40.r,
-                                color: isDark ? AppColors.darkPrimary : AppColors.primaryClay,
+                                color: isDark ? AppColors.darkPrimary : AppColors.primary,
                               ),
                             ),
                           ),
@@ -141,7 +141,7 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
                           'Forgot Password',
                           style: theme.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.w900,
-                            color: isDark ? Colors.white : AppColors.textCharcoal,
+                            color: isDark ? Colors.white : AppColors.textPrimary,
                             letterSpacing: -0.5,
                             fontSize: 32.sp,
                           ),
@@ -163,9 +163,9 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
                           Container(
                             padding: EdgeInsets.all(AppSpacing.p16),
                             decoration: BoxDecoration(
-                              color: AppColors.errorRed.withValues(alpha: 0.1),
+                              color: AppColors.error.withValues(alpha: 0.1),
                               border: Border.all(
-                                color: AppColors.errorRed.withValues(alpha: 0.3),
+                                color: AppColors.error.withValues(alpha: 0.3),
                                 width: 1.5,
                               ),
                               borderRadius: BorderRadius.circular(AppRadius.r12),
@@ -175,12 +175,12 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
                                 Container(
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
-                                    color: AppColors.errorRed.withValues(alpha: 0.2),
+                                    color: AppColors.error.withValues(alpha: 0.2),
                                     shape: BoxShape.circle,
                                   ),
                                   child: const Icon(
                                     Icons.warning_amber_rounded,
-                                    color: AppColors.errorRed,
+                                    color: AppColors.error,
                                     size: 20,
                                   ),
                                 ),
@@ -189,7 +189,7 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
                                   child: Text(
                                     authState.errorMessage!,
                                     style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: AppColors.errorRed,
+                                      color: AppColors.error,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),

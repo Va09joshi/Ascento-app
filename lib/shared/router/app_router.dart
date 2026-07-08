@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ascento_abacus/core/widgets/error_view.dart';
-import 'package:ascento_abacus/features/attendance/presentation/views/attendance_view.dart';
+import 'package:ascento_abacus/features/attendance/presentation/views/attendance_management_view.dart';
 import 'package:ascento_abacus/features/dashboard/presentation/views/dashboard_view.dart';
 import 'package:ascento_abacus/features/dashboard/presentation/views/admin_dashboard_view.dart';
 import 'package:ascento_abacus/features/dashboard/presentation/views/teacher_dashboard_view.dart';
 import 'package:ascento_abacus/features/enquiry/presentation/views/enquiry_view.dart';
-import 'package:ascento_abacus/features/exams/presentation/views/exam_view.dart';
+import 'package:ascento_abacus/features/exams/presentation/views/exams_management_view.dart';
+import 'package:ascento_abacus/features/exams/presentation/views/exam_form_view.dart';
 import 'package:ascento_abacus/features/fees/presentation/views/fees_view.dart';
 import 'package:ascento_abacus/features/homework/presentation/views/homework_view.dart';
-import 'package:ascento_abacus/features/notifications/presentation/views/notifications_view.dart';
+import 'package:ascento_abacus/features/notifications/presentation/views/notices_management_view.dart';
+import 'package:ascento_abacus/features/notifications/presentation/views/notice_form_view.dart';
 import 'package:ascento_abacus/features/splash/presentation/views/splash_view.dart';
 import 'package:ascento_abacus/features/onboarding/presentation/views/onboarding_view.dart';
 import 'package:ascento_abacus/features/auth/presentation/views/login_view.dart';
@@ -18,14 +20,30 @@ import 'package:ascento_abacus/features/auth/presentation/views/forgot_password_
 import 'package:ascento_abacus/features/auth/presentation/views/otp_verification_view.dart';
 import 'package:ascento_abacus/features/auth/presentation/views/reset_password_view.dart';
 import 'package:ascento_abacus/features/profile/presentation/views/profile_view.dart';
-import 'package:ascento_abacus/features/timetable/presentation/views/timetable_view.dart';
-import 'package:ascento_abacus/features/programs/presentation/views/programs_view.dart';
+import 'package:ascento_abacus/features/timetable/presentation/views/timetable_management_view.dart';
+import 'package:ascento_abacus/features/courses/presentation/views/courses_management_view.dart';
 import 'package:ascento_abacus/features/lessons/presentation/views/lessons_view.dart';
 import 'package:ascento_abacus/features/users/presentation/views/users_management_view.dart';
+import 'package:ascento_abacus/features/users/presentation/widgets/user_form_view.dart';
 
 import 'package:ascento_abacus/shared/router/route_names.dart';
 import 'package:ascento_abacus/shared/router/route_guard.dart';
 import 'package:ascento_abacus/shared/router/navigation_shell.dart';
+
+import '../../features/academics/presentation/views/academics_management_view.dart';
+import '../../features/academics/presentation/views/academic_year_form_view.dart';
+import '../../features/academics/presentation/views/class_form_view.dart';
+import '../../features/academics/presentation/views/section_form_view.dart';
+import '../../features/academics/presentation/views/subject_form_view.dart';
+import '../../features/branches/presentation/views/branches_management_view.dart';
+import '../../features/branches/presentation/views/branch_form_view.dart';
+import '../models/notice_model.dart';
+import '../models/user_model.dart';
+import '../models/branch_model.dart';
+import '../models/academic_year_model.dart';
+import '../models/class_model.dart';
+import '../models/section_model.dart';
+import '../models/subject_model.dart';
 
 // Decoupled, centralized GoRouter configuration driving Ascento Abacus application navigation
 final routerProvider = Provider<GoRouter>((ref) {
@@ -136,6 +154,29 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(
+            path: RoutePaths.manageBranches,
+            name: RouteNames.manageBranches,
+            pageBuilder: (context, state) => CustomTransitionPage(
+              key: state.pageKey,
+              child: const BranchesManagementView(),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+            ),
+          ),
+          GoRoute(
+            path: RoutePaths.academicsConfig,
+            name: RouteNames.academicsConfig,
+            pageBuilder: (context, state) => CustomTransitionPage(
+              key: state.pageKey,
+              child: const AcademicsManagementView(),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+            ),
+          ),
+
+          GoRoute(
             path: RoutePaths.studentDashboard,
             name: RouteNames.studentDashboard,
             pageBuilder: (context, state) => CustomTransitionPage(
@@ -151,7 +192,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             name: RouteNames.attendance,
             pageBuilder: (context, state) => CustomTransitionPage(
               key: state.pageKey,
-              child: const AttendanceView(),
+              child: const AttendanceManagementView(),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
                     return FadeTransition(opacity: animation, child: child);
@@ -163,7 +204,19 @@ final routerProvider = Provider<GoRouter>((ref) {
             name: RouteNames.exams,
             pageBuilder: (context, state) => CustomTransitionPage(
               key: state.pageKey,
-              child: const ExamView(),
+              child: const ExamsManagementView(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+            ),
+          ),
+          GoRoute(
+            path: RoutePaths.addExam,
+            name: RouteNames.addExam,
+            pageBuilder: (context, state) => CustomTransitionPage(
+              key: state.pageKey,
+              child: const ExamFormView(),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
                     return FadeTransition(opacity: animation, child: child);
@@ -199,7 +252,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             name: RouteNames.notifications,
             pageBuilder: (context, state) => CustomTransitionPage(
               key: state.pageKey,
-              child: const NotificationsView(),
+              child: const NoticesManagementView(),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
                     return FadeTransition(opacity: animation, child: child);
@@ -211,7 +264,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             name: RouteNames.timetable,
             pageBuilder: (context, state) => CustomTransitionPage(
               key: state.pageKey,
-              child: const TimetableView(),
+              child: const TimetableManagementView(),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
                     return FadeTransition(opacity: animation, child: child);
@@ -235,7 +288,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             name: RouteNames.programs,
             pageBuilder: (context, state) => CustomTransitionPage(
               key: state.pageKey,
-              child: const ProgramsView(),
+              child: const CoursesManagementView(),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
                     return FadeTransition(opacity: animation, child: child);
@@ -267,6 +320,202 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
         ],
+      ),
+
+      GoRoute(
+        path: RoutePaths.addUser,
+        name: RouteNames.addUser,
+        pageBuilder: (context, state) {
+          final role = state.extra as String? ?? 'student';
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: UserFormView(initialRole: role),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          );
+        },
+      ),
+      GoRoute(
+        path: RoutePaths.editUser,
+        name: RouteNames.editUser,
+        pageBuilder: (context, state) {
+          final user = state.extra as UserModel;
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: UserFormView(initialRole: user.role.name, userToEdit: user),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          );
+        },
+      ),
+      GoRoute(
+        path: RoutePaths.addBranch,
+        name: RouteNames.addBranch,
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: const BranchFormView(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          );
+        },
+      ),
+      GoRoute(
+        path: RoutePaths.editBranch,
+        name: RouteNames.editBranch,
+        pageBuilder: (context, state) {
+          final branch = state.extra as BranchModel;
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: BranchFormView(branch: branch),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          );
+        },
+      ),
+
+      GoRoute(
+        path: RoutePaths.addAcademicYear,
+        name: RouteNames.addAcademicYear,
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: const AcademicYearFormView(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          );
+        },
+      ),
+      GoRoute(
+        path: RoutePaths.editAcademicYear,
+        name: RouteNames.editAcademicYear,
+        pageBuilder: (context, state) {
+          final year = state.extra as AcademicYearModel;
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: AcademicYearFormView(academicYear: year),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          );
+        },
+      ),
+
+      GoRoute(
+        path: RoutePaths.addClass,
+        name: RouteNames.addClass,
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: const ClassFormView(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          );
+        },
+      ),
+      GoRoute(
+        path: RoutePaths.editClass,
+        name: RouteNames.editClass,
+        pageBuilder: (context, state) {
+          final classModel = state.extra as ClassModel;
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: ClassFormView(classModel: classModel),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          );
+        },
+      ),
+
+      GoRoute(
+        path: RoutePaths.addSection,
+        name: RouteNames.addSection,
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: const SectionFormView(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          );
+        },
+      ),
+      GoRoute(
+        path: RoutePaths.editSection,
+        name: RouteNames.editSection,
+        pageBuilder: (context, state) {
+          final section = state.extra as SectionModel;
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: SectionFormView(section: section),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          );
+        },
+      ),
+
+      GoRoute(
+        path: RoutePaths.addSubject,
+        name: RouteNames.addSubject,
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: const SubjectFormView(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          );
+        },
+      ),
+      GoRoute(
+        path: RoutePaths.editSubject,
+        name: RouteNames.editSubject,
+        pageBuilder: (context, state) {
+          final subject = state.extra as SubjectModel;
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: SubjectFormView(subject: subject),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          );
+        },
+      ),
+      
+      GoRoute(
+        path: RoutePaths.addNotice,
+        name: RouteNames.addNotice,
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: const NoticeFormView(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          );
+        },
+      ),
+      GoRoute(
+        path: RoutePaths.editNotice,
+        name: RouteNames.editNotice,
+        pageBuilder: (context, state) {
+          final notice = state.extra as NoticeModel;
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: NoticeFormView(notice: notice),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          );
+        },
       ),
 
       // --- Guarded Billing Sandbox Page ---

@@ -23,21 +23,21 @@ class StatsGrid extends StatelessWidget {
         value: 'Level ${completedLevels + 1}',
         subtitle: 'Soroban Beginner',
         icon: Icons.school_rounded,
-        color: AppColors.primaryClay,
+        color: AppColors.primary,
       ),
       _StatItem(
         title: 'Stars Earned',
         value: '$totalStars',
         subtitle: 'Math points',
         icon: Icons.star_rounded,
-        color: AppColors.tertiaryHoney,
+        color: AppColors.info,
       ),
       _StatItem(
         title: 'Exercises',
         value: '${completedLevels * 5 + 4}',
         subtitle: 'Completed items',
         icon: Icons.task_alt_rounded,
-        color: AppColors.secondarySage,
+        color: AppColors.secondary,
       ),
       _StatItem(
         title: 'Daily Streak',
@@ -68,12 +68,12 @@ class StatsGrid extends StatelessWidget {
           itemBuilder: (context, index) {
             final item = stats[index];
             return Card(
-              color: isDark ? AppColors.darkSurface : AppColors.creamSurface,
+              color: isDark ? AppColors.darkSurface : AppColors.surface,
               margin: EdgeInsets.zero,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
                 side: BorderSide(
-                  color: isDark ? AppColors.darkBorder : AppColors.creamSurfaceDarker,
+                  color: isDark ? AppColors.darkBorder : AppColors.surfaceDarker,
                   width: 1.5,
                 ),
               ),

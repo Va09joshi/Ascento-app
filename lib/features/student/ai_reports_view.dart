@@ -22,7 +22,7 @@ class AiReportsView extends ConsumerWidget {
             Icon(
               Icons.auto_awesome_outlined,
               size: 64,
-              color: isDark ? AppColors.darkPrimary : AppColors.primaryClay,
+              color: isDark ? AppColors.darkPrimary : AppColors.primary,
             ),
             AppSpacing.h16,
             Text(

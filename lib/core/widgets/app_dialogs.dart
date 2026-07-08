@@ -33,7 +33,7 @@ class AppDialog {
       context: context,
       barrierDismissible: isDismissible,
       builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? AppColors.darkSurface : AppColors.creamSurface,
+        backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
         title: Text(title, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
         content: Text(message, style: theme.textTheme.bodyMedium),
@@ -46,7 +46,7 @@ class AppDialog {
           TextButton(
             onPressed: () { Navigator.pop(ctx); onConfirm?.call(); },
             child: Text(confirmText, style: TextStyle(
-              color: isDark ? AppColors.darkPrimary : AppColors.primaryClay,
+              color: isDark ? AppColors.darkPrimary : AppColors.primary,
               fontWeight: FontWeight.bold,
             )),
           ),
@@ -81,19 +81,19 @@ class AppSnackbar {
   AppSnackbar._();
 
   static void show(BuildContext context, {required String message, Duration? duration}) {
-    _show(context, message: message, icon: Icons.info_outline, color: AppColors.primaryClay, duration: duration);
+    _show(context, message: message, icon: Icons.info_outline, color: AppColors.primary, duration: duration);
   }
 
   static void success(BuildContext context, {required String message}) {
-    _show(context, message: message, icon: Icons.check_circle_outline, color: AppColors.secondarySage);
+    _show(context, message: message, icon: Icons.check_circle_outline, color: AppColors.secondary);
   }
 
   static void error(BuildContext context, {required String message}) {
-    _show(context, message: message, icon: Icons.error_outline, color: AppColors.errorRed);
+    _show(context, message: message, icon: Icons.error_outline, color: AppColors.error);
   }
 
   static void warning(BuildContext context, {required String message}) {
-    _show(context, message: message, icon: Icons.warning_amber_rounded, color: AppColors.tertiaryHoney);
+    _show(context, message: message, icon: Icons.warning_amber_rounded, color: AppColors.info);
   }
 
   static void _show(BuildContext context, {required String message, required IconData icon, required Color color, Duration? duration}) {
@@ -140,7 +140,7 @@ class AppBottomSheet {
       constraints: maxHeight != null ? BoxConstraints(maxHeight: maxHeight) : null,
       builder: (ctx) => Container(
         decoration: BoxDecoration(
-          color: isDark ? AppColors.darkSurface : AppColors.creamSurface,
+          color: isDark ? AppColors.darkSurface : AppColors.surface,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
         ),
         child: Column(

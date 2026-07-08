@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:dio/dio.dart';
 import 'package:ascento_abacus/core/network/dio_client.dart';
 import 'package:ascento_abacus/core/logging/app_logger.dart';
 import 'package:ascento_abacus/shared/models/user_model.dart';
@@ -12,6 +13,7 @@ class UsersRepository {
     try {
       final response = await _dioClient.get('/admin/users', queryParameters: {
         'role': role,
+        'is_active': true,
       });
 
       final List data = response.data['data'] ?? [];
@@ -28,6 +30,12 @@ class UsersRepository {
       return UserModel.fromJson(response.data['data']);
     } catch (e) {
       AppLogger.error('Failed to create user', e);
+      if (e is DioException && e.response?.data != null) {
+        final errorMap = e.response!.data['error'];
+        if (errorMap != null && errorMap['message'] != null) {
+          throw Exception(errorMap['message']);
+        }
+      }
       throw Exception('Failed to create user.');
     }
   }
@@ -38,6 +46,12 @@ class UsersRepository {
       return UserModel.fromJson(response.data['data']);
     } catch (e) {
       AppLogger.error('Failed to update user', e);
+      if (e is DioException && e.response?.data != null) {
+        final errorMap = e.response!.data['error'];
+        if (errorMap != null && errorMap['message'] != null) {
+          throw Exception(errorMap['message']);
+        }
+      }
       throw Exception('Failed to update user.');
     }
   }
@@ -47,6 +61,12 @@ class UsersRepository {
       await _dioClient.delete('/admin/users/$id');
     } catch (e) {
       AppLogger.error('Failed to delete user', e);
+      if (e is DioException && e.response?.data != null) {
+        final errorMap = e.response!.data['error'];
+        if (errorMap != null && errorMap['message'] != null) {
+          throw Exception(errorMap['message']);
+        }
+      }
       throw Exception('Failed to delete user.');
     }
   }

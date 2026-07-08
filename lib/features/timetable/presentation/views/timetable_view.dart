@@ -76,7 +76,7 @@ class _TimetableViewState extends ConsumerState<TimetableView> {
     final timetableAsync = ref.watch(weeklyTimetableProvider);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.creamBg,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       body: timetableAsync.when(
         loading: () => ListView(
           padding: EdgeInsets.all(20.w),
@@ -125,13 +125,13 @@ class _TimetableViewState extends ConsumerState<TimetableView> {
                         decoration: BoxDecoration(
                           color: (isDark
                                   ? AppColors.darkSurface
-                                  : AppColors.creamSurface)
+                                  : AppColors.surface)
                               .withValues(alpha: 0.92),
                           borderRadius: BorderRadius.circular(14.r),
                           border: Border.all(
                             color: isDark
                                 ? AppColors.darkBorder
-                                : AppColors.creamBorder,
+                                : AppColors.border,
                           ),
                         ),
                         child: Image.asset(
@@ -139,7 +139,7 @@ class _TimetableViewState extends ConsumerState<TimetableView> {
                           fit: BoxFit.contain,
                           errorBuilder: (_, __, ___) => Icon(
                             Icons.schedule_rounded,
-                            color: AppColors.primaryClay,
+                            color: AppColors.primary,
                             size: 22.r,
                           ),
                         ),
@@ -181,10 +181,10 @@ class _TimetableViewState extends ConsumerState<TimetableView> {
                     height: 46.h,
                     padding: EdgeInsets.all(4.w),
                     decoration: BoxDecoration(
-                      color: isDark ? AppColors.darkSurface : AppColors.creamSurface,
+                      color: isDark ? AppColors.darkSurface : AppColors.surface,
                       borderRadius: BorderRadius.circular(14.r),
                       border: Border.all(
-                        color: isDark ? AppColors.darkBorder : AppColors.creamBorder,
+                        color: isDark ? AppColors.darkBorder : AppColors.border,
                       ),
                     ),
                     child: Row(
@@ -196,7 +196,7 @@ class _TimetableViewState extends ConsumerState<TimetableView> {
                               duration: const Duration(milliseconds: 200),
                               decoration: BoxDecoration(
                                 color: _viewMode == TimetableViewMode.daily
-                                    ? (isDark ? AppColors.darkPrimary : AppColors.primaryClay)
+                                    ? (isDark ? AppColors.darkPrimary : AppColors.primary)
                                     : Colors.transparent,
                                 borderRadius: BorderRadius.circular(10.r),
                               ),
@@ -220,7 +220,7 @@ class _TimetableViewState extends ConsumerState<TimetableView> {
                               duration: const Duration(milliseconds: 200),
                               decoration: BoxDecoration(
                                 color: _viewMode == TimetableViewMode.weekly
-                                    ? (isDark ? AppColors.darkPrimary : AppColors.primaryClay)
+                                    ? (isDark ? AppColors.darkPrimary : AppColors.primary)
                                     : Colors.transparent,
                                 borderRadius: BorderRadius.circular(10.r),
                               ),
@@ -268,17 +268,17 @@ class _TimetableViewState extends ConsumerState<TimetableView> {
                                 color: isSelected
                                     ? (isDark
                                           ? AppColors.darkPrimary
-                                          : AppColors.primaryClay)
+                                          : AppColors.primary)
                                     : (isDark
                                           ? AppColors.darkSurface
-                                          : AppColors.creamSurface),
+                                          : AppColors.surface),
                                 borderRadius: BorderRadius.circular(16.r),
                                 border: Border.all(
                                   color: isSelected
                                       ? Colors.transparent
                                       : (isDark
                                             ? AppColors.darkBorder
-                                            : AppColors.creamBorder),
+                                            : AppColors.border),
                                 ),
                               ),
                               child: Column(
@@ -291,8 +291,8 @@ class _TimetableViewState extends ConsumerState<TimetableView> {
                                       color: isSelected
                                           ? Colors.white
                                           : (isDark
-                                                ? AppColors.darkText
-                                                : AppColors.textCharcoal),
+                                                ? AppColors.darkTextPrimary
+                                                : AppColors.textPrimary),
                                     ),
                                   ),
                                   SizedBox(height: 6.h),
@@ -521,13 +521,13 @@ class _TimetableViewState extends ConsumerState<TimetableView> {
       builder: (context) {
         return Container(
           decoration: BoxDecoration(
-            color: isDark ? AppColors.darkSurface : AppColors.creamSurface,
+            color: isDark ? AppColors.darkSurface : AppColors.surface,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(24.r),
               topRight: Radius.circular(24.r),
             ),
             border: Border.all(
-              color: isDark ? AppColors.darkBorder : AppColors.creamBorder,
+              color: isDark ? AppColors.darkBorder : AppColors.border,
             ),
           ),
           padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 24.h),
@@ -905,10 +905,10 @@ class _TimetableListTile extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : AppColors.creamSurface,
+        color: isDark ? AppColors.darkSurface : AppColors.surface,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.creamBorder,
+          color: isDark ? AppColors.darkBorder : AppColors.border,
         ),
         boxShadow: [
           BoxShadow(
@@ -1153,7 +1153,7 @@ class _WeeklyMatrixGrid extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
-            color: isDark ? AppColors.darkBorder : AppColors.creamBorder,
+            color: isDark ? AppColors.darkBorder : AppColors.border,
           ),
         ),
         clipBehavior: Clip.antiAlias,
@@ -1161,7 +1161,7 @@ class _WeeklyMatrixGrid extends StatelessWidget {
           children: [
             // --- HEADER ROW ---
             Container(
-              color: isDark ? AppColors.darkSurface : AppColors.creamSurface,
+              color: isDark ? AppColors.darkSurface : AppColors.surface,
               child: Row(
                 children: [
                   Container(
@@ -1171,10 +1171,10 @@ class _WeeklyMatrixGrid extends StatelessWidget {
                     decoration: BoxDecoration(
                       border: Border(
                         right: BorderSide(
-                          color: isDark ? AppColors.darkBorder : AppColors.creamBorder,
+                          color: isDark ? AppColors.darkBorder : AppColors.border,
                         ),
                         bottom: BorderSide(
-                          color: isDark ? AppColors.darkBorder : AppColors.creamBorder,
+                          color: isDark ? AppColors.darkBorder : AppColors.border,
                         ),
                       ),
                     ),
@@ -1199,16 +1199,16 @@ class _WeeklyMatrixGrid extends StatelessWidget {
                         color: isCurrentDay
                             ? (isDark
                                 ? AppColors.darkPrimary.withValues(alpha: 0.08)
-                                : AppColors.primaryClay.withValues(alpha: 0.06))
+                                : AppColors.primary.withValues(alpha: 0.06))
                             : null,
                         border: Border(
                           right: BorderSide(
                             color: index == 5
                                 ? Colors.transparent
-                                : (isDark ? AppColors.darkBorder : AppColors.creamBorder),
+                                : (isDark ? AppColors.darkBorder : AppColors.border),
                           ),
                           bottom: BorderSide(
-                            color: isDark ? AppColors.darkBorder : AppColors.creamBorder,
+                            color: isDark ? AppColors.darkBorder : AppColors.border,
                           ),
                         ),
                       ),
@@ -1216,7 +1216,7 @@ class _WeeklyMatrixGrid extends StatelessWidget {
                         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
                         decoration: isCurrentDay
                             ? BoxDecoration(
-                                color: isDark ? AppColors.darkPrimary : AppColors.primaryClay,
+                                color: isDark ? AppColors.darkPrimary : AppColors.primary,
                                 borderRadius: BorderRadius.circular(8.r),
                               )
                             : null,
@@ -1226,7 +1226,7 @@ class _WeeklyMatrixGrid extends StatelessWidget {
                             fontWeight: FontWeight.w800,
                             color: isCurrentDay
                                 ? Colors.white
-                                : (isDark ? AppColors.darkText : AppColors.textCharcoal),
+                                : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
                           ),
                         ),
                       ),
@@ -1247,7 +1247,7 @@ class _WeeklyMatrixGrid extends StatelessWidget {
                         : const Color(0xFFF1F5F9).withValues(alpha: 0.6),
                     border: Border(
                       bottom: BorderSide(
-                        color: isDark ? AppColors.darkBorder : AppColors.creamBorder,
+                        color: isDark ? AppColors.darkBorder : AppColors.border,
                       ),
                     ),
                   ),
@@ -1259,7 +1259,7 @@ class _WeeklyMatrixGrid extends StatelessWidget {
                         decoration: BoxDecoration(
                           border: Border(
                             right: BorderSide(
-                              color: isDark ? AppColors.darkBorder : AppColors.creamBorder,
+                              color: isDark ? AppColors.darkBorder : AppColors.border,
                             ),
                           ),
                         ),
@@ -1283,8 +1283,8 @@ class _WeeklyMatrixGrid extends StatelessWidget {
                                     : Icons.coffee_rounded,
                                 size: 14.r,
                                 color: period.label == 'Lunch'
-                                    ? AppColors.tertiaryHoney
-                                    : AppColors.primaryClay,
+                                    ? AppColors.info
+                                    : AppColors.primary,
                               ),
                               SizedBox(width: 8.w),
                               Text(
@@ -1292,7 +1292,7 @@ class _WeeklyMatrixGrid extends StatelessWidget {
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   fontWeight: FontWeight.w700,
                                   fontStyle: FontStyle.italic,
-                                  color: isDark ? Colors.white70 : AppColors.textCharcoal,
+                                  color: isDark ? Colors.white70 : AppColors.textPrimary,
                                 ),
                               ),
                             ],
@@ -1309,7 +1309,7 @@ class _WeeklyMatrixGrid extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                      color: isDark ? AppColors.darkBorder : AppColors.creamBorder,
+                      color: isDark ? AppColors.darkBorder : AppColors.border,
                     ),
                   ),
                 ),
@@ -1320,10 +1320,10 @@ class _WeeklyMatrixGrid extends StatelessWidget {
                       padding: EdgeInsets.symmetric(horizontal: 6.w),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.darkSurface : AppColors.creamSurface,
+                        color: isDark ? AppColors.darkSurface : AppColors.surface,
                         border: Border(
                           right: BorderSide(
-                            color: isDark ? AppColors.darkBorder : AppColors.creamBorder,
+                            color: isDark ? AppColors.darkBorder : AppColors.border,
                           ),
                         ),
                       ),
@@ -1334,7 +1334,7 @@ class _WeeklyMatrixGrid extends StatelessWidget {
                             period.label,
                             style: theme.textTheme.bodySmall?.copyWith(
                               fontWeight: FontWeight.w800,
-                              color: isDark ? Colors.white70 : AppColors.textCharcoal,
+                              color: isDark ? Colors.white70 : AppColors.textPrimary,
                             ),
                           ),
                           SizedBox(height: 2.h),
@@ -1368,13 +1368,13 @@ class _WeeklyMatrixGrid extends StatelessWidget {
                           color: isCurrentDay
                               ? (isDark
                                   ? AppColors.darkPrimary.withValues(alpha: 0.04)
-                                  : AppColors.primaryClay.withValues(alpha: 0.02))
+                                  : AppColors.primary.withValues(alpha: 0.02))
                               : null,
                           border: Border(
                             right: BorderSide(
                               color: dayIndex == 5
                                   ? Colors.transparent
-                                  : (isDark ? AppColors.darkBorder : AppColors.creamBorder),
+                                  : (isDark ? AppColors.darkBorder : AppColors.border),
                             ),
                           ),
                         ),
@@ -1453,7 +1453,7 @@ class _WeeklyCellCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontWeight: FontWeight.w800,
-                  color: isDark ? Colors.white : AppColors.textCharcoal,
+                  color: isDark ? Colors.white : AppColors.textPrimary,
                   fontSize: 11.sp,
                 ),
               ),
@@ -1586,7 +1586,7 @@ class _DetailRow extends StatelessWidget {
                 value,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : AppColors.textCharcoal,
+                  color: isDark ? Colors.white : AppColors.textPrimary,
                 ),
               ),
             ],

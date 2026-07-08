@@ -23,7 +23,7 @@ class CoursesPaymentsView extends ConsumerWidget {
             Icon(
               Icons.account_balance_wallet_outlined,
               size: 64,
-              color: isDark ? AppColors.darkPrimary : AppColors.primaryClay,
+              color: isDark ? AppColors.darkPrimary : AppColors.primary,
             ),
             AppSpacing.h16,
             Text(

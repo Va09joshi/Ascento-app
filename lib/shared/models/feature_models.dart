@@ -154,22 +154,28 @@ class ExamSchedule {
   final String time;
   final String room;
   final int totalMarks;
+  final String? type;
+  final String? classId;
+  final String? academicYearId;
 
   const ExamSchedule({
     required this.id, required this.examName, required this.subject,
     required this.date, required this.time, required this.room,
-    required this.totalMarks,
+    required this.totalMarks, this.type, this.classId, this.academicYearId
   });
 
   factory ExamSchedule.fromJson(Map<String, dynamic> json) {
     return ExamSchedule(
       id: json['id'] as String? ?? '',
-      examName: json['examName'] as String? ?? '',
-      subject: json['subject'] as String? ?? '',
-      date: DateTime.tryParse(json['date'] as String? ?? '') ?? DateTime.now(),
-      time: json['time'] as String? ?? '',
-      room: json['room'] as String? ?? '',
-      totalMarks: json['totalMarks'] as int? ?? 100,
+      examName: json['title'] as String? ?? json['examName'] as String? ?? '',
+      subject: json['subject_id'] as String? ?? json['subject'] as String? ?? 'General',
+      date: DateTime.tryParse(json['exam_date'] as String? ?? json['date'] as String? ?? '') ?? DateTime.now(),
+      time: json['start_time'] as String? ?? json['time'] as String? ?? '09:00',
+      room: json['room'] as String? ?? 'Main Hall',
+      totalMarks: json['total_marks'] as int? ?? json['totalMarks'] as int? ?? 100,
+      type: json['type'] as String?,
+      classId: json['class_id'] as String?,
+      academicYearId: json['academic_year_id'] as String?,
     );
   }
 }

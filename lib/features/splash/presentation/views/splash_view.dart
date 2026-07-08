@@ -14,18 +14,18 @@ class SplashView extends ConsumerStatefulWidget {
 
 class _SplashViewState extends ConsumerState<SplashView> with SingleTickerProviderStateMixin {
   late final AnimationController _animationController;
-  late final Animation<double> _fadeAnimation;
+  late final Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1400),
-    )..repeat(reverse: true);
+      duration: const Duration(milliseconds: 800),
+    )..forward();
 
-    _fadeAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    _animation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
     );
   }
 
@@ -51,7 +51,7 @@ class _SplashViewState extends ConsumerState<SplashView> with SingleTickerProvid
     final bool isError = splashState.status == SplashStatus.error;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.creamBg,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -59,9 +59,9 @@ class _SplashViewState extends ConsumerState<SplashView> with SingleTickerProvid
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (!isError) ...[
-                // Glowing/Pulsing center logo (no circular container background)
-                FadeTransition(
-                  opacity: _fadeAnimation,
+                // Simple scale animation
+                ScaleTransition(
+                  scale: _animation,
                   child: SizedBox(
                     width: 160,
                     height: 160,
@@ -74,7 +74,7 @@ class _SplashViewState extends ConsumerState<SplashView> with SingleTickerProvid
                         size: 96,
                         color: isDark
                             ? AppColors.darkPrimary
-                            : AppColors.primaryClay,
+                            : AppColors.primary,
                       ),
                     ),
                   ),
@@ -89,7 +89,7 @@ class _SplashViewState extends ConsumerState<SplashView> with SingleTickerProvid
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                     side: BorderSide(
-                      color: AppColors.errorRed.withValues(alpha: 0.5),
+                      color: AppColors.error.withValues(alpha: 0.5),
                       width: 1.5,
                     ),
                   ),
@@ -100,12 +100,12 @@ class _SplashViewState extends ConsumerState<SplashView> with SingleTickerProvid
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: AppColors.errorRed.withValues(alpha: 0.12),
+                            color: AppColors.error.withValues(alpha: 0.12),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
                             Icons.report_problem_rounded,
-                            color: AppColors.errorRed,
+                            color: AppColors.error,
                             size: 40,
                           ),
                         ),
@@ -113,7 +113,7 @@ class _SplashViewState extends ConsumerState<SplashView> with SingleTickerProvid
                         Text(
                           'Initialization Error',
                           style: theme.textTheme.titleLarge?.copyWith(
-                            color: AppColors.errorRed,
+                            color: AppColors.error,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -134,7 +134,7 @@ class _SplashViewState extends ConsumerState<SplashView> with SingleTickerProvid
                           width: double.infinity,
                           child: ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.errorRed,
+                              backgroundColor: AppColors.error,
                               foregroundColor: AppColors.white,
                             ),
                             icon: const Icon(Icons.refresh_rounded),

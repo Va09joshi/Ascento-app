@@ -36,7 +36,7 @@ class _ExamViewState extends ConsumerState<ExamView>
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.creamBg,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       body: Column(
         children: [
           Padding(
@@ -48,10 +48,10 @@ class _ExamViewState extends ConsumerState<ExamView>
                 controller: _tabController,
                 indicatorColor: isDark
                     ? AppColors.darkPrimary
-                    : AppColors.primaryClay,
+                    : AppColors.primary,
                 labelColor: isDark
                     ? AppColors.darkPrimary
-                    : AppColors.primaryClay,
+                    : AppColors.primary,
                 unselectedLabelColor: Colors.grey,
                 tabs: const [
                   Tab(text: 'Schedule'),
@@ -200,7 +200,7 @@ class _ExamScheduleTab extends ConsumerWidget {
                         width: 52.w,
                         height: 52.w,
                         decoration: BoxDecoration(
-                          color: AppColors.primaryClay.withValues(alpha: 0.12),
+                          color: AppColors.primary.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(14.r),
                         ),
                         child: Column(
@@ -210,13 +210,13 @@ class _ExamScheduleTab extends ConsumerWidget {
                               '${exam.date.day}',
                               style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.primaryClay,
+                                color: AppColors.primary,
                               ),
                             ),
                             Text(
                               _monthName(exam.date.month),
                               style: theme.textTheme.bodySmall?.copyWith(
-                                color: AppColors.primaryClay,
+                                color: AppColors.primary,
                               ),
                             ),
                           ],
@@ -249,7 +249,7 @@ class _ExamScheduleTab extends ConsumerWidget {
                           vertical: 6.h,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.secondarySage.withValues(
+                          color: AppColors.secondary.withValues(
                             alpha: 0.12,
                           ),
                           borderRadius: BorderRadius.circular(16.r),
@@ -257,7 +257,7 @@ class _ExamScheduleTab extends ConsumerWidget {
                         child: Text(
                           '${exam.totalMarks}M',
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: AppColors.secondarySage,
+                            color: AppColors.secondary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -328,7 +328,7 @@ class _ReportCardTab extends ConsumerWidget {
                 ),
                 borderRadius: BorderRadius.circular(20.r),
                 border: Border.all(
-                  color: isDark ? AppColors.darkBorder : AppColors.creamBorder,
+                  color: isDark ? AppColors.darkBorder : AppColors.border,
                 ),
               ),
               child: Row(
@@ -422,15 +422,15 @@ class _ReportCardTab extends ConsumerWidget {
   Color _gradeColor(String grade) {
     switch (grade) {
       case 'A+':
-        return AppColors.secondarySage;
+        return AppColors.secondary;
       case 'A':
         return const Color(0xFF4CAF50);
       case 'B+':
-        return AppColors.primaryClay;
+        return AppColors.primary;
       case 'B':
-        return AppColors.tertiaryHoney;
+        return AppColors.info;
       default:
-        return AppColors.errorRed;
+        return AppColors.error;
     }
   }
 }

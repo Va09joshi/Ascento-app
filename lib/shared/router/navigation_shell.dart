@@ -86,10 +86,10 @@ class NavigationShell extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.creamBg,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       // --- School Management Drawer Menu ---
       drawer: Drawer(
-        backgroundColor: isDark ? AppColors.darkBg : AppColors.creamBg,
+        backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
         child: SafeArea(
           child: Column(
             children: [
@@ -176,9 +176,9 @@ class NavigationShell extends ConsumerWidget {
                       _DrawerItem(
                         icon: Icons.account_tree_rounded,
                         label: 'Manage Branches',
-                        active: false,
+                        active: currentPath == RoutePaths.manageBranches,
                         accent: const Color(0xFFFF8A34),
-                        onTap: () => _showComingSoon(context),
+                        onTap: () => _go(context, RoutePaths.manageBranches),
                       ),
                       _DrawerItem(
                         icon: Icons.manage_accounts_rounded,
@@ -190,15 +190,50 @@ class NavigationShell extends ConsumerWidget {
                       _DrawerItem(
                         icon: Icons.school_rounded,
                         label: 'Academics Config',
-                        active: false,
+                        active: currentPath == RoutePaths.academicsConfig,
                         accent: const Color(0xFF6C4ED9),
-                        onTap: () => _showComingSoon(context),
+                        onTap: () => _go(context, RoutePaths.academicsConfig),
+                      ),
+                      _DrawerItem(
+                        icon: Icons.event_note_rounded,
+                        label: 'Courses Config',
+                        active: currentPath == RoutePaths.programs,
+                        accent: const Color(0xFFE85A9A),
+                        onTap: () => _go(context, RoutePaths.programs),
+                      ),
+                      _DrawerItem(
+                        icon: Icons.co_present_rounded,
+                        label: 'Attendance Data',
+                        active: currentPath == RoutePaths.attendance,
+                        accent: const Color(0xFFF9A826),
+                        onTap: () => _go(context, RoutePaths.attendance),
+                      ),
+                      _DrawerItem(
+                        icon: Icons.access_time_filled_rounded,
+                        label: 'Timetable Setup',
+                        active: currentPath == RoutePaths.timetable,
+                        accent: const Color(0xFF00B4D8),
+                        onTap: () => _go(context, RoutePaths.timetable),
+                      ),
+                      _DrawerItem(
+                        icon: Icons.assignment_rounded,
+                        label: 'Exams Config',
+                        active: currentPath == RoutePaths.exams,
+                        accent: const Color(0xFF9D4EDD),
+                        onTap: () => _go(context, RoutePaths.exams),
+                      ),
+                      _DrawerItem(
+                        icon: Icons.campaign_rounded,
+                        label: 'Notices Board',
+                        active: currentPath == RoutePaths.notifications,
+                        accent: const Color(0xFFFF5400),
+                        onTap: () => _go(context, RoutePaths.notifications),
                       ),
                       _DrawerItem(
                         icon: Icons.analytics_rounded,
                         label: 'System Reports',
                         active: false,
-                        accent: const Color(0xFFE85A9A),
+                        accent: const Color(0xFF90A4AE),
                         onTap: () => _showComingSoon(context),
                       ),
                     ] else if (user?.role == UserRole.teacher) ...[
@@ -357,34 +392,35 @@ class NavigationShell extends ConsumerWidget {
         elevation: 0,
         centerTitle: true,
         actions: [
-          IconButton(
-            onPressed: () => context.go(RoutePaths.notifications),
-            icon: Stack(
-              alignment: Alignment.topRight,
-              children: [
-                const Icon(Icons.notifications_none_rounded),
-                Container(
-                  width: 8,
-                  height: 8,
-                  margin: const EdgeInsets.only(top: 2, right: 2),
-                  decoration: const BoxDecoration(
-                    color: AppColors.tertiaryHoney,
-                    shape: BoxShape.circle,
+          if (currentPath != RoutePaths.notifications)
+            IconButton(
+              onPressed: () => context.go(RoutePaths.notifications),
+              icon: Stack(
+                alignment: Alignment.topRight,
+                children: [
+                  const Icon(Icons.notifications_none_rounded),
+                  Container(
+                    width: 8,
+                    height: 8,
+                    margin: const EdgeInsets.only(top: 2, right: 2),
+                    decoration: const BoxDecoration(
+                      color: AppColors.info,
+                      shape: BoxShape.circle,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
         ],
       ),
       body: child,
       // --- Bottom Navigation Bar ---
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: isDark ? AppColors.darkSurface : AppColors.creamSurface,
+          color: isDark ? AppColors.darkSurface : AppColors.surface,
           border: Border(
             top: BorderSide(
-              color: isDark ? AppColors.darkBorder : AppColors.creamBorder,
+              color: isDark ? AppColors.darkBorder : AppColors.border,
               width: 1,
             ),
           ),
@@ -404,7 +440,7 @@ class NavigationShell extends ConsumerWidget {
                 final navItems = _getNavItems(user?.role);
                 final tabWidth = constraints.maxWidth / navItems.length;
                 final selectedIndex = _getSelectedIndex(navItems);
-                final indicatorColor = isDark ? AppColors.darkPrimary : AppColors.primaryClay;
+                final indicatorColor = isDark ? AppColors.darkPrimary : AppColors.primary;
 
                 return Stack(
                   children: [
@@ -569,19 +605,19 @@ class _DrawerItem extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final Color activeColor = isDanger
-        ? AppColors.errorRed
-        : (accent ?? AppColors.primaryClay);
+        ? AppColors.error
+        : (accent ?? AppColors.primary);
     final Color iconColor = isDanger
-        ? AppColors.errorRed
+        ? AppColors.error
         : (active
               ? activeColor
               : (accent ??
                     (isDark ? AppColors.darkTextMuted : AppColors.textMuted)));
     final Color textColor = isDanger
-        ? AppColors.errorRed
+        ? AppColors.error
         : (active
               ? activeColor
-              : (isDark ? AppColors.darkText : AppColors.textCharcoal));
+              : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary));
 
     return InkWell(
       onTap: onTap,
@@ -611,7 +647,7 @@ class _DrawerItem extends StatelessWidget {
               height: 30.w,
               decoration: BoxDecoration(
                 color:
-                    (active ? activeColor : (accent ?? AppColors.primaryClay))
+                    (active ? activeColor : (accent ?? AppColors.primary))
                         .withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10.r),
               ),

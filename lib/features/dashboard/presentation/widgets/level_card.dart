@@ -26,10 +26,10 @@ class LevelCard extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     final Color badgeColor = isLocked
-        ? (isDark ? AppColors.darkBorder : AppColors.creamSurfaceDarker)
-        : AppColors.primaryClay;
+        ? (isDark ? AppColors.darkBorder : AppColors.surfaceDarker)
+        : AppColors.primary;
 
-    final Color cardBg = isDark ? AppColors.darkSurface : AppColors.creamBg;
+    final Color cardBg = isDark ? AppColors.darkSurface : AppColors.background;
 
     return Card(
       color: isLocked ? cardBg.withOpacity(0.5) : cardBg,
@@ -38,8 +38,8 @@ class LevelCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
           color: isLocked
-              ? (isDark ? AppColors.darkBorder : AppColors.creamSurfaceDarker.withOpacity(0.5))
-              : (isDark ? AppColors.darkBorder : AppColors.creamSurfaceDarker),
+              ? (isDark ? AppColors.darkBorder : AppColors.surfaceDarker.withOpacity(0.5))
+              : (isDark ? AppColors.darkBorder : AppColors.surfaceDarker),
           width: 1.5,
         ),
       ),
@@ -66,7 +66,7 @@ class LevelCard extends StatelessWidget {
                       : Text(
                           '$index',
                           style: theme.textTheme.titleMedium?.copyWith(
-                            color: AppColors.primaryClay,
+                            color: AppColors.primary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -92,7 +92,7 @@ class LevelCard extends StatelessWidget {
                           ),
                         ),
                         if (!isLocked && progress >= 1.0)
-                          const Icon(Icons.check_circle_rounded, color: AppColors.secondarySage, size: 20),
+                          const Icon(Icons.check_circle_rounded, color: AppColors.secondary, size: 20),
                       ],
                     ),
                     AppSizes.h4,
@@ -113,8 +113,8 @@ class LevelCard extends StatelessWidget {
                               child: LinearProgressIndicator(
                                 value: progress,
                                 minHeight: 6,
-                                backgroundColor: isDark ? AppColors.darkBorder : AppColors.creamSurfaceDarker,
-                                valueColor: const AlwaysStoppedAnimation<Color>(AppColors.secondarySage),
+                                backgroundColor: isDark ? AppColors.darkBorder : AppColors.surfaceDarker,
+                                valueColor: const AlwaysStoppedAnimation<Color>(AppColors.secondary),
                               ),
                             ),
                           ),
@@ -123,7 +123,7 @@ class LevelCard extends StatelessWidget {
                             '${(progress * 100).toInt()}%',
                             style: theme.textTheme.labelSmall?.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: AppColors.secondarySage,
+                              color: AppColors.secondary,
                             ),
                           ),
                         ],

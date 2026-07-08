@@ -12,7 +12,7 @@ class ProgramsView extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.creamBg,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
@@ -324,7 +324,7 @@ class _ProgramBanner extends StatelessWidget {
                           benefit,
                           style: TextStyle(
                             fontSize: compact ? 10.sp : 11.sp,
-                            color: isDark ? Colors.white70 : AppColors.textCharcoal,
+                            color: isDark ? Colors.white70 : AppColors.textPrimary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -379,7 +379,7 @@ class _ProgramBanner extends StatelessWidget {
                         child: Text(
                           level,
                           style: TextStyle(
-                            color: isDark ? Colors.white70 : AppColors.textCharcoal,
+                            color: isDark ? Colors.white70 : AppColors.textPrimary,
                             fontSize: compact ? 8.sp : 9.sp,
                             fontWeight: FontWeight.w600,
                           ),
@@ -453,9 +453,9 @@ class _ProgramBanner extends StatelessWidget {
                       backgroundColor: isDark ? Colors.white10 : Colors.white,
                       foregroundColor: isDark
                           ? Colors.white.withValues(alpha: 0.8)
-                          : AppColors.textCharcoal,
+                          : AppColors.textPrimary,
                       side: BorderSide(
-                        color: isDark ? Colors.white24 : AppColors.creamBorder,
+                        color: isDark ? Colors.white24 : AppColors.border,
                         width: 1,
                       ),
                       shape: RoundedRectangleBorder(
@@ -549,9 +549,9 @@ class _ProgramBanner extends StatelessWidget {
                       backgroundColor: isDark ? Colors.white10 : Colors.white,
                       foregroundColor: isDark
                           ? Colors.white.withValues(alpha: 0.8)
-                          : AppColors.textCharcoal,
+                          : AppColors.textPrimary,
                       side: BorderSide(
-                        color: isDark ? Colors.white24 : AppColors.creamBorder,
+                        color: isDark ? Colors.white24 : AppColors.border,
                         width: 1,
                       ),
                       shape: RoundedRectangleBorder(
@@ -596,7 +596,7 @@ class _ProgramBanner extends StatelessWidget {
               color: cardBg,
               borderRadius: BorderRadius.circular(16.r),
               border: Border.all(
-                color: isDark ? AppColors.darkBorder : AppColors.creamBorder,
+                color: isDark ? AppColors.darkBorder : AppColors.border,
                 width: 1,
               ),
               boxShadow: [
@@ -654,7 +654,7 @@ class _ProgramBanner extends StatelessWidget {
                         title,
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w800,
-                          color: isDark ? Colors.white : AppColors.textCharcoal,
+                          color: isDark ? Colors.white : AppColors.textPrimary,
                           fontSize: 21.sp,
                         ),
                       ),
@@ -719,7 +719,7 @@ class _ProgramBanner extends StatelessWidget {
                     title,
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w800,
-                      color: isDark ? Colors.white : AppColors.textCharcoal,
+                      color: isDark ? Colors.white : AppColors.textPrimary,
                       fontSize: 20.sp,
                     ),
                   ),
@@ -749,7 +749,7 @@ class _ProgramBanner extends StatelessWidget {
               color: cardBg,
               borderRadius: BorderRadius.circular(16.r),
               border: Border.all(
-                color: isDark ? AppColors.darkBorder : AppColors.creamBorder,
+                color: isDark ? AppColors.darkBorder : AppColors.border,
                 width: 1,
               ),
               boxShadow: [

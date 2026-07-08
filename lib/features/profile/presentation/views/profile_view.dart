@@ -23,7 +23,7 @@ class ProfileView extends ConsumerWidget {
 
     if (user != null && user.role != UserRole.student && user.role != UserRole.parent) {
       return Scaffold(
-        backgroundColor: isDark ? AppColors.darkBg : AppColors.creamBg,
+        backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
         body: _buildStaffProfile(context, user, ref, isDark),
       );
     }
@@ -31,7 +31,7 @@ class ProfileView extends ConsumerWidget {
     final profileAsync = ref.watch(studentProfileProvider);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.creamBg,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       body: profileAsync.when(
         loading: () => ListView(
           padding: EdgeInsets.all(24.w),
@@ -56,7 +56,7 @@ class ProfileView extends ConsumerWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(20.r),
+                  borderRadius: BorderRadius.circular(16.r),
                 ),
                 child: Row(
                   children: [
@@ -219,7 +219,7 @@ class ProfileView extends ConsumerWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(20.r),
+                borderRadius: BorderRadius.circular(16.r),
               ),
               child: Row(
                 children: [
@@ -336,10 +336,10 @@ class _InfoRow extends StatelessWidget {
             width: 30.w,
             height: 30.w,
             decoration: BoxDecoration(
-              color: AppColors.primaryClay.withValues(alpha: 0.12),
+              color: AppColors.primary.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(10.r),
             ),
-            child: Icon(icon, size: 16, color: AppColors.primaryClay),
+            child: Icon(icon, size: 16, color: AppColors.primary),
           ),
           SizedBox(width: 10.w),
           Text(
@@ -348,7 +348,7 @@ class _InfoRow extends StatelessWidget {
               color: AppColors.textMuted,
             ),
           ),
-          const Spacer(),
+          SizedBox(width: 16.w),
           Expanded(
             child: Text(
               value,
@@ -356,7 +356,8 @@ class _InfoRow extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
               textAlign: TextAlign.right,
-              maxLines: 2,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

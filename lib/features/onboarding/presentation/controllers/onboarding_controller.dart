@@ -42,31 +42,31 @@ class OnboardingController extends StateNotifier<OnboardingState> {
       title: 'Smart Attendance',
       description: 'Ditch the paper registers! Clock in student presence instantly with AI-driven digital roll-calls and auto-notify parents in real time.',
       illustration: OnboardingIllustration.attendance,
-      accentColor: AppColors.primaryClay,
+      accentColor: AppColors.primary,
     ),
     const OnboardingItem(
       title: 'Homework Tracking',
       description: 'Set daily educational worksheets, track student problem-solving rates, and reward digital star badges for error-free home assignments.',
       illustration: OnboardingIllustration.homework,
-      accentColor: AppColors.secondarySage,
+      accentColor: AppColors.secondary,
     ),
     const OnboardingItem(
       title: 'Timetable Management',
       description: 'Organize abacus classes, schedule teacher timetables, track classroom hours, and resolve class clashes automatically.',
       illustration: OnboardingIllustration.timetable,
-      accentColor: AppColors.tertiaryHoney,
+      accentColor: AppColors.info,
     ),
     const OnboardingItem(
       title: 'Fees & Exams',
       description: 'Review digital student fee statuses, manage invoices, schedule academic grading tests, and deliver abacus certification records.',
       illustration: OnboardingIllustration.fees,
-      accentColor: AppColors.primaryClay,
+      accentColor: AppColors.primary,
     ),
     const OnboardingItem(
       title: 'Parent-Teacher Connect',
       description: 'Bridge school activities and families. Message parent portals, schedule review sessions, and celebrate child milestones together.',
       illustration: OnboardingIllustration.connect,
-      accentColor: AppColors.secondarySage,
+      accentColor: AppColors.secondary,
     ),
   ];
 

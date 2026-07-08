@@ -121,7 +121,7 @@ class _PlayschoolViewState extends ConsumerState<PlayschoolView> with SingleTick
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : const Color(0xFFF9F7FF),
+      backgroundColor: isDark ? AppColors.darkBackground : const Color(0xFFF9F7FF),
       appBar: AppBar(
         title: const Text(
           '🎈 Playschool Academy',

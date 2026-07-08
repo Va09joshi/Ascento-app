@@ -26,6 +26,7 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
   final _passwordController = TextEditingController();
 
   bool _isPasswordObscured = true;
+  bool _rememberMe = false;
   late AnimationController _bgController;
 
   @override
@@ -117,7 +118,7 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
                   padding: EdgeInsets.all(AppSpacing.p32),
                   decoration: BoxDecoration(
                     color: isDark ? AppColors.darkSurface : Colors.white,
-                    borderRadius: BorderRadius.circular(32),
+                    borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
@@ -155,7 +156,7 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
                                   errorBuilder: (context, error, stackTrace) => Icon(
                                     Icons.school_rounded,
                                     size: 56,
-                                    color: isDark ? AppColors.darkPrimary : AppColors.primaryClay,
+                                    color: isDark ? AppColors.darkPrimary : AppColors.primary,
                                   ),
                                 ),
                               ),
@@ -168,7 +169,7 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
                             'Welcome Back',
                             style: theme.textTheme.headlineMedium?.copyWith(
                               fontWeight: FontWeight.w900,
-                              color: isDark ? Colors.white : AppColors.textCharcoal,
+                              color: isDark ? Colors.white : AppColors.textPrimary,
                               letterSpacing: -0.5,
                               fontSize: 32.sp,
                             ),
@@ -190,9 +191,9 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
                             Container(
                               padding: EdgeInsets.all(AppSpacing.p16),
                               decoration: BoxDecoration(
-                                color: AppColors.errorRed.withValues(alpha: 0.1),
+                                color: AppColors.error.withValues(alpha: 0.1),
                                 border: Border.all(
-                                  color: AppColors.errorRed.withValues(alpha: 0.3),
+                                  color: AppColors.error.withValues(alpha: 0.3),
                                   width: 1.5,
                                 ),
                                 borderRadius: BorderRadius.circular(AppRadius.r12),
@@ -202,12 +203,12 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
                                   Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: AppColors.errorRed.withValues(alpha: 0.2),
+                                      color: AppColors.error.withValues(alpha: 0.2),
                                       shape: BoxShape.circle,
                                     ),
                                     child: const Icon(
                                       Icons.warning_amber_rounded,
-                                      color: AppColors.errorRed,
+                                      color: AppColors.error,
                                       size: 20,
                                     ),
                                   ),
@@ -216,7 +217,7 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
                                     child: Text(
                                       authState.errorMessage!,
                                       style: theme.textTheme.bodyMedium?.copyWith(
-                                        color: AppColors.errorRed,
+                                        color: AppColors.error,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -255,28 +256,58 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
                             validator: FormValidators.validatePassword,
                           ),
 
-                          // --- Forgot Password Text Button Link ---
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: TextButton(
-                              onPressed: () {
-                                context.push('/forgot-password');
-                              },
-                              style: TextButton.styleFrom(
-                                foregroundColor: isDark ? AppColors.darkPrimary : AppColors.primaryClay,
+                          // --- Remember Me & Forgot Password ---
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    height: 24,
+                                    width: 24,
+                                    child: Checkbox(
+                                      value: _rememberMe,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _rememberMe = value ?? false;
+                                        });
+                                      },
+                                      activeColor: isDark ? AppColors.darkPrimary : AppColors.primary,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Remember me',
+                                    style: TextStyle(
+                                      color: isDark ? Colors.white70 : AppColors.textPrimary,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              child: const Text(
-                                'Forgot Password?',
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                              TextButton(
+                                onPressed: () {
+                                  context.push('/forgot-password');
+                                },
+                                style: TextButton.styleFrom(
+                                  foregroundColor: isDark ? AppColors.darkPrimary : AppColors.primary,
+                                  padding: EdgeInsets.zero,
+                                ),
+                                child: const Text(
+                                  'Forgot Password?',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
                               ),
-                            ),
+                            ],
                           ),
                           AppSpacing.h24,
 
                           // --- Login Action Submit Button ---
                           CustomButton(
                             text: 'Sign In',
-                            icon: Icons.login_rounded,
                             isLoading: authState.isLoading,
                             onPressed: _submitLogin,
                           ),

@@ -66,7 +66,7 @@ class DashboardView extends ConsumerWidget {
         .length;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.creamBg,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
@@ -195,7 +195,7 @@ class DashboardView extends ConsumerWidget {
                       style: TextStyle(
                         color: isDark
                             ? AppColors.darkPrimary
-                            : AppColors.primaryClay,
+                            : AppColors.primary,
                       ),
                     ),
                   ),
@@ -223,7 +223,7 @@ class DashboardView extends ConsumerWidget {
   // --- Centralized Dashboard Shimmer Skeleton Loader ---
   Widget _buildShimmerSkeleton(BuildContext context, bool isDark, ThemeData theme) {
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.creamBg,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
@@ -234,10 +234,10 @@ class DashboardView extends ConsumerWidget {
               Container(
                 padding: EdgeInsets.all(20.w),
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.darkSurface : AppColors.creamSurface,
+                  color: isDark ? AppColors.darkSurface : AppColors.surface,
                   borderRadius: BorderRadius.circular(24.r),
                   border: Border.all(
-                    color: isDark ? AppColors.darkBorder : AppColors.creamBorder,
+                    color: isDark ? AppColors.darkBorder : AppColors.border,
                     width: 1.5,
                   ),
                   boxShadow: [
@@ -273,11 +273,11 @@ class DashboardView extends ConsumerWidget {
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
                       decoration: BoxDecoration(
-                        color: (isDark ? AppColors.darkPrimary : AppColors.primaryClay)
+                        color: (isDark ? AppColors.darkPrimary : AppColors.primary)
                             .withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(14.r),
                         border: Border.all(
-                          color: (isDark ? AppColors.darkPrimary : AppColors.primaryClay)
+                          color: (isDark ? AppColors.darkPrimary : AppColors.primary)
                               .withValues(alpha: 0.15),
                           width: 1,
                         ),
@@ -286,7 +286,7 @@ class DashboardView extends ConsumerWidget {
                         children: [
                           Icon(
                             Icons.emoji_events_rounded,
-                            color: isDark ? AppColors.darkTertiary : const Color(0xFFFFB100),
+                            color: isDark ? AppColors.info : const Color(0xFFFFB100),
                             size: 18,
                           ),
                           SizedBox(width: 10.w),
@@ -439,7 +439,7 @@ class DashboardView extends ConsumerWidget {
                       style: TextStyle(
                         color: isDark
                             ? AppColors.darkPrimary
-                            : AppColors.primaryClay,
+                            : AppColors.primary,
                       ),
                     ),
                   ),
@@ -494,10 +494,10 @@ class _HeaderCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : AppColors.creamSurface,
+        color: isDark ? AppColors.darkSurface : AppColors.surface,
         borderRadius: BorderRadius.circular(24.r),
         border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.creamBorder,
+          color: isDark ? AppColors.darkBorder : AppColors.border,
           width: 1.5,
         ),
         boxShadow: [
@@ -515,14 +515,14 @@ class _HeaderCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 26.r,
-                backgroundColor: (isDark ? AppColors.darkPrimary : AppColors.primaryClay)
+                backgroundColor: (isDark ? AppColors.darkPrimary : AppColors.primary)
                     .withValues(alpha: 0.12),
                 child: Text(
                   studentName.isNotEmpty ? studentName[0].toUpperCase() : 'S',
                   style: TextStyle(
                     fontWeight: FontWeight.w900,
                     fontSize: 20.sp,
-                    color: isDark ? AppColors.darkPrimary : AppColors.primaryClay,
+                    color: isDark ? AppColors.darkPrimary : AppColors.primary,
                   ),
                 ),
               ),
@@ -544,7 +544,7 @@ class _HeaderCard extends StatelessWidget {
                       studentName,
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w800,
-                        color: isDark ? AppColors.darkText : AppColors.textCharcoal,
+                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                       ),
                     ),
                     SizedBox(height: 4.h),
@@ -564,11 +564,11 @@ class _HeaderCard extends StatelessWidget {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
             decoration: BoxDecoration(
-              color: (isDark ? AppColors.darkPrimary : AppColors.primaryClay)
+              color: (isDark ? AppColors.darkPrimary : AppColors.primary)
                   .withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(14.r),
               border: Border.all(
-                color: (isDark ? AppColors.darkPrimary : AppColors.primaryClay)
+                color: (isDark ? AppColors.darkPrimary : AppColors.primary)
                     .withValues(alpha: 0.15),
                 width: 1,
               ),
@@ -577,7 +577,7 @@ class _HeaderCard extends StatelessWidget {
               children: [
                 Icon(
                   Icons.emoji_events_rounded,
-                  color: isDark ? AppColors.darkTertiary : const Color(0xFFFFB100),
+                  color: isDark ? AppColors.info : const Color(0xFFFFB100),
                   size: 18,
                 ),
                 SizedBox(width: 10.w),
@@ -585,7 +585,7 @@ class _HeaderCard extends StatelessWidget {
                   child: Text(
                     subtitle,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: isDark ? AppColors.darkText : AppColors.textCharcoal,
+                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -723,7 +723,7 @@ class _ExamTile extends StatelessWidget {
             width: 48.w,
             height: 48.w,
             decoration: BoxDecoration(
-              color: AppColors.primaryClay.withValues(alpha: 0.12),
+              color: AppColors.primary.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(14.r),
             ),
             child: Column(
@@ -733,13 +733,13 @@ class _ExamTile extends StatelessWidget {
                   '${exam.date.day}',
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: AppColors.primaryClay,
+                    color: AppColors.primary,
                   ),
                 ),
                 Text(
                   _monthShort(exam.date.month),
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.primaryClay,
+                    color: AppColors.primary,
                   ),
                 ),
               ],
@@ -769,13 +769,13 @@ class _ExamTile extends StatelessWidget {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
             decoration: BoxDecoration(
-              color: AppColors.primaryClay.withValues(alpha: 0.12),
+              color: AppColors.primary.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(16.r),
             ),
             child: Text(
               '${exam.date.day} ${_monthShort(exam.date.month)}',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: AppColors.primaryClay,
+                color: AppColors.primary,
               ),
             ),
           ),

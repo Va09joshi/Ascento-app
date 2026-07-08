@@ -18,7 +18,7 @@ class HomeworkView extends ConsumerWidget {
     final hwAsync = ref.watch(homeworkListProvider(null));
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.creamBg,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       body: hwAsync.when(
         loading: () => ListView(
           padding: EdgeInsets.all(24.w),
@@ -74,7 +74,7 @@ class _FilterChip extends StatelessWidget {
         padding: EdgeInsets.symmetric(vertical: 10.h),
         decoration: BoxDecoration(
           color: active
-              ? AppColors.primaryClay.withValues(alpha: 0.12)
+              ? AppColors.primary.withValues(alpha: 0.12)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(12.r),
         ),
@@ -83,7 +83,7 @@ class _FilterChip extends StatelessWidget {
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
             fontWeight: FontWeight.bold,
-            color: active ? AppColors.primaryClay : AppColors.textMuted,
+            color: active ? AppColors.primary : AppColors.textMuted,
           ),
         ),
       ),
@@ -98,13 +98,13 @@ class _HomeworkTile extends StatelessWidget {
   Color _statusColor() {
     switch (item.status) {
       case HomeworkStatus.pending:
-        return item.isOverdue ? AppColors.errorRed : AppColors.tertiaryHoney;
+        return item.isOverdue ? AppColors.error : AppColors.info;
       case HomeworkStatus.submitted:
-        return AppColors.primaryClay;
+        return AppColors.primary;
       case HomeworkStatus.late:
-        return AppColors.errorRed;
+        return AppColors.error;
       case HomeworkStatus.graded:
-        return AppColors.secondarySage;
+        return AppColors.secondary;
     }
   }
 
@@ -199,7 +199,7 @@ class _HomeworkTile extends StatelessWidget {
                 Icon(
                   Icons.star_rounded,
                   size: 16,
-                  color: AppColors.tertiaryHoney,
+                  color: AppColors.info,
                 ),
                 SizedBox(width: 4.w),
                 Text(

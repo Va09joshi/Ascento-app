@@ -43,10 +43,10 @@ class BranchListView extends ConsumerWidget {
               return Container(
                 padding: EdgeInsets.all(AppSpacing.p16),
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.darkSurface : AppColors.creamSurface,
+                  color: isDark ? AppColors.darkSurface : AppColors.surface,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isDark ? AppColors.darkBorder : AppColors.creamBorder,
+                    color: isDark ? AppColors.darkBorder : AppColors.border,
                   ),
                 ),
                 child: Row(

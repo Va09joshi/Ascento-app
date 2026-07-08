@@ -37,7 +37,7 @@ class _LessonsViewState extends ConsumerState<LessonsView> {
     final unlockedNotes = ref.watch(unlockedNotesProvider);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : const Color(0xFFFAF9F5), // Premium off-white background
+      backgroundColor: isDark ? AppColors.darkBackground : const Color(0xFFFAF9F5), // Premium off-white background
       body: lessonsAsync.when(
         data: (lessons) {
           // Dynamic category counts
@@ -103,7 +103,7 @@ class _LessonsViewState extends ConsumerState<LessonsView> {
                                       textStyle: TextStyle(
                                         fontSize: 24.sp,
                                         fontWeight: FontWeight.w800,
-                                        color: isDark ? AppColors.darkText : const Color(0xFF1F2328),
+                                        color: isDark ? AppColors.darkTextPrimary : const Color(0xFF1F2328),
                                       ),
                                     ),
                                   ),
@@ -231,7 +231,7 @@ class _LessonsViewState extends ConsumerState<LessonsView> {
                                 },
                                 style: TextStyle(
                                   fontSize: 11.5.sp,
-                                  color: isDark ? AppColors.darkText : AppColors.textCharcoal,
+                                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                                 ),
                                 decoration: InputDecoration(
                                   hintText: 'Search notes...',
@@ -517,7 +517,7 @@ class _CategoryChip extends StatelessWidget {
         : (isDark ? AppColors.darkSurface : const Color(0xFFF4F2EB));
     final Color textColor = isSelected
         ? Colors.white
-        : (isDark ? AppColors.darkText : const Color(0xFF1F2328));
+        : (isDark ? AppColors.darkTextPrimary : const Color(0xFF1F2328));
     final Color iconColor = isSelected
         ? Colors.white
         : baseColor;
@@ -606,7 +606,7 @@ class _FilterPill extends StatelessWidget {
         : (isDark ? AppColors.darkSurface : const Color(0xFFFAF9F5));
     final Color textColor = isSelected
         ? (isDark ? const Color(0xFF121215) : Colors.white)
-        : (isDark ? AppColors.darkTextMuted : AppColors.textCharcoal);
+        : (isDark ? AppColors.darkTextMuted : AppColors.textPrimary);
 
     return Container(
       margin: EdgeInsets.only(right: 6.w),
@@ -765,7 +765,7 @@ class _ContentCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12.5.sp,
                           fontWeight: FontWeight.bold,
-                          color: isDark ? AppColors.darkText : AppColors.textCharcoal,
+                          color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                         ),
                       ),
                       SizedBox(height: 3.h),
@@ -816,7 +816,7 @@ class _ContentCard extends StatelessWidget {
                         isUnlocked ? Icons.visibility_rounded : Icons.lock_rounded,
                         size: 10.r,
                         color: isUnlocked
-                            ? AppColors.textCharcoal
+                            ? AppColors.textPrimary
                             : Colors.white,
                       ),
                       label: Text(
@@ -825,7 +825,7 @@ class _ContentCard extends StatelessWidget {
                           fontSize: 9.5.sp,
                           fontWeight: FontWeight.w800,
                           color: isUnlocked
-                              ? AppColors.textCharcoal
+                              ? AppColors.textPrimary
                               : Colors.white,
                         ),
                       ),
@@ -834,7 +834,7 @@ class _ContentCard extends StatelessWidget {
                             ? const Color(0xFFEFEBE4) // Neutral tan/grey
                             : const Color(0xFF6C4ED9), // Solid royal purple
                         foregroundColor: isUnlocked
-                            ? AppColors.textCharcoal
+                            ? AppColors.textPrimary
                             : Colors.white,
                         elevation: 0,
                         shadowColor: Colors.transparent,
@@ -1778,18 +1778,18 @@ class _MockPdfReaderViewState extends State<MockPdfReaderView> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : const Color(0xFFFAF9F5),
+      backgroundColor: isDark ? AppColors.darkBackground : const Color(0xFFFAF9F5),
       appBar: AppBar(
         title: Text(
           widget.title,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 14.5.sp,
-            color: isDark ? AppColors.darkText : AppColors.textCharcoal,
+            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
           ),
         ),
         backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
-        foregroundColor: isDark ? AppColors.darkText : AppColors.textCharcoal,
+        foregroundColor: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
         elevation: 0.5,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),

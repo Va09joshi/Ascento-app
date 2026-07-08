@@ -79,7 +79,7 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('A fresh verification code has been dispatched to your email.'),
-              backgroundColor: AppColors.secondarySage,
+              backgroundColor: AppColors.secondary,
             ),
           );
         },
@@ -101,7 +101,7 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_rounded,
-            color: isDark ? Colors.white : AppColors.textCharcoal,
+            color: isDark ? Colors.white : AppColors.textPrimary,
           ),
           onPressed: () => context.pop(),
         ),
@@ -170,14 +170,14 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
                               height: 80.r,
                               decoration: BoxDecoration(
                                 color: isDark 
-                                    ? AppColors.secondarySage.withValues(alpha: 0.15) 
-                                    : AppColors.secondarySage.withValues(alpha: 0.1),
+                                    ? AppColors.secondary.withValues(alpha: 0.15) 
+                                    : AppColors.secondary.withValues(alpha: 0.1),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
                                 Icons.mark_email_read_rounded,
                                 size: 40.r,
-                                color: isDark ? AppColors.secondarySage : AppColors.secondarySage,
+                                color: isDark ? AppColors.secondary : AppColors.secondary,
                               ),
                             ),
                           ),
@@ -189,7 +189,7 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
                           'Verify Identity',
                           style: theme.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.w900,
-                            color: isDark ? Colors.white : AppColors.textCharcoal,
+                            color: isDark ? Colors.white : AppColors.textPrimary,
                             letterSpacing: -0.5,
                             fontSize: 32.sp,
                           ),
@@ -211,9 +211,9 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
                           Container(
                             padding: EdgeInsets.all(AppSpacing.p16),
                             decoration: BoxDecoration(
-                              color: AppColors.errorRed.withValues(alpha: 0.1),
+                              color: AppColors.error.withValues(alpha: 0.1),
                               border: Border.all(
-                                color: AppColors.errorRed.withValues(alpha: 0.3),
+                                color: AppColors.error.withValues(alpha: 0.3),
                                 width: 1.5,
                               ),
                               borderRadius: BorderRadius.circular(AppRadius.r12),
@@ -223,12 +223,12 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
                                 Container(
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
-                                    color: AppColors.errorRed.withValues(alpha: 0.2),
+                                    color: AppColors.error.withValues(alpha: 0.2),
                                     shape: BoxShape.circle,
                                   ),
                                   child: const Icon(
                                     Icons.warning_amber_rounded,
-                                    color: AppColors.errorRed,
+                                    color: AppColors.error,
                                     size: 20,
                                   ),
                                 ),
@@ -237,7 +237,7 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
                                   child: Text(
                                     authState.errorMessage!,
                                     style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: AppColors.errorRed,
+                                      color: AppColors.error,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -285,7 +285,7 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
                                 'Resend Code',
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: _canResend 
-                                      ? (isDark ? AppColors.darkPrimary : AppColors.primaryClay)
+                                      ? (isDark ? AppColors.darkPrimary : AppColors.primary)
                                       : Colors.grey,
                                   fontWeight: FontWeight.bold,
                                 ),

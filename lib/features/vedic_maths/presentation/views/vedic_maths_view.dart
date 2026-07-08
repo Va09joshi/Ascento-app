@@ -229,7 +229,7 @@ class _VedicMathsViewState extends ConsumerState<VedicMathsView> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : const Color(0xFFFFF9F5),
+      backgroundColor: isDark ? AppColors.darkBackground : const Color(0xFFFFF9F5),
       appBar: AppBar(
         title: const Text(
           '⚡ Vedic Maths Sutras',

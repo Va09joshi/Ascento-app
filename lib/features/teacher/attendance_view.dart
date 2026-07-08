@@ -22,7 +22,7 @@ class AttendanceView extends ConsumerWidget {
             Icon(
               Icons.how_to_reg_outlined,
               size: 64,
-              color: isDark ? AppColors.darkPrimary : AppColors.primaryClay,
+              color: isDark ? AppColors.darkPrimary : AppColors.primary,
             ),
             AppSpacing.h16,
             Text(

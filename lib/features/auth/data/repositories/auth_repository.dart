@@ -122,9 +122,9 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final response = await _dioClient.post(
         '/auth/refresh',
-        data: {'refreshToken': refreshToken},
+        data: {'refresh_token': refreshToken},
       );
-      return response.data['accessToken'] as String;
+      return response.data['data']['access_token'] as String;
     } catch (e) {
       AppLogger.warning('Refresh token failed. Returning session fallback.');
       return 'renewed_jwt_mock_token';

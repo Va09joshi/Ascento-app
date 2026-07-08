@@ -22,7 +22,7 @@ class ExamResultsView extends ConsumerWidget {
             Icon(
               Icons.format_list_numbered_outlined,
               size: 64,
-              color: isDark ? AppColors.darkPrimary : AppColors.primaryClay,
+              color: isDark ? AppColors.darkPrimary : AppColors.primary,
             ),
             AppSpacing.h16,
             Text(

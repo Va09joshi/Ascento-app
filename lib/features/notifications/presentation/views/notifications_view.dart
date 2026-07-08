@@ -18,7 +18,7 @@ class NotificationsView extends ConsumerWidget {
     final notifAsync = ref.watch(notificationsProvider);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.creamBg,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       body: notifAsync.when(
         loading: () => ListView(
           padding: EdgeInsets.all(24.w),
@@ -55,7 +55,7 @@ class NotificationsView extends ConsumerWidget {
                   border: Border.all(
                     color: isDark
                         ? AppColors.darkBorder
-                        : AppColors.creamBorder,
+                        : AppColors.border,
                   ),
                 ),
                 child: Row(
@@ -63,12 +63,12 @@ class NotificationsView extends ConsumerWidget {
                     Container(
                       padding: EdgeInsets.all(10.w),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryClay.withValues(alpha: 0.12),
+                        color: AppColors.primary.withValues(alpha: 0.12),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
                         Icons.notifications_none_rounded,
-                        color: AppColors.primaryClay,
+                        color: AppColors.primary,
                       ),
                     ),
                     SizedBox(width: 12.w),
@@ -110,15 +110,15 @@ class _NotificationTile extends StatelessWidget {
   Color _typeColor() {
     switch (item.type) {
       case NotificationType.fees:
-        return AppColors.tertiaryHoney;
+        return AppColors.info;
       case NotificationType.homework:
-        return AppColors.primaryClay;
+        return AppColors.primary;
       case NotificationType.event:
         return const Color(0xFF7E57C2);
       case NotificationType.attendance:
-        return AppColors.errorRed;
+        return AppColors.error;
       case NotificationType.academic:
-        return AppColors.secondarySage;
+        return AppColors.secondary;
       case NotificationType.general:
         return Colors.grey;
     }
@@ -154,7 +154,7 @@ class _NotificationTile extends StatelessWidget {
     final color = _typeColor();
 
     return AppCard(
-      color: item.isRead ? null : AppColors.primaryClay.withValues(alpha: 0.04),
+      color: item.isRead ? null : AppColors.primary.withValues(alpha: 0.04),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

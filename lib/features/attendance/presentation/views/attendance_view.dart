@@ -23,7 +23,7 @@ class AttendanceView extends ConsumerWidget {
     );
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.creamBg,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       body: summaryAsync.when(
         loading: () => ListView(
           padding: EdgeInsets.all(24.w),
@@ -49,7 +49,7 @@ class AttendanceView extends ConsumerWidget {
                 'Recent Classes',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: isDark ? AppColors.darkText : AppColors.textCharcoal,
+                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                 ),
               ),
               SizedBox(height: 16.h),
@@ -261,7 +261,7 @@ class _ClassListItem extends StatelessWidget {
                   '$monthStr $dayStr',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: isDark ? AppColors.darkText : AppColors.textCharcoal,
+                    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                   ),
                 ),
                 SizedBox(height: 2.h),
@@ -282,7 +282,7 @@ class _ClassListItem extends StatelessWidget {
             child: Text(
               record.remark ?? 'Abacus Speed Practice',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: isDark ? AppColors.darkTextMuted : AppColors.textCharcoal.withAlpha(200),
+                color: isDark ? AppColors.darkTextMuted : AppColors.textPrimary.withAlpha(200),
                 fontWeight: FontWeight.w500,
               ),
             ),

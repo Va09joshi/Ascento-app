@@ -19,7 +19,7 @@ class TeacherDashboardView extends ConsumerWidget {
     final userName = authState.currentUser?.name ?? 'Teacher';
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.creamBg,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
@@ -165,10 +165,10 @@ class _HeaderCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : AppColors.creamSurface,
+        color: isDark ? AppColors.darkSurface : AppColors.surface,
         borderRadius: BorderRadius.circular(24.r),
         border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.creamBorder,
+          color: isDark ? AppColors.darkBorder : AppColors.border,
           width: 1.5,
         ),
         boxShadow: [
@@ -186,14 +186,14 @@ class _HeaderCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 26.r,
-                backgroundColor: (isDark ? AppColors.darkPrimary : AppColors.primaryClay)
+                backgroundColor: (isDark ? AppColors.darkPrimary : AppColors.primary)
                     .withValues(alpha: 0.12),
                 child: Text(
                   userName.isNotEmpty ? userName[0].toUpperCase() : 'T',
                   style: TextStyle(
                     fontWeight: FontWeight.w900,
                     fontSize: 20.sp,
-                    color: isDark ? AppColors.darkPrimary : AppColors.primaryClay,
+                    color: isDark ? AppColors.darkPrimary : AppColors.primary,
                   ),
                 ),
               ),
@@ -215,7 +215,7 @@ class _HeaderCard extends StatelessWidget {
                       userName,
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w800,
-                        color: isDark ? AppColors.darkText : AppColors.textCharcoal,
+                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                       ),
                     ),
                   ],
@@ -227,11 +227,11 @@ class _HeaderCard extends StatelessWidget {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
             decoration: BoxDecoration(
-              color: (isDark ? AppColors.darkPrimary : AppColors.primaryClay)
+              color: (isDark ? AppColors.darkPrimary : AppColors.primary)
                   .withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(14.r),
               border: Border.all(
-                color: (isDark ? AppColors.darkPrimary : AppColors.primaryClay)
+                color: (isDark ? AppColors.darkPrimary : AppColors.primary)
                     .withValues(alpha: 0.15),
                 width: 1,
               ),
@@ -240,7 +240,7 @@ class _HeaderCard extends StatelessWidget {
               children: [
                 Icon(
                   Icons.notifications_active_rounded,
-                  color: isDark ? AppColors.darkTertiary : const Color(0xFF5B67F4),
+                  color: isDark ? AppColors.info : const Color(0xFF5B67F4),
                   size: 18,
                 ),
                 SizedBox(width: 10.w),
@@ -248,7 +248,7 @@ class _HeaderCard extends StatelessWidget {
                   child: Text(
                     subtitle,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: isDark ? AppColors.darkText : AppColors.textCharcoal,
+                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                       fontWeight: FontWeight.w700,
                     ),
                   ),

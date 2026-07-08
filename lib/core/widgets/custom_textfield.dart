@@ -20,6 +20,8 @@ class CustomTextField extends StatelessWidget {
   final int minLines;
   final int maxLines;
   final bool enabled;
+  final bool readOnly;
+  final VoidCallback? onTap;
 
   const CustomTextField({
     super.key,
@@ -39,6 +41,8 @@ class CustomTextField extends StatelessWidget {
     this.minLines = 1,
     this.maxLines = 1,
     this.enabled = true,
+    this.readOnly = false,
+    this.onTap,
   });
 
   @override
@@ -69,6 +73,8 @@ class CustomTextField extends StatelessWidget {
           textCapitalization: textCapitalization,
           textInputAction: textInputAction,
           enabled: enabled,
+          readOnly: readOnly,
+          onTap: onTap,
           minLines: isObscure ? 1 : minLines,
           maxLines: isObscure ? 1 : maxLines,
           style: theme.textTheme.bodyMedium,
@@ -99,35 +105,35 @@ class CustomTextField extends StatelessWidget {
               vertical: 16,
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSizes.r12),
+              borderRadius: BorderRadius.circular(AppSizes.r8),
               borderSide: BorderSide(
                 color: theme.colorScheme.outline,
                 width: 1.2,
               ),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSizes.r12),
+              borderRadius: BorderRadius.circular(AppSizes.r8),
               borderSide: BorderSide(
                 color: theme.colorScheme.outline,
                 width: 1.2,
               ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSizes.r12),
+              borderRadius: BorderRadius.circular(AppSizes.r8),
               borderSide: BorderSide(
                 color: theme.colorScheme.primary,
                 width: 2.0,
               ),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSizes.r12),
+              borderRadius: BorderRadius.circular(AppSizes.r8),
               borderSide: BorderSide(
                 color: theme.colorScheme.error,
                 width: 1.5,
               ),
             ),
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSizes.r12),
+              borderRadius: BorderRadius.circular(AppSizes.r8),
               borderSide: BorderSide(
                 color: theme.colorScheme.error,
                 width: 2.0,

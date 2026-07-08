@@ -95,7 +95,7 @@ class _CustomButtonState extends State<CustomButton>
             color: widget.onPressed == null
                 ? theme.disabledColor.withOpacity(0.12)
                 : buttonColor,
-            borderRadius: BorderRadius.circular(AppSizes.r12),
+            borderRadius: BorderRadius.circular(AppSizes.r8),
             border: Border.fromBorderSide(
               widget.onPressed == null ? BorderSide.none : borderSide,
             ),

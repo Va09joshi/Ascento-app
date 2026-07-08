@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ascento_abacus/core/theme/app_colors.dart';
@@ -8,6 +9,9 @@ import 'package:ascento_abacus/shared/router/route_names.dart';
 import 'package:ascento_abacus/features/auth/presentation/controllers/auth_controller.dart';
 
 import 'package:ascento_abacus/features/dashboard/presentation/providers/admin_dashboard_provider.dart';
+
+import 'package:ascento_abacus/features/notifications/presentation/providers/notices_provider.dart';
+import 'package:ascento_abacus/shared/models/notice_model.dart';
 
 class AdminDashboardView extends ConsumerWidget {
   const AdminDashboardView({super.key});
@@ -20,9 +24,10 @@ class AdminDashboardView extends ConsumerWidget {
     final authState = ref.watch(authControllerProvider);
     final userName = authState.currentUser?.name ?? 'Admin';
     final statsAsync = ref.watch(adminDashboardProvider);
+    final noticesAsync = ref.watch(noticesListProvider);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.creamBg,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
@@ -45,11 +50,24 @@ class AdminDashboardView extends ConsumerWidget {
               SizedBox(height: 12.h),
               
               statsAsync.when(
-                loading: () => const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(32.0),
-                    child: CircularProgressIndicator(),
-                  ),
+                loading: () => Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(child: _buildShimmerStatCard(isDark)),
+                        SizedBox(width: 12.w),
+                        Expanded(child: _buildShimmerStatCard(isDark)),
+                      ],
+                    ),
+                    SizedBox(height: 12.h),
+                    Row(
+                      children: [
+                        Expanded(child: _buildShimmerStatCard(isDark)),
+                        SizedBox(width: 12.w),
+                        Expanded(child: _buildShimmerStatCard(isDark)),
+                      ],
+                    ),
+                  ],
                 ),
                 error: (error, stack) => AppCard(
                   child: Center(
@@ -126,19 +144,19 @@ class AdminDashboardView extends ConsumerWidget {
                     label: 'Timetables',
                     icon: Icons.calendar_month_rounded,
                     color: const Color(0xFF23B07D),
-                    onTap: () {},
+                    onTap: () => context.go(RoutePaths.timetable),
                   ),
                   _QuickAction(
-                    label: 'Finances',
-                    icon: Icons.monetization_on_rounded,
-                    color: const Color(0xFFFF7A3A),
-                    onTap: () {},
+                    label: 'Branches',
+                    icon: Icons.account_tree_rounded,
+                    color: const Color(0xFFFF8A34),
+                    onTap: () => context.go(RoutePaths.manageBranches),
                   ),
                   _QuickAction(
-                    label: 'Reports',
-                    icon: Icons.analytics_rounded,
-                    color: const Color(0xFFE85A9A),
-                    onTap: () {},
+                    label: 'Academics',
+                    icon: Icons.school_rounded,
+                    color: const Color(0xFF6C4ED9),
+                    onTap: () => context.go(RoutePaths.academicsConfig),
                   ),
                 ],
               ),
@@ -151,24 +169,34 @@ class AdminDashboardView extends ConsumerWidget {
                 ),
               ),
               SizedBox(height: 12.h),
-              AppCard(
-                margin: EdgeInsets.only(bottom: 12.h),
-                child: ListTile(
-                  leading: const Icon(Icons.person_add_rounded, color: Color(0xFF23B07D)),
-                  title: Text('New student enrolled in Class 10-A'),
-                  subtitle: Text('2 hours ago'),
-                  contentPadding: EdgeInsets.zero,
+              
+              noticesAsync.when(
+                loading: () => Column(
+                  children: List.generate(2, (index) => _buildShimmerActivityCard(isDark)),
                 ),
-              ),
-              AppCard(
-                margin: EdgeInsets.only(bottom: 12.h),
-                child: ListTile(
-                  leading: const Icon(Icons.payment_rounded, color: Color(0xFF6C4ED9)),
-                  title: Text('Fee payment received (Rs 5,000)'),
-                  subtitle: Text('3 hours ago'),
-                  contentPadding: EdgeInsets.zero,
+                error: (error, stack) => AppCard(
+                  child: Center(
+                    child: Text('Failed to load activity', style: TextStyle(color: AppColors.error)),
+                  ),
                 ),
+                data: (notices) {
+                  if (notices.isEmpty) {
+                    return AppCard(
+                      child: Center(
+                        child: Text('No recent activity', style: TextStyle(color: AppColors.textMuted)),
+                      ),
+                    );
+                  }
+                  
+                  // Show top 3 recent notices
+                  final recentNotices = notices.take(3).toList();
+                  
+                  return Column(
+                    children: recentNotices.map((notice) => _buildRecentNoticeCard(notice, theme)).toList(),
+                  );
+                },
               ),
+              SizedBox(height: 24.h),
             ],
           ),
         ),
@@ -194,10 +222,10 @@ class _HeaderCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : AppColors.creamSurface,
+        color: isDark ? AppColors.darkSurface : AppColors.surface,
         borderRadius: BorderRadius.circular(24.r),
         border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.creamBorder,
+          color: isDark ? AppColors.darkBorder : AppColors.border,
           width: 1.5,
         ),
         boxShadow: [
@@ -215,11 +243,11 @@ class _HeaderCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 26.r,
-                backgroundColor: (isDark ? AppColors.darkPrimary : AppColors.primaryClay)
+                backgroundColor: (isDark ? AppColors.darkPrimary : AppColors.primary)
                     .withValues(alpha: 0.12),
                 child: Icon(
                   Icons.admin_panel_settings_rounded,
-                  color: isDark ? AppColors.darkPrimary : AppColors.primaryClay,
+                  color: isDark ? AppColors.darkPrimary : AppColors.primary,
                   size: 28,
                 ),
               ),
@@ -241,7 +269,7 @@ class _HeaderCard extends StatelessWidget {
                       userName,
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w800,
-                        color: isDark ? AppColors.darkText : AppColors.textCharcoal,
+                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                       ),
                     ),
                   ],
@@ -253,11 +281,11 @@ class _HeaderCard extends StatelessWidget {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
             decoration: BoxDecoration(
-              color: (isDark ? AppColors.darkPrimary : AppColors.primaryClay)
+              color: (isDark ? AppColors.darkPrimary : AppColors.primary)
                   .withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(14.r),
               border: Border.all(
-                color: (isDark ? AppColors.darkPrimary : AppColors.primaryClay)
+                color: (isDark ? AppColors.darkPrimary : AppColors.primary)
                     .withValues(alpha: 0.15),
                 width: 1,
               ),
@@ -266,7 +294,7 @@ class _HeaderCard extends StatelessWidget {
               children: [
                 Icon(
                   Icons.verified_user_rounded,
-                  color: isDark ? AppColors.darkTertiary : const Color(0xFF23B07D),
+                  color: isDark ? AppColors.info : const Color(0xFF23B07D),
                   size: 18,
                 ),
                 SizedBox(width: 10.w),
@@ -274,7 +302,7 @@ class _HeaderCard extends StatelessWidget {
                   child: Text(
                     subtitle,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: isDark ? AppColors.darkText : AppColors.textCharcoal,
+                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -395,4 +423,86 @@ class _QuickAction extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _buildShimmerStatCard(bool isDark) {
+  return Shimmer.fromColors(
+    baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+    highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
+    child: Container(
+      height: 110.h,
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey[800] : Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+    ),
+  );
+}
+
+Widget _buildShimmerActivityCard(bool isDark) {
+  return Shimmer.fromColors(
+    baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+    highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
+    child: Container(
+      height: 72.h,
+      margin: EdgeInsets.only(bottom: 12.h),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey[800] : Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+    ),
+  );
+}
+
+Widget _buildRecentNoticeCard(NoticeModel notice, ThemeData theme) {
+  Color iconColor;
+  IconData iconData;
+  
+  switch (notice.type.toLowerCase()) {
+    case 'event':
+      iconColor = const Color(0xFF23B07D);
+      iconData = Icons.event_rounded;
+      break;
+    case 'academic':
+      iconColor = const Color(0xFF5B67F4);
+      iconData = Icons.school_rounded;
+      break;
+    case 'fees':
+      iconColor = const Color(0xFFE85A9A);
+      iconData = Icons.attach_money_rounded;
+      break;
+    default:
+      iconColor = const Color(0xFFFF8A34);
+      iconData = Icons.notifications_rounded;
+  }
+
+  return AppCard(
+    margin: EdgeInsets.only(bottom: 12.h),
+    child: ListTile(
+      leading: Container(
+        padding: EdgeInsets.all(10.r),
+        decoration: BoxDecoration(
+          color: iconColor.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+        child: Icon(iconData, color: iconColor, size: 22.sp),
+      ),
+      title: Text(
+        notice.title,
+        style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      subtitle: Padding(
+        padding: EdgeInsets.only(top: 4.h),
+        child: Text(
+          notice.content,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontSize: 12.sp, color: AppColors.textMuted),
+        ),
+      ),
+      contentPadding: EdgeInsets.zero,
+    ),
+  );
 }

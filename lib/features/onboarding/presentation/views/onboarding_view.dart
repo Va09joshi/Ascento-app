@@ -40,7 +40,7 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
     final controllerNotifier = ref.read(onboardingControllerProvider.notifier);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.creamBg,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       body: SafeArea(
           child: Column(
             children: [
@@ -68,7 +68,7 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
                         child: Text(
                           'Skip',
                           style: theme.textTheme.titleMedium?.copyWith(
-                            color: isDark ? AppColors.darkPrimary : AppColors.textCharcoal,
+                            color: isDark ? AppColors.darkPrimary : AppColors.textPrimary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -102,7 +102,7 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
                               item.title,
                               style: theme.textTheme.displaySmall?.copyWith(
                                 fontWeight: FontWeight.w900,
-                                color: isDark ? AppColors.darkText : AppColors.textCharcoal,
+                                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -112,7 +112,7 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
                             Text(
                               item.description,
                               style: theme.textTheme.bodyLarge?.copyWith(
-                                color: isDark ? AppColors.darkTextMuted : AppColors.textCharcoal,
+                                color: isDark ? AppColors.darkTextMuted : AppColors.textPrimary,
                                 height: 1.5,
                               ),
                               textAlign: TextAlign.center,
@@ -152,7 +152,6 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
                         width: double.infinity,
                         child: CustomButton(
                           text: onboardingState.isLastPage ? 'Get Started' : 'Continue',
-                          icon: onboardingState.isLastPage ? Icons.done_rounded : Icons.arrow_forward_rounded,
                           onPressed: () {
                             if (onboardingState.isLastPage) {
                               controllerNotifier.completeOnboarding(() {
@@ -187,7 +186,7 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
       width: isActive ? 24.r : 8.r,
       decoration: BoxDecoration(
         color: isActive
-            ? (isDark ? AppColors.darkPrimary : AppColors.primaryClay)
+            ? (isDark ? AppColors.darkPrimary : AppColors.primary)
             : (isDark ? AppColors.darkBorder : AppColors.textMuted.withValues(alpha: 0.3)),
         borderRadius: BorderRadius.circular(4.r),
       ),

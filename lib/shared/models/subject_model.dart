@@ -1,0 +1,26 @@
+class SubjectModel {
+  final String id;
+  final String name;
+  final String code;
+
+  const SubjectModel({
+    required this.id,
+    required this.name,
+    required this.code,
+  });
+
+  factory SubjectModel.fromJson(Map<String, dynamic> json) {
+    return SubjectModel(
+      id: json['id'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      code: json['code'] as String? ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'code': code,
+    };
+  }
+}

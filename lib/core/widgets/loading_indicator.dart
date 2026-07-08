@@ -33,11 +33,11 @@ class _LoadingIndicatorState extends State<LoadingIndicator> with SingleTickerPr
     final isDark = theme.brightness == Brightness.dark;
 
     final beadColors = [
-      AppColors.primaryClay,
-      AppColors.secondarySage,
-      AppColors.tertiaryHoney,
-      isDark ? AppColors.darkPrimary : AppColors.secondarySage.withOpacity(0.7),
-      isDark ? AppColors.darkSecondary : AppColors.primaryClay.withOpacity(0.7),
+      AppColors.primary,
+      AppColors.secondary,
+      AppColors.info,
+      isDark ? AppColors.darkPrimary : AppColors.secondary.withOpacity(0.7),
+      isDark ? AppColors.darkSecondary : AppColors.primary.withOpacity(0.7),
     ];
 
     return Center(
@@ -50,10 +50,10 @@ class _LoadingIndicatorState extends State<LoadingIndicator> with SingleTickerPr
             height: 100,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: isDark ? AppColors.darkSurface : AppColors.creamSurface,
+              color: isDark ? AppColors.darkSurface : AppColors.surface,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: isDark ? AppColors.darkBorder : AppColors.creamSurfaceDarker,
+                color: isDark ? AppColors.darkBorder : AppColors.surfaceDarker,
                 width: 3.0,
               ),
               boxShadow: [
@@ -71,7 +71,7 @@ class _LoadingIndicatorState extends State<LoadingIndicator> with SingleTickerPr
                   alignment: const Alignment(0, -0.2),
                   child: Container(
                     height: 5,
-                    color: isDark ? AppColors.darkBorder : AppColors.creamSurfaceDarker,
+                    color: isDark ? AppColors.darkBorder : AppColors.surfaceDarker,
                   ),
                 ),
                 // 5 columns, each with a rod and a bouncing bead!
@@ -154,7 +154,7 @@ class _AbacusRodBead extends StatelessWidget {
             Container(
               width: 2.0,
               height: 76,
-              color: isDark ? AppColors.darkBorder : AppColors.creamSurfaceDarker.withOpacity(0.7),
+              color: isDark ? AppColors.darkBorder : AppColors.surfaceDarker.withOpacity(0.7),
             ),
             // Floating Bouncing Bead
             Positioned(

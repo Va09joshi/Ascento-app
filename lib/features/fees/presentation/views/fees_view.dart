@@ -72,7 +72,7 @@ class FeesView extends ConsumerWidget {
     final feesState = ref.watch(localFeesProvider);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.creamBg,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       body: feesState.when(
         loading: () => ListView(
           padding: EdgeInsets.all(24.w),
@@ -93,7 +93,7 @@ class FeesView extends ConsumerWidget {
             onRefresh: () async {
               ref.invalidate(localFeesProvider);
             },
-            color: isDark ? AppColors.darkPrimary : AppColors.primaryClay,
+            color: isDark ? AppColors.darkPrimary : AppColors.primary,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: EdgeInsets.fromLTRB(16.w, 14.h, 16.w, 24.h),
@@ -432,13 +432,13 @@ class _FeeTileState extends State<_FeeTile> {
   Color _statusColor() {
     switch (widget.fee.status) {
       case PaymentStatus.paid:
-        return AppColors.secondarySage;
+        return AppColors.secondary;
       case PaymentStatus.pending:
-        return AppColors.tertiaryHoney;
+        return AppColors.info;
       case PaymentStatus.overdue:
-        return AppColors.errorRed;
+        return AppColors.error;
       case PaymentStatus.partial:
-        return AppColors.primaryClay;
+        return AppColors.primary;
     }
   }
 
@@ -545,7 +545,7 @@ class _FeeTileState extends State<_FeeTile> {
                 color: isDark ? Colors.white.withValues(alpha: 0.02) : Colors.black.withValues(alpha: 0.01),
                 border: Border(
                   top: BorderSide(
-                    color: isDark ? AppColors.darkBorder : AppColors.creamBorder,
+                    color: isDark ? AppColors.darkBorder : AppColors.border,
                     width: 1,
                   ),
                 ),
@@ -578,7 +578,7 @@ class _FeeTileState extends State<_FeeTile> {
                       widget.fee.balanceDue,
                       isDark,
                       isBold: true,
-                      customColor: widget.fee.balanceDue > 0 ? AppColors.errorRed : AppColors.secondarySage,
+                      customColor: widget.fee.balanceDue > 0 ? AppColors.error : AppColors.secondary,
                     ),
                   ],
                   if (widget.fee.transactionId != null) ...[
@@ -643,9 +643,9 @@ class _FeeTileState extends State<_FeeTile> {
                                     _showDownloadDialog(context, widget.fee);
                                   },
                                   style: OutlinedButton.styleFrom(
-                                    foregroundColor: isDark ? Colors.white70 : AppColors.textCharcoal,
+                                    foregroundColor: isDark ? Colors.white70 : AppColors.textPrimary,
                                     side: BorderSide(
-                                      color: isDark ? Colors.white24 : AppColors.creamBorder,
+                                      color: isDark ? Colors.white24 : AppColors.border,
                                     ),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8.r),
@@ -691,7 +691,7 @@ class _FeeTileState extends State<_FeeTile> {
             style: TextStyle(
               fontSize: 11.sp,
               fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
-              color: isDark ? Colors.white70 : AppColors.textCharcoal,
+              color: isDark ? Colors.white70 : AppColors.textPrimary,
             ),
           ),
           Text(
@@ -701,8 +701,8 @@ class _FeeTileState extends State<_FeeTile> {
               fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
               color: customColor ??
                   (isCredit
-                      ? AppColors.secondarySage
-                      : (isDark ? Colors.white : AppColors.textCharcoal)),
+                      ? AppColors.secondary
+                      : (isDark ? Colors.white : AppColors.textPrimary)),
             ),
           ),
         ],
@@ -728,7 +728,7 @@ class _FeeTileState extends State<_FeeTile> {
             value,
             style: TextStyle(
               fontSize: 10.sp,
-              color: isDark ? Colors.white70 : AppColors.textCharcoal,
+              color: isDark ? Colors.white70 : AppColors.textPrimary,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -1289,7 +1289,7 @@ class _ReceiptDownloadDialogState extends State<_ReceiptDownloadDialog> {
     final theme = Theme.of(context);
 
     return AlertDialog(
-      backgroundColor: isDark ? AppColors.darkSurface : AppColors.creamSurface,
+      backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
       content: Padding(
         padding: EdgeInsets.symmetric(vertical: 12.h),
@@ -1304,7 +1304,7 @@ class _ReceiptDownloadDialogState extends State<_ReceiptDownloadDialog> {
                 children: [
                   CircularProgressIndicator(
                     value: _progress,
-                    color: isDark ? AppColors.darkPrimary : AppColors.primaryClay,
+                    color: isDark ? AppColors.darkPrimary : AppColors.primary,
                     strokeWidth: 5,
                     backgroundColor: isDark ? Colors.white10 : Colors.black12,
                   ),
@@ -1313,7 +1313,7 @@ class _ReceiptDownloadDialogState extends State<_ReceiptDownloadDialog> {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 12.sp,
-                      color: isDark ? Colors.white : AppColors.textCharcoal,
+                      color: isDark ? Colors.white : AppColors.textPrimary,
                     ),
                   ),
                 ],

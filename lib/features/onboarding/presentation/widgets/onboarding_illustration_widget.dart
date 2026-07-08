@@ -46,10 +46,10 @@ class _OnboardingIllustrationWidgetState extends State<OnboardingIllustrationWid
           width: 260,
           height: 260,
           decoration: BoxDecoration(
-            color: isDark ? AppColors.darkSurface : AppColors.creamSurface,
+            color: isDark ? AppColors.darkSurface : AppColors.surface,
             shape: BoxShape.circle,
             border: Border.all(
-              color: isDark ? AppColors.darkBorder : AppColors.creamBorder,
+              color: isDark ? AppColors.darkBorder : AppColors.border,
               width: 2.0,
             ),
             boxShadow: [
@@ -129,7 +129,7 @@ class _IllustrationPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
     
     final borderPaint = Paint()
-      ..color = AppColors.primaryClay
+      ..color = AppColors.primary
       ..strokeWidth = 3
       ..style = PaintingStyle.stroke;
 
@@ -139,7 +139,7 @@ class _IllustrationPainter extends CustomPainter {
 
     // Calendar Header
     final headerPaint = Paint()
-      ..color = AppColors.primaryClay
+      ..color = AppColors.primary
       ..style = PaintingStyle.fill;
     final headerRect = Rect.fromLTWH(sheetRect.left, sheetRect.top, sheetRect.width, 32);
     canvas.drawRRect(
@@ -153,7 +153,7 @@ class _IllustrationPainter extends CustomPainter {
 
     // Dynamic floating presence checkboxes
     final checkPaint = Paint()
-      ..color = AppColors.secondarySage
+      ..color = AppColors.secondary
       ..strokeWidth = 4
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -184,7 +184,7 @@ class _IllustrationPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
     
     final borderPaint = Paint()
-      ..color = AppColors.secondarySage
+      ..color = AppColors.secondary
       ..strokeWidth = 2.5
       ..style = PaintingStyle.stroke;
 
@@ -199,7 +199,7 @@ class _IllustrationPainter extends CustomPainter {
 
     // Lined rules
     final linePaint = Paint()
-      ..color = AppColors.secondarySage.withValues(alpha: 0.3)
+      ..color = AppColors.secondary.withValues(alpha: 0.3)
       ..strokeWidth = 2.0;
 
     for (var i = 0; i < 4; i++) {
@@ -209,7 +209,7 @@ class _IllustrationPainter extends CustomPainter {
 
     // Floating achievement stars
     final starPaint = Paint()
-      ..color = AppColors.tertiaryHoney
+      ..color = AppColors.info
       ..style = PaintingStyle.fill;
 
     final hoverOffset = math.sin(animationValue * math.pi) * 10;
@@ -226,7 +226,7 @@ class _IllustrationPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     final borderPaint = Paint()
-      ..color = AppColors.tertiaryHoney
+      ..color = AppColors.info
       ..strokeWidth = 4.0
       ..style = PaintingStyle.stroke;
 
@@ -246,7 +246,7 @@ class _IllustrationPainter extends CustomPainter {
 
     // Chalk timetable blocks (warm highlights)
     final blockPaint = Paint()
-      ..color = AppColors.tertiaryHoney.withValues(alpha: 0.6)
+      ..color = AppColors.info.withValues(alpha: 0.6)
       ..style = PaintingStyle.fill;
 
     final highlightRect = Rect.fromLTWH(boardRect.left + 46, boardRect.top + 36, 37, 27);
@@ -254,7 +254,7 @@ class _IllustrationPainter extends CustomPainter {
 
     // Floating clock
     final clockPaint = Paint()
-      ..color = AppColors.primaryClay
+      ..color = AppColors.primary
       ..strokeWidth = 3.0
       ..style = PaintingStyle.stroke;
     
@@ -272,7 +272,7 @@ class _IllustrationPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     final borderPaint = Paint()
-      ..color = AppColors.primaryClay
+      ..color = AppColors.primary
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
 
@@ -282,7 +282,7 @@ class _IllustrationPainter extends CustomPainter {
 
     // Receipt lines
     final linePaint = Paint()
-      ..color = AppColors.primaryClay.withValues(alpha: 0.3)
+      ..color = AppColors.primary.withValues(alpha: 0.3)
       ..strokeWidth = 2;
 
     for (var i = 0; i < 3; i++) {
@@ -295,7 +295,7 @@ class _IllustrationPainter extends CustomPainter {
 
     // Stamp circle (Paid badge!)
     final stampPaint = Paint()
-      ..color = AppColors.secondarySage
+      ..color = AppColors.secondary
       ..strokeWidth = 2.5
       ..style = PaintingStyle.stroke;
 
@@ -305,7 +305,7 @@ class _IllustrationPainter extends CustomPainter {
 
     // Floating money gold medals
     final coinPaint = Paint()
-      ..color = AppColors.tertiaryHoney
+      ..color = AppColors.info
       ..style = PaintingStyle.fill;
 
     final float = math.sin(animationValue * math.pi) * 8;
@@ -315,7 +315,7 @@ class _IllustrationPainter extends CustomPainter {
   void _paintConnect(Canvas canvas, Offset center, double maxRadius) {
     // Network nodes representing Parent-Teacher connected hub
     final linkPaint = Paint()
-      ..color = AppColors.secondarySage.withValues(alpha: 0.4)
+      ..color = AppColors.secondary.withValues(alpha: 0.4)
       ..strokeWidth = 3.0;
 
     final c1 = center.translate(-40, 20);
@@ -326,9 +326,9 @@ class _IllustrationPainter extends CustomPainter {
     canvas.drawLine(c2, c3, linkPaint);
     canvas.drawLine(c3, c1, linkPaint);
 
-    final nodePaint1 = Paint()..color = AppColors.primaryClay;
-    final nodePaint2 = Paint()..color = AppColors.secondarySage;
-    final nodePaint3 = Paint()..color = AppColors.tertiaryHoney;
+    final nodePaint1 = Paint()..color = AppColors.primary;
+    final nodePaint2 = Paint()..color = AppColors.secondary;
+    final nodePaint3 = Paint()..color = AppColors.info;
 
     final bounce = math.sin(animationValue * math.pi) * 5;
 

@@ -22,7 +22,7 @@ class TimetableView extends ConsumerWidget {
             Icon(
               Icons.calendar_month_outlined,
               size: 64,
-              color: isDark ? AppColors.darkPrimary : AppColors.primaryClay,
+              color: isDark ? AppColors.darkPrimary : AppColors.primary,
             ),
             AppSpacing.h16,
             Text(
