@@ -242,8 +242,8 @@ class _TimetableManagementViewState extends ConsumerState<TimetableManagementVie
                           border: TableBorder.all(color: Colors.grey.shade300),
                           dataRowMaxHeight: 80,
                           columns: [
-                            const DataColumn(label: Text('Day', style: TextStyle(fontWeight: FontWeight.bold))),
-                            ...periods.map((p) => DataColumn(label: Text(p, style: const TextStyle(fontWeight: FontWeight.bold)))),
+                            const DataColumn(label: Text('Day', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black))),
+                            ...periods.map((p) => DataColumn(label: Text(p, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black)))),
                           ],
                           rows: List.generate(days.length, (dayIndex) {
                             final dayName = days[dayIndex];
@@ -259,22 +259,67 @@ class _TimetableManagementViewState extends ConsumerState<TimetableManagementVie
                                   if (pIndex < daySlots.length) {
                                     final slot = daySlots[pIndex];
                                     return DataCell(
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                                        decoration: BoxDecoration(
-                                          color: (slot.subjectColor ?? Colors.blue).withValues(alpha: 0.1),
-                                          borderRadius: BorderRadius.circular(8),
-                                          border: Border.all(color: (slot.subjectColor ?? Colors.blue).withValues(alpha: 0.3)),
-                                        ),
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(slot.subject, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                                            Text('${slot.startTime} - ${slot.endTime}', style: const TextStyle(fontSize: 10)),
-                                            Text(slot.teacherName, style: TextStyle(fontSize: 10, color: Colors.grey.shade700)),
-                                          ],
-                                        ),
+                                      Stack(
+                                        clipBehavior: Clip.none,
+                                        children: [
+                                          Container(
+                                            constraints: const BoxConstraints(minWidth: 100),
+                                            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                                            decoration: BoxDecoration(
+                                              color: (slot.subjectColor ?? Colors.blue).withValues(alpha: 0.1),
+                                              borderRadius: BorderRadius.circular(8),
+                                              border: Border.all(color: (slot.subjectColor ?? Colors.blue).withValues(alpha: 0.3)),
+                                            ),
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(slot.subject, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                                                Text('${slot.startTime} - ${slot.endTime}', style: const TextStyle(fontSize: 10)),
+                                                Text(slot.teacherName, style: TextStyle(fontSize: 10, color: Colors.grey.shade700)),
+                                              ],
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: -8,
+                                            right: -8,
+                                            child: IconButton(
+                                              padding: EdgeInsets.zero,
+                                              constraints: const BoxConstraints(),
+                                              icon: const Icon(Icons.cancel, size: 18, color: Colors.redAccent),
+                                              onPressed: () async {
+                                                final confirm = await showDialog<bool>(
+                                                  context: context,
+                                                  builder: (ctx) => AlertDialog(
+                                                    title: const Text('Remove Slot'),
+                                                    content: const Text('Are you sure you want to remove this timetable slot?'),
+                                                    actions: [
+                                                      TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+                                                      TextButton(
+                                                        onPressed: () => Navigator.pop(ctx, true), 
+                                                        child: const Text('Remove', style: TextStyle(color: Colors.red))
+                                                      ),
+                                                    ],
+                                                  )
+                                                );
+                                                
+                                                if (confirm == true) {
+                                                  try {
+                                                    await ref.read(timetableRepositoryProvider).deleteTimetableSlot(slot.id);
+                                                    ref.invalidate(sectionTimetableProvider);
+                                                    if (context.mounted) {
+                                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Slot removed successfully')));
+                                                    }
+                                                  } catch (e) {
+                                                    if (context.mounted) {
+                                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     );
                                   } else {

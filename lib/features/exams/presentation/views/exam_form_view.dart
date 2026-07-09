@@ -10,7 +10,8 @@ import 'package:ascento_abacus/features/exams/presentation/providers/exams_provi
 import 'package:ascento_abacus/features/academics/presentation/providers/academics_provider.dart';
 
 class ExamFormView extends ConsumerStatefulWidget {
-  const ExamFormView({super.key});
+  final ExamSchedule? examToEdit;
+  const ExamFormView({super.key, this.examToEdit});
 
   @override
   ConsumerState<ExamFormView> createState() => _ExamFormViewState();
@@ -31,6 +32,21 @@ class _ExamFormViewState extends ConsumerState<ExamFormView> {
   final _examTypes = ['midterm', 'final', 'unit_test'];
   
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.examToEdit != null) {
+      final exam = widget.examToEdit!;
+      _titleController.text = exam.examName;
+      _totalMarksController.text = exam.totalMarks.toString();
+      _passingMarksController.text = '40'; // Fallback as we don't have passing marks in ExamSchedule model immediately available
+      _selectedAcademicYearId = exam.academicYearId;
+      _selectedClassId = exam.classId;
+      _selectedDate = exam.date;
+      _selectedExamType = _examTypes.contains(exam.type) ? exam.type : _examTypes.first;
+    }
+  }
 
   @override
   void dispose() {
@@ -73,12 +89,16 @@ class _ExamFormViewState extends ConsumerState<ExamFormView> {
         "passing_marks": int.tryParse(_passingMarksController.text.trim()) ?? 40,
       };
 
-      await ref.read(examsRepositoryProvider).createExam(payload);
+      if (widget.examToEdit != null) {
+        await ref.read(examsRepositoryProvider).updateExam(widget.examToEdit!.id, payload);
+      } else {
+        await ref.read(examsRepositoryProvider).createExam(payload);
+      }
       ref.invalidate(examsListProvider);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Exam created successfully')),
+          SnackBar(content: Text(widget.examToEdit != null ? 'Exam updated successfully' : 'Exam created successfully')),
         );
         context.pop();
       }
@@ -100,7 +120,7 @@ class _ExamFormViewState extends ConsumerState<ExamFormView> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       appBar: AppBar(
-        title: const Text('New Exam'),
+        title: Text(widget.examToEdit != null ? 'Edit Exam' : 'New Exam'),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -196,7 +216,7 @@ class _ExamFormViewState extends ConsumerState<ExamFormView> {
                 ),
                 SizedBox(height: 32.h),
                 CustomButton(
-                  text: 'Create Exam',
+                  text: widget.examToEdit != null ? 'Update Exam' : 'Create Exam',
                   isLoading: _isLoading,
                   onPressed: _submitForm,
                 ),

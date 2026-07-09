@@ -4,6 +4,7 @@ import 'package:ascento_abacus/core/network/dio_client.dart';
 import 'package:ascento_abacus/core/network/api_exception.dart';
 import 'package:ascento_abacus/core/logging/app_logger.dart';
 import 'package:ascento_abacus/shared/models/user_model.dart';
+import 'package:image_picker/image_picker.dart';
 class UsersRepository {
   final DioClient _dioClient;
 
@@ -23,12 +24,13 @@ class UsersRepository {
     }
   }
 
-  Future<UserModel> createUser(Map<String, dynamic> payload, {String? avatarPath}) async {
+  Future<UserModel> createUser(Map<String, dynamic> payload, {XFile? avatarFile}) async {
     try {
       dynamic data = payload;
-      if (avatarPath != null) {
+      if (avatarFile != null) {
+        final bytes = await avatarFile.readAsBytes();
         final formData = FormData.fromMap(payload);
-        formData.files.add(MapEntry('avatar', await MultipartFile.fromFile(avatarPath)));
+        formData.files.add(MapEntry('avatar', MultipartFile.fromBytes(bytes, filename: avatarFile.name)));
         data = formData;
       }
       final response = await _dioClient.post('/admin/users', data: data);
@@ -45,12 +47,13 @@ class UsersRepository {
     }
   }
 
-  Future<UserModel> updateUser(String id, Map<String, dynamic> payload, {String? avatarPath}) async {
+  Future<UserModel> updateUser(String id, Map<String, dynamic> payload, {XFile? avatarFile}) async {
     try {
       dynamic data = payload;
-      if (avatarPath != null) {
+      if (avatarFile != null) {
+        final bytes = await avatarFile.readAsBytes();
         final formData = FormData.fromMap(payload);
-        formData.files.add(MapEntry('avatar', await MultipartFile.fromFile(avatarPath)));
+        formData.files.add(MapEntry('avatar', MultipartFile.fromBytes(bytes, filename: avatarFile.name)));
         data = formData;
       }
       final response = await _dioClient.patch('/admin/users/$id', data: data);

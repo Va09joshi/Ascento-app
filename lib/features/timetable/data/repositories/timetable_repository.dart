@@ -49,6 +49,18 @@ class TimetableRepository {
       rethrow;
     }
   }
+
+  Future<void> deleteTimetableSlot(String slotId) async {
+    try {
+      final response = await _dioClient.delete('/timetable/$slotId');
+      if (response.data['success'] != true) {
+        throw Exception(response.data['message'] ?? 'Failed to delete slot');
+      }
+    } catch (e) {
+      AppLogger.error('Failed to delete timetable slot', e);
+      rethrow;
+    }
+  }
 }
 
 final timetableRepositoryProvider = Provider<TimetableRepository>((ref) {

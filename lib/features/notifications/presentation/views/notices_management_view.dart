@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:ascento_abacus/core/theme/app_colors.dart';
 import 'package:ascento_abacus/shared/models/notice_model.dart';
 import 'package:ascento_abacus/features/notifications/presentation/providers/notices_provider.dart';
-import 'package:ascento_abacus/shared/widgets/premium_data_table.dart';
 import 'package:ascento_abacus/shared/router/route_names.dart';
 
 class NoticesManagementView extends ConsumerWidget {
@@ -34,96 +33,207 @@ class NoticesManagementView extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              PremiumDataTable<NoticeModel>(
-                title: 'Notices & Announcements',
-                subtitle: 'Manage school-wide notices, banners, and push notifications.',
-                isLoading: noticesAsync.isLoading,
-                data: noticesAsync.valueOrNull ?? [],
-                columns: const ['Notice', 'Type', 'Date Posted', 'Actions'],
-                rowBuilder: (notice) => [
-                  // Notice Title & Body
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: notice.bannerUrl != null ? EdgeInsets.zero : EdgeInsets.all(8.w),
-                        decoration: BoxDecoration(
-                          color: (isDark ? AppColors.darkPrimary : AppColors.primary).withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8.r),
-                        ),
-                        child: notice.bannerUrl != null
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(8.r),
-                                child: Image.network(notice.bannerUrl!, width: 36.w, height: 36.w, fit: BoxFit.cover),
-                              )
-                            : Icon(_getTypeIcon(notice.type), color: isDark ? AppColors.darkPrimary : AppColors.primary, size: 16.sp),
-                      ),
-                      SizedBox(width: 12.w),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            notice.title,
-                            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp),
-                          ),
-                          SizedBox(
-                            width: 250.w,
-                            child: Text(
-                            notice.content,
-                              style: TextStyle(color: AppColors.textMuted, fontSize: 11.sp),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  // Type Badge
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                    decoration: BoxDecoration(
-                      color: (isDark ? AppColors.darkSurfaceDarker : AppColors.surfaceDarker),
-                      borderRadius: BorderRadius.circular(4.r),
-                      border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
-                    ),
-                    child: Text(
-                      notice.type.toUpperCase(),
-                      style: TextStyle(
-                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
-                        fontSize: 10.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  // Date
-                  Text(notice.createdAt != null ? notice.createdAt!.toIso8601String().split('T')[0] : 'N/A'),
-                  // Actions
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit_outlined, size: 20),
-                        color: AppColors.info,
-                        onPressed: () {
-                          context.push(RoutePaths.editNotice, extra: notice);
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline, size: 20),
-                        color: AppColors.error,
-                        onPressed: () => _showDeleteDialog(context, notice, ref),
-                      ),
-                    ],
-                  ),
-                ],
+              Text(
+                'Notices & Announcements',
+                style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
               ),
+              SizedBox(height: 8.h),
+              Text(
+                'Manage school-wide notices, banners, and push notifications.',
+                style: TextStyle(fontSize: 14.sp, color: AppColors.textMuted),
+              ),
+              SizedBox(height: 24.h),
+              if (noticesAsync.isLoading)
+                const Center(child: CircularProgressIndicator())
+              else if (noticesAsync.hasError)
+                Center(child: Text('Error: ${noticesAsync.error}'))
+              else if (noticesAsync.valueOrNull == null || noticesAsync.valueOrNull!.isEmpty)
+                Center(child: Text('No notices found', style: TextStyle(color: AppColors.textMuted)))
+              else
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 400.w,
+                    childAspectRatio: 0.8,
+                    crossAxisSpacing: 24.w,
+                    mainAxisSpacing: 24.h,
+                  ),
+                  itemCount: noticesAsync.value!.length,
+                  itemBuilder: (context, index) {
+                    final notice = noticesAsync.value![index];
+                    return _buildNoticePosterCard(context, notice, isDark, ref);
+                  },
+                ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildNoticePosterCard(BuildContext context, NoticeModel notice, bool isDark, WidgetRef ref) {
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : AppColors.surface,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Banner or Default Graphic
+          Expanded(
+            flex: 3,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                if (notice.bannerUrl != null && notice.bannerUrl!.isNotEmpty)
+                  Image.network(
+                    notice.bannerUrl!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => _buildPlaceholderGraphic(notice, isDark),
+                  )
+                else
+                  _buildPlaceholderGraphic(notice, isDark),
+                
+                // Overlay Gradient
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withValues(alpha: 0.7),
+                      ],
+                    ),
+                  ),
+                ),
+                
+                // Type Badge
+                Positioned(
+                  top: 12.h,
+                  left: 12.w,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.9),
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                    child: Text(
+                      notice.type.toUpperCase(),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Date & Actions (Edit/Delete) overlay
+                Positioned(
+                  top: 8.h,
+                  right: 8.w,
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Colors.white, size: 20),
+                        onPressed: () => context.push(RoutePaths.editNotice, extra: notice),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.white, size: 20),
+                        onPressed: () => _showDeleteDialog(context, notice, ref),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Content
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: EdgeInsets.all(16.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    notice.title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.sp,
+                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 8.h),
+                  Expanded(
+                    child: Text(
+                      notice.content,
+                      style: TextStyle(
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                        fontSize: 12.sp,
+                        height: 1.4,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  SizedBox(height: 8.h),
+                  Row(
+                    children: [
+                      Icon(Icons.calendar_today, size: 14.sp, color: AppColors.textMuted),
+                      SizedBox(width: 6.w),
+                      Text(
+                        notice.createdAt != null ? notice.createdAt!.toIso8601String().split('T')[0] : 'Just now',
+                        style: TextStyle(fontSize: 11.sp, color: AppColors.textMuted),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlaceholderGraphic(NoticeModel notice, bool isDark) {
+    return Container(
+      color: _getTypeColor(notice.type).withValues(alpha: 0.2),
+      child: Center(
+        child: Icon(
+          _getTypeIcon(notice.type),
+          size: 64.sp,
+          color: _getTypeColor(notice.type),
+        ),
+      ),
+    );
+  }
+
+  Color _getTypeColor(String type) {
+    switch (type.toLowerCase()) {
+      case 'general': return Colors.blue;
+      case 'academic': return Colors.green;
+      case 'fees': return Colors.orange;
+      case 'event': return Colors.purple;
+      case 'update': return Colors.teal;
+      case 'alert': return Colors.red;
+      default: return AppColors.primary;
+    }
   }
 
   void _showDeleteDialog(BuildContext context, NoticeModel notice, WidgetRef ref) {

@@ -191,8 +191,21 @@ class AdminDashboardView extends ConsumerWidget {
                   // Show top 3 recent notices
                   final recentNotices = notices.take(3).toList();
                   
-                  return Column(
-                    children: recentNotices.map((notice) => _buildRecentNoticeCard(notice, theme)).toList(),
+                  return SizedBox(
+                    height: 240.h,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: recentNotices.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: EdgeInsets.only(right: 16.w),
+                          child: SizedBox(
+                            width: 200.w,
+                            child: _buildRecentNoticePosterCard(recentNotices[index], theme, isDark),
+                          ),
+                        );
+                      },
+                    ),
                   );
                 },
               ),
@@ -454,57 +467,97 @@ Widget _buildShimmerActivityCard(bool isDark) {
   );
 }
 
-Widget _buildRecentNoticeCard(NoticeModel notice, ThemeData theme) {
-  Color iconColor;
+Widget _buildRecentNoticePosterCard(NoticeModel notice, ThemeData theme, bool isDark) {
+  Color typeColor;
   IconData iconData;
   
   switch (notice.type.toLowerCase()) {
-    case 'event':
-      iconColor = const Color(0xFF23B07D);
-      iconData = Icons.event_rounded;
-      break;
-    case 'academic':
-      iconColor = const Color(0xFF5B67F4);
-      iconData = Icons.school_rounded;
-      break;
-    case 'fees':
-      iconColor = const Color(0xFFE85A9A);
-      iconData = Icons.attach_money_rounded;
-      break;
-    default:
-      iconColor = const Color(0xFFFF8A34);
-      iconData = Icons.notifications_rounded;
+    case 'general': typeColor = Colors.blue; iconData = Icons.notifications_rounded; break;
+    case 'academic': typeColor = Colors.green; iconData = Icons.school_rounded; break;
+    case 'fees': typeColor = Colors.orange; iconData = Icons.attach_money_rounded; break;
+    case 'event': typeColor = Colors.purple; iconData = Icons.event_rounded; break;
+    case 'update': typeColor = Colors.teal; iconData = Icons.update_rounded; break;
+    case 'alert': typeColor = Colors.red; iconData = Icons.warning_rounded; break;
+    default: typeColor = AppColors.primary; iconData = Icons.campaign_rounded;
   }
 
-  return AppCard(
-    margin: EdgeInsets.only(bottom: 12.h),
-    child: ListTile(
-      leading: Container(
-        padding: EdgeInsets.all(10.r),
-        decoration: BoxDecoration(
-          color: iconColor.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12.r),
-        ),
-        child: Icon(iconData, color: iconColor, size: 22.sp),
-      ),
-      title: Text(
-        notice.title,
-        style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-      subtitle: notice.content.isNotEmpty
-          ? Padding(
-              padding: EdgeInsets.only(top: 4.h),
-              child: Text(
-                notice.content,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 12.sp, color: AppColors.textMuted),
-              ),
-            )
-          : null,
-      contentPadding: EdgeInsets.zero,
+  return Container(
+    decoration: BoxDecoration(
+      color: isDark ? AppColors.darkSurface : AppColors.surface,
+      borderRadius: BorderRadius.circular(16.r),
+      boxShadow: [
+        BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
+      ],
     ),
+    clipBehavior: Clip.antiAlias,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Banner
+        Expanded(
+          flex: 4,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              if (notice.bannerUrl != null && notice.bannerUrl!.isNotEmpty)
+                Image.network(notice.bannerUrl!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => _buildActivityPlaceholder(typeColor, iconData))
+              else
+                _buildActivityPlaceholder(typeColor, iconData),
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.transparent, Colors.black.withValues(alpha: 0.7)],
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 8.h,
+                left: 12.w,
+                child: Text(
+                  notice.type.toUpperCase(),
+                  style: TextStyle(color: Colors.white, fontSize: 10.sp, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        ),
+        // Content
+        Expanded(
+          flex: 3,
+          child: Padding(
+            padding: EdgeInsets.all(12.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  notice.title,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp, color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: 4.h),
+                Expanded(
+                  child: Text(
+                    notice.content,
+                    style: TextStyle(color: AppColors.textMuted, fontSize: 11.sp, height: 1.2),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _buildActivityPlaceholder(Color color, IconData icon) {
+  return Container(
+    color: color.withValues(alpha: 0.2),
+    child: Center(child: Icon(icon, size: 48.sp, color: color)),
   );
 }

@@ -236,6 +236,21 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(
+            path: RoutePaths.editExam,
+            name: RouteNames.editExam,
+            pageBuilder: (context, state) {
+              final exam = state.extra as ExamSchedule;
+              return CustomTransitionPage(
+                key: state.pageKey,
+                child: ExamFormView(examToEdit: exam),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(opacity: animation, child: child);
+                    },
+              );
+            },
+          ),
+          GoRoute(
             path: RoutePaths.fees,
             name: RouteNames.fees,
             pageBuilder: (context, state) => CustomTransitionPage(

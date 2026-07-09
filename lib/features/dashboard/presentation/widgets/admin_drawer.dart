@@ -167,6 +167,16 @@ class AdminDrawer extends ConsumerWidget {
                       context.go(RoutePaths.notifications);
                     },
                   ),
+                  _DrawerItem(
+                    icon: Icons.help_outline_rounded,
+                    title: 'Enquiries',
+                    iconColor: const Color(0xFFFFC857),
+                    isSelected: currentRoute.startsWith(RoutePaths.enquiry),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      context.go(RoutePaths.enquiry);
+                    },
+                  ),
                 ],
               ),
             ),

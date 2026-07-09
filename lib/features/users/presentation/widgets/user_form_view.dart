@@ -9,6 +9,7 @@ import 'package:ascento_abacus/features/users/presentation/providers/users_provi
 import 'package:ascento_abacus/features/domains/presentation/providers/domains_provider.dart';
 import 'package:ascento_abacus/shared/models/user_model.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io';
 class UserFormView extends ConsumerStatefulWidget {
   final String initialRole;
@@ -134,9 +135,9 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
       };
       
       if (_isEdit) {
-        await repo.updateUser(widget.userToEdit!.id, payload, avatarPath: _selectedAvatar?.path);
+        await repo.updateUser(widget.userToEdit!.id, payload, avatarFile: _selectedAvatar);
       } else {
-        await repo.createUser(payload, avatarPath: _selectedAvatar?.path);
+        await repo.createUser(payload, avatarFile: _selectedAvatar);
       }
       
       ref.invalidate(usersListProvider(_selectedRole));
@@ -209,7 +210,9 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
                         radius: 50.r,
                         backgroundColor: Colors.grey.shade200,
                         backgroundImage: _selectedAvatar != null
-                            ? FileImage(File(_selectedAvatar!.path))
+                            ? (kIsWeb 
+                                ? NetworkImage(_selectedAvatar!.path) 
+                                : FileImage(File(_selectedAvatar!.path))) as ImageProvider
                             : (widget.userToEdit?.avatarUrl != null
                                 ? NetworkImage(widget.userToEdit!.avatarUrl!) as ImageProvider
                                 : null),

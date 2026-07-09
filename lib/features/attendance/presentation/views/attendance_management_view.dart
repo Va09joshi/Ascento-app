@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ascento_abacus/core/theme/app_colors.dart';
 import 'package:ascento_abacus/shared/models/feature_models.dart';
 import 'package:ascento_abacus/shared/router/route_names.dart';
+import 'package:ascento_abacus/core/widgets/app_card.dart';
 import 'package:ascento_abacus/shared/widgets/premium_data_table.dart';
 import 'package:ascento_abacus/features/attendance/presentation/widgets/attendance_form_dialog.dart';
 
@@ -38,6 +39,61 @@ class AttendanceManagementView extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Text(
+                'Attendance Dashboard',
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : AppColors.textPrimary,
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                'Monitor and manage daily attendance records.',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
+                ),
+              ),
+              SizedBox(height: 24.h),
+              
+              // Statistics Cards
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildStatCard(
+                      context, 
+                      'Total Students', 
+                      '120', 
+                      Icons.groups_rounded, 
+                      Colors.blue, 
+                      isDark,
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: _buildStatCard(
+                      context, 
+                      'Present', 
+                      '115', 
+                      Icons.check_circle_rounded, 
+                      AppColors.success, 
+                      isDark,
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: _buildStatCard(
+                      context, 
+                      'Absent', 
+                      '5', 
+                      Icons.cancel_rounded, 
+                      AppColors.error, 
+                      isDark,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 24.h),
+
               PremiumDataTable<AttendanceRecord>(
                 title: 'Attendance Management',
                 subtitle: 'Mark and review daily attendance records.',
@@ -130,5 +186,42 @@ class AttendanceManagementView extends ConsumerWidget {
       case AttendanceStatus.halfDay: return AppColors.secondary;
       default: return AppColors.textPrimary;
     }
+  }
+
+  Widget _buildStatCard(BuildContext context, String title, String value, IconData icon, Color color, bool isDark) {
+    return AppCard(
+      padding: EdgeInsets.all(16.w),
+      margin: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.all(8.w),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8.r),
+            ),
+            child: Icon(icon, color: color, size: 24.sp),
+          ),
+          SizedBox(height: 12.h),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 12.sp,
+              color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
+            ),
+          ),
+          SizedBox(height: 4.h),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 24.sp,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : AppColors.textPrimary,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

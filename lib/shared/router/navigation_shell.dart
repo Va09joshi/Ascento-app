@@ -201,13 +201,7 @@ class NavigationShell extends ConsumerWidget {
                         accent: const Color(0xFF6C4ED9),
                         onTap: () => _go(context, RoutePaths.academicsConfig),
                       ),
-                      _DrawerItem(
-                        icon: Icons.event_note_rounded,
-                        label: 'Courses Config',
-                        active: currentPath == RoutePaths.programs,
-                        accent: const Color(0xFFE85A9A),
-                        onTap: () => _go(context, RoutePaths.programs),
-                      ),
+
                       _DrawerItem(
                         icon: Icons.co_present_rounded,
                         label: 'Attendance Data',
@@ -237,12 +231,13 @@ class NavigationShell extends ConsumerWidget {
                         onTap: () => _go(context, RoutePaths.notifications),
                       ),
                       _DrawerItem(
-                        icon: Icons.analytics_rounded,
-                        label: 'System Reports',
-                        active: false,
-                        accent: const Color(0xFF90A4AE),
-                        onTap: () => _showComingSoon(context),
+                        icon: Icons.help_outline_rounded,
+                        label: 'Enquiries',
+                        active: currentPath == RoutePaths.enquiry,
+                        accent: const Color(0xFFFFC857),
+                        onTap: () => _go(context, RoutePaths.enquiry),
                       ),
+
                     ] else if (user?.role == UserRole.teacher) ...[
                       _DrawerSection(title: 'Teacher Portal'),
                       _DrawerItem(

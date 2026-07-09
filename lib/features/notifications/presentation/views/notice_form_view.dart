@@ -8,6 +8,8 @@ import 'package:ascento_abacus/features/notifications/presentation/providers/not
 import 'package:ascento_abacus/core/services/storage_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io';
 
 class NoticeFormView extends ConsumerStatefulWidget {
   final NoticeModel? notice;
@@ -182,7 +184,9 @@ class _NoticeFormViewState extends ConsumerState<NoticeFormView> {
                     child: _selectedImage != null
                         ? ClipRRect(
                             borderRadius: BorderRadius.circular(12.r),
-                            child: Image.network(_selectedImage!.path, fit: BoxFit.cover, errorBuilder: (ctx, err, st) => const Icon(Icons.image)),
+                            child: kIsWeb 
+                                ? Image.network(_selectedImage!.path, fit: BoxFit.cover, errorBuilder: (ctx, err, st) => const Icon(Icons.image))
+                                : Image.file(File(_selectedImage!.path), fit: BoxFit.cover, errorBuilder: (ctx, err, st) => const Icon(Icons.image)),
                           )
                         : widget.notice?.bannerUrl != null
                             ? ClipRRect(
