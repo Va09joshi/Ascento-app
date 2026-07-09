@@ -40,6 +40,9 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
   // Shared
   String? _selectedBranchId;
 
+  String? _selectedGender;
+  DateTime? _selectedDateOfBirth;
+
   bool get _isEdit => widget.userToEdit != null;
 
   @override
@@ -83,6 +86,14 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
       
       if (_phoneController.text.isNotEmpty) {
         payload['phone'] = _phoneController.text.trim();
+      }
+      
+      if (_selectedGender != null) {
+        payload['gender'] = _selectedGender;
+      }
+      
+      if (_selectedDateOfBirth != null) {
+        payload['date_of_birth'] = _selectedDateOfBirth!.toIso8601String().split('T').first;
       }
       
       if (!_isEdit && _selectedBranchId != null) {
@@ -222,6 +233,51 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
                         label: 'Phone Number (Optional)',
                         hint: '+91 9876543210',
                         prefixIcon: Icons.phone_rounded,
+                      ),
+                      SizedBox(height: 20.h),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              value: _selectedGender,
+                              decoration: InputDecoration(
+                                labelText: 'Gender (Optional)',
+                                prefixIcon: const Icon(Icons.people_rounded),
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12)),
+                                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12)),
+                              ),
+                              items: const [
+                                DropdownMenuItem(value: 'male', child: Text('Male')),
+                                DropdownMenuItem(value: 'female', child: Text('Female')),
+                                DropdownMenuItem(value: 'other', child: Text('Other')),
+                              ],
+                              onChanged: (val) => setState(() => _selectedGender = val),
+                            ),
+                          ),
+                          SizedBox(width: 16.w),
+                          Expanded(
+                            child: InkWell(
+                              onTap: () async {
+                                final date = await showDatePicker(
+                                  context: context,
+                                  initialDate: _selectedDateOfBirth ?? DateTime.now().subtract(const Duration(days: 365 * 10)),
+                                  firstDate: DateTime(1900),
+                                  lastDate: DateTime.now(),
+                                );
+                                if (date != null) setState(() => _selectedDateOfBirth = date);
+                              },
+                              child: InputDecorator(
+                                decoration: InputDecoration(
+                                  labelText: 'Date of Birth (Optional)',
+                                  prefixIcon: const Icon(Icons.cake_rounded),
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12)),
+                                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12)),
+                                ),
+                                child: Text(_selectedDateOfBirth == null ? 'Select Date' : '${_selectedDateOfBirth!.day}/${_selectedDateOfBirth!.month}/${_selectedDateOfBirth!.year}'),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
 
                       if (!_isEdit) ...[
