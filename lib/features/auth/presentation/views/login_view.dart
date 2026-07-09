@@ -116,7 +116,7 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
                   );
                 },
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 450),
+                  constraints: const BoxConstraints(maxWidth: 800),
                   child: Container(
                     padding: EdgeInsets.all(AppSpacing.p32),
                   child: Form(
