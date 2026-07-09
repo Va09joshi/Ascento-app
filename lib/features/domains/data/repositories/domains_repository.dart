@@ -11,7 +11,7 @@ class DomainsRepository {
 
   Future<List<DomainModel>> fetchDomains() async {
     try {
-      final response = await _dioClient.get('/admin/domains');
+      final response = await _dioClient.get('/domains');
       final List data = response.data['data'] ?? [];
       return data.map((json) => DomainModel.fromJson(json)).toList();
     } catch (e) {
@@ -22,7 +22,7 @@ class DomainsRepository {
 
   Future<DomainModel> createDomain(Map<String, dynamic> payload) async {
     try {
-      final response = await _dioClient.post('/admin/domains', data: payload);
+      final response = await _dioClient.post('/domains', data: payload);
       return DomainModel.fromJson(response.data['data']);
     } catch (e) {
       AppLogger.error('Failed to create domain', e);
@@ -33,7 +33,7 @@ class DomainsRepository {
 
   Future<DomainModel> updateDomain(String id, Map<String, dynamic> payload) async {
     try {
-      final response = await _dioClient.patch('/admin/domains/$id', data: payload);
+      final response = await _dioClient.put('/domains/$id', data: payload);
       return DomainModel.fromJson(response.data['data']);
     } catch (e) {
       AppLogger.error('Failed to update domain', e);
@@ -44,7 +44,7 @@ class DomainsRepository {
 
   Future<void> deleteDomain(String id) async {
     try {
-      await _dioClient.delete('/admin/domains/$id');
+      await _dioClient.delete('/domains/$id');
     } catch (e) {
       AppLogger.error('Failed to delete domain', e);
       if (e is ApiException) throw Exception(e.message);
