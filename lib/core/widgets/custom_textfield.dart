@@ -63,80 +63,95 @@ class CustomTextField extends StatelessWidget {
           ),
         ),
         AppSizes.h8,
-        TextFormField(
-          controller: controller,
-          obscureText: isObscure,
-          keyboardType: keyboardType,
-          validator: validator,
-          onChanged: onChanged,
-          inputFormatters: inputFormatters,
-          textCapitalization: textCapitalization,
-          textInputAction: textInputAction,
-          enabled: enabled,
-          readOnly: readOnly,
-          onTap: onTap,
-          minLines: isObscure ? 1 : minLines,
-          maxLines: isObscure ? 1 : maxLines,
-          style: theme.textTheme.bodyMedium,
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.hintColor.withOpacity(0.5),
-            ),
-            fillColor: isDark
-                ? theme.colorScheme.primaryContainer
-                : AppColors.white,
-            filled: true,
-            prefixIcon: prefixIcon != null
-                ? Icon(prefixIcon, color: theme.colorScheme.primary, size: 20)
-                : null,
-            suffixIcon: suffixIcon != null
-                ? IconButton(
-                    icon: Icon(
-                      suffixIcon,
-                      color: theme.colorScheme.secondary,
-                      size: 20,
-                    ),
-                    onPressed: onSuffixIconPressed,
-                  )
-                : null,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 16,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSizes.r8),
-              borderSide: BorderSide(
-                color: theme.colorScheme.outline,
-                width: 1.2,
+        Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: isDark 
+                    ? Colors.black.withOpacity(0.3) 
+                    : theme.colorScheme.shadow.withOpacity(0.04),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
               ),
+            ],
+          ),
+          child: TextFormField(
+            controller: controller,
+            obscureText: isObscure,
+            keyboardType: keyboardType,
+            validator: validator,
+            onChanged: onChanged,
+            inputFormatters: inputFormatters,
+            textCapitalization: textCapitalization,
+            textInputAction: textInputAction,
+            enabled: enabled,
+            readOnly: readOnly,
+            onTap: onTap,
+            minLines: isObscure ? 1 : minLines,
+            maxLines: isObscure ? 1 : maxLines,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w500,
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSizes.r8),
-              borderSide: BorderSide(
-                color: theme.colorScheme.outline,
-                width: 1.2,
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.hintColor.withOpacity(0.4),
+                fontWeight: FontWeight.w400,
               ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSizes.r8),
-              borderSide: BorderSide(
-                color: theme.colorScheme.primary,
-                width: 2.0,
+              fillColor: isDark
+                  ? theme.colorScheme.surface
+                  : AppColors.white,
+              filled: true,
+              prefixIcon: prefixIcon != null
+                  ? Icon(prefixIcon, color: theme.colorScheme.primary.withOpacity(0.8), size: 22)
+                  : null,
+              suffixIcon: suffixIcon != null
+                  ? IconButton(
+                      icon: Icon(
+                        suffixIcon,
+                        color: theme.colorScheme.secondary.withOpacity(0.8),
+                        size: 22,
+                      ),
+                      onPressed: onSuffixIconPressed,
+                    )
+                  : null,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 18,
               ),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSizes.r8),
-              borderSide: BorderSide(
-                color: theme.colorScheme.error,
-                width: 1.5,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
               ),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSizes.r8),
-              borderSide: BorderSide(
-                color: theme.colorScheme.error,
-                width: 2.0,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: isDark ? Colors.white12 : Colors.black.withOpacity(0.05),
+                  width: 1,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: theme.colorScheme.primary,
+                  width: 2.0,
+                ),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: theme.colorScheme.error.withOpacity(0.5),
+                  width: 1.5,
+                ),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: theme.colorScheme.error,
+                  width: 2.0,
+                ),
               ),
             ),
           ),

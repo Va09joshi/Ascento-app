@@ -3,10 +3,13 @@ import 'package:ascento_abacus/core/logging/app_logger.dart';
 import 'package:ascento_abacus/core/network/network_info.dart';
 import 'package:ascento_abacus/shared/models/user_model.dart';
 
+import 'package:ascento_abacus/core/services/storage_service.dart';
+
 class SplashService {
   final NetworkInfo _networkInfo;
+  final StorageService _storageService;
 
-  const SplashService(this._networkInfo);
+  const SplashService(this._networkInfo, this._storageService);
 
   // 1. Version Check: verifies app compatibility (Production min-version required is 1.0.0)
   Future<bool> isAppVersionValid() async {
@@ -37,10 +40,15 @@ class SplashService {
     AppLogger.info('Decrypting credentials from secure storage...');
     await Future.delayed(const Duration(milliseconds: 500));
     
-    // We simulate secure storage extraction via our StorageService. 
-    // In production, you would swap this for the flutter_secure_storage package.
-    // For now, we mock an existing login if needed, or return null if starting fresh.
-    return 'ascento_abacus_secured_session_token_jwt';
+    if (!_storageService.getRememberMe()) {
+      AppLogger.info('Remember me is false, clearing previous session on boot.');
+      await _storageService.remove('secure_jwt_access_token');
+      await _storageService.remove('secure_jwt_refresh_token');
+      await _storageService.removeUser();
+      return null;
+    }
+    
+    return _storageService.getString('secure_jwt_access_token');
   }
 
   // 4. Role checking: Extract user role metadata
@@ -48,13 +56,14 @@ class SplashService {
     AppLogger.info('Resolving system access authorization rights...');
     await Future.delayed(const Duration(milliseconds: 500));
     
-    // Default mock is student. You can alter this to match teacher/admin accounts.
-    return UserRole.student;
+    final user = _storageService.getCurrentUser();
+    return user?.role ?? UserRole.student;
   }
 }
 
 // Global Splash Service Provider
 final splashServiceProvider = Provider<SplashService>((ref) {
   final networkInfo = ref.watch(networkInfoProvider);
-  return SplashService(networkInfo);
+  final storageService = ref.watch(storageServiceProvider);
+  return SplashService(networkInfo, storageService);
 });

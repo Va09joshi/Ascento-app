@@ -147,8 +147,9 @@ class SplashController extends StateNotifier<SplashState> {
           route = '/dashboard';
           break;
         case UserRole.superAdmin:
-          // TODO: Handle this case.
-          throw UnimplementedError();
+          AppLogger.info('Role resolved: Super Admin.');
+          route = '/dashboard';
+          break;
       }
 
       // 7. Successful Handshake

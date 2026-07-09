@@ -47,11 +47,12 @@ class AuthController extends StateNotifier<AuthUIState> {
     String email,
     String password,
     UserRole role,
+    bool rememberMe,
     VoidCallback onSuccess,
   ) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      final user = await _authService.authenticate(email, password, role);
+      final user = await _authService.authenticate(email, password, role, rememberMe);
       state = state.copyWith(isLoading: false, currentUser: user);
       onSuccess();
     } catch (e) {

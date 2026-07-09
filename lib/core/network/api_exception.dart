@@ -226,8 +226,12 @@ _ParsedError _parseBadResponse(Response? response) {
 
   // Attempt to extract structured message from JSON response body
   if (data is Map<String, dynamic>) {
-    final serverMessage = data['message'] ?? data['error'] ?? data['msg'];
+    dynamic serverMessage = data['message'] ?? data['error'] ?? data['msg'];
     final serverCode = data['errorCode'] ?? data['code'];
+
+    if (serverMessage is Map) {
+      serverMessage = serverMessage['message'] ?? serverMessage['msg'] ?? serverMessage.toString();
+    }
 
     if (serverMessage != null) {
       return _ParsedError(

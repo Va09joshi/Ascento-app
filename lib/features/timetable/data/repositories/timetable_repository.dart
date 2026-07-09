@@ -37,6 +37,18 @@ class TimetableRepository {
       rethrow;
     }
   }
+
+  Future<void> createTimetableSlot(Map<String, dynamic> payload) async {
+    try {
+      final response = await _dioClient.post('/timetable', data: payload);
+      if (response.data['success'] != true) {
+        throw Exception(response.data['message'] ?? 'Failed to create slot');
+      }
+    } catch (e) {
+      AppLogger.error('Failed to create timetable slot', e);
+      rethrow;
+    }
+  }
 }
 
 final timetableRepositoryProvider = Provider<TimetableRepository>((ref) {

@@ -7,6 +7,7 @@ import 'package:ascento_abacus/core/widgets/custom_button.dart';
 import 'package:ascento_abacus/core/widgets/custom_textfield.dart';
 import 'package:ascento_abacus/features/exams/data/repositories/exams_repository.dart';
 import 'package:ascento_abacus/features/exams/presentation/providers/exams_provider.dart';
+import 'package:ascento_abacus/features/academics/presentation/providers/academics_provider.dart';
 
 class ExamFormView extends ConsumerStatefulWidget {
   const ExamFormView({super.key});
@@ -19,39 +20,55 @@ class _ExamFormViewState extends ConsumerState<ExamFormView> {
   final _formKey = GlobalKey<FormState>();
   
   final _titleController = TextEditingController();
-  final _typeController = TextEditingController();
-  final _academicYearIdController = TextEditingController();
-  final _classIdController = TextEditingController();
-  final _examDateController = TextEditingController();
   final _totalMarksController = TextEditingController(text: '100');
   final _passingMarksController = TextEditingController(text: '40');
+  
+  String? _selectedAcademicYearId;
+  String? _selectedClassId;
+  String? _selectedExamType;
+  DateTime? _selectedDate;
+
+  final _examTypes = ['midterm', 'final', 'unit_test'];
   
   bool _isLoading = false;
 
   @override
   void dispose() {
     _titleController.dispose();
-    _typeController.dispose();
-    _academicYearIdController.dispose();
-    _classIdController.dispose();
-    _examDateController.dispose();
     _totalMarksController.dispose();
     _passingMarksController.dispose();
     super.dispose();
   }
 
+  Future<void> _selectDate(BuildContext context) async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
+      setState(() => _selectedDate = picked);
+    }
+  }
+
   Future<void> _submitForm() async {
     if (!_formKey.currentState!.validate()) return;
+
+    if (_selectedAcademicYearId == null || _selectedClassId == null || _selectedExamType == null || _selectedDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please fill all fields')));
+      return;
+    }
 
     setState(() => _isLoading = true);
 
     try {
       final payload = {
         "title": _titleController.text.trim(),
-        "type": _typeController.text.trim().toLowerCase(),
-        "academic_year_id": _academicYearIdController.text.trim(),
-        "class_id": _classIdController.text.trim(),
-        "exam_date": _examDateController.text.trim(),
+        "type": _selectedExamType,
+        "academic_year_id": _selectedAcademicYearId,
+        "class_id": _selectedClassId,
+        "exam_date": _selectedDate!.toIso8601String().split('T').first,
         "total_marks": int.tryParse(_totalMarksController.text.trim()) ?? 100,
         "passing_marks": int.tryParse(_passingMarksController.text.trim()) ?? 40,
       };
@@ -102,32 +119,60 @@ class _ExamFormViewState extends ConsumerState<ExamFormView> {
                   validator: (v) => v == null || v.isEmpty ? 'Title required' : null,
                 ),
                 SizedBox(height: 16.h),
-                CustomTextField(
-                  label: 'Exam Type',
-                  hint: 'e.g. midterm, final, unit_test',
-                  controller: _typeController,
-                  validator: (v) => v == null || v.isEmpty ? 'Type required' : null,
+
+                DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                    labelText: 'Exam Type',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
+                  ),
+                  initialValue: _selectedExamType,
+                  items: _examTypes.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
+                  onChanged: (val) => setState(() => _selectedExamType = val),
+                  validator: (val) => val == null ? 'Required' : null,
                 ),
                 SizedBox(height: 16.h),
-                CustomTextField(
-                  label: 'Academic Year ID',
-                  hint: 'Enter academic year ID',
-                  controller: _academicYearIdController,
-                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+
+                ref.watch(academicYearsListProvider).when(
+                  data: (years) => DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      labelText: 'Academic Year',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
+                    ),
+                    initialValue: _selectedAcademicYearId,
+                    items: years.map((y) => DropdownMenuItem(value: y.id, child: Text(y.name))).toList(),
+                    onChanged: (val) => setState(() => _selectedAcademicYearId = val),
+                    validator: (val) => val == null ? 'Required' : null,
+                  ),
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (e, s) => Text('Error loading academic years: $e'),
                 ),
                 SizedBox(height: 16.h),
-                CustomTextField(
-                  label: 'Class ID',
-                  hint: 'Enter class ID',
-                  controller: _classIdController,
-                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+
+                ref.watch(classesListProvider).when(
+                  data: (classes) => DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      labelText: 'Class',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
+                    ),
+                    initialValue: _selectedClassId,
+                    items: classes.map((c) => DropdownMenuItem(value: c.id, child: Text(c.name))).toList(),
+                    onChanged: (val) => setState(() => _selectedClassId = val),
+                    validator: (val) => val == null ? 'Required' : null,
+                  ),
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (e, s) => Text('Error loading classes: $e'),
                 ),
                 SizedBox(height: 16.h),
-                CustomTextField(
-                  label: 'Exam Date',
-                  hint: 'YYYY-MM-DD',
-                  controller: _examDateController,
-                  validator: (v) => v == null || v.isEmpty ? 'Date required' : null,
+
+                InkWell(
+                  onTap: () => _selectDate(context),
+                  child: InputDecorator(
+                    decoration: InputDecoration(
+                      labelText: 'Exam Date',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
+                    ),
+                    child: Text(_selectedDate == null ? 'YYYY-MM-DD' : _selectedDate!.toIso8601String().split('T').first),
+                  ),
                 ),
                 SizedBox(height: 16.h),
                 Row(

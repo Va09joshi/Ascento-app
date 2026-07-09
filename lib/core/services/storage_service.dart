@@ -14,6 +14,7 @@ class StorageService {
   static const String _keyAbacusLevelsCompleted = 'levels_completed';
   static const String _keyAbacusTotalStars = 'total_stars';
   static const String _keyCurrentUser = 'cached_current_user';
+  static const String _keyRememberMe = 'remember_me';
 
   // Dynamic getters/setters
   String? getString(String key) {
@@ -92,6 +93,16 @@ class StorageService {
   Future<bool> setTotalStars(int stars) async {
     AppLogger.debug('Total stars saved: $stars');
     return await _prefs.setInt(_keyAbacusTotalStars, stars);
+  }
+
+  // Remember Me
+  bool getRememberMe() {
+    return _prefs.getBool(_keyRememberMe) ?? false;
+  }
+
+  Future<bool> setRememberMe(bool value) async {
+    AppLogger.debug('Remember Me flag saved: $value');
+    return await _prefs.setBool(_keyRememberMe, value);
   }
 
   // Clear Storage

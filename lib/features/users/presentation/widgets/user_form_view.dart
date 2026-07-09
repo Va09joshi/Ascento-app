@@ -68,8 +68,12 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
     setState(() => _isLoading = true);
     
     try {
+      final nameParts = _nameController.text.trim().split(' ');
       final payload = <String, dynamic>{
         'full_name': _nameController.text.trim(),
+        'name': _nameController.text.trim(),
+        'first_name': nameParts.isNotEmpty ? nameParts.first : '',
+        'last_name': nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '',
       };
       
       if (!_isEdit) {
@@ -110,7 +114,14 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e'), backgroundColor: Colors.red));
+        final errorMsg = e.toString().replaceFirst('Exception: ', '');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMsg), 
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+          )
+        );
       }
     } finally {
       if (mounted) {

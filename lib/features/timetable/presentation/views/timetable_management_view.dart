@@ -7,6 +7,7 @@ import 'package:ascento_abacus/shared/widgets/premium_data_table.dart';
 
 import 'package:ascento_abacus/features/timetable/presentation/providers/timetable_provider.dart';
 import 'package:ascento_abacus/features/academics/presentation/providers/academics_provider.dart';
+import 'package:ascento_abacus/features/timetable/presentation/widgets/timetable_slot_form_dialog.dart';
 
 class TimetableManagementView extends ConsumerWidget {
   const TimetableManagementView({super.key});
@@ -166,7 +167,16 @@ class TimetableManagementView extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          // TODO: Add Slot
+          if (selectedSectionId == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Please select a class and section first'), backgroundColor: Colors.red)
+            );
+            return;
+          }
+          showDialog(
+            context: context,
+            builder: (ctx) => TimetableSlotFormDialog(sectionId: selectedSectionId),
+          );
         },
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,

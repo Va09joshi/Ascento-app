@@ -24,10 +24,10 @@ class AuthService {
   }
 
   // Submit sign in and cache token values
-  Future<UserModel> authenticate(String email, String password, UserRole role) async {
+  Future<UserModel> authenticate(String email, String password, UserRole role, bool rememberMe) async {
     try {
       final response = await _authRepository.login(email, password, role);
-      await _saveSession(response);
+      await _saveSession(response, rememberMe);
       return response.user;
     } catch (e) {
       AppLogger.error('Auth failure inside domain service', e);
@@ -74,10 +74,11 @@ class AuthService {
   }
 
   // Private helper to save session values inside shared storage
-  Future<void> _saveSession(AuthResponse response) async {
+  Future<void> _saveSession(AuthResponse response, bool rememberMe) async {
     await _storageService.setString('secure_jwt_access_token', response.accessToken);
     await _storageService.setString('secure_jwt_refresh_token', response.refreshToken);
     await _storageService.setCurrentUser(response.user);
+    await _storageService.setRememberMe(rememberMe);
   }
 }
 

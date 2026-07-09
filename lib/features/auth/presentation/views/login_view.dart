@@ -52,6 +52,7 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
         _usernameController.text.trim(),
         _passwordController.text,
         UserRole.student, // We pass student for now, backend dictates actual role
+        _rememberMe,
         () {
           final authState = ref.read(authControllerProvider);
           final userRole = authState.currentUser?.role;
@@ -116,18 +117,6 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
                 },
                 child: Container(
                   padding: EdgeInsets.all(AppSpacing.p32),
-                  decoration: BoxDecoration(
-                    color: isDark ? AppColors.darkSurface : Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
-                        blurRadius: 32,
-                        spreadRadius: 8,
-                        offset: const Offset(0, 16),
-                      ),
-                    ],
-                  ),
                   child: Form(
                       key: _formKey,
                       child: Column(
@@ -164,27 +153,7 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
                           ),
                           AppSpacing.h32,
 
-                          // --- Welcome Text ---
-                          Text(
-                            'Welcome Back',
-                            style: theme.textTheme.headlineMedium?.copyWith(
-                              fontWeight: FontWeight.w900,
-                              color: isDark ? Colors.white : AppColors.textPrimary,
-                              letterSpacing: -0.5,
-                              fontSize: 32.sp,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          AppSpacing.h8,
-                          Text(
-                            'Sign in to Ascento Abacus',
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              color: isDark ? Colors.white70 : AppColors.textMuted,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          AppSpacing.h32,
+                          // Removed Welcome Text and Subtitle
 
                           // --- Red Error Announcement Panel ---
                           if (authState.errorMessage != null) ...[

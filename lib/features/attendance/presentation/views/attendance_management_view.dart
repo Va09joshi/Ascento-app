@@ -6,6 +6,7 @@ import 'package:ascento_abacus/core/theme/app_colors.dart';
 import 'package:ascento_abacus/shared/models/feature_models.dart';
 import 'package:ascento_abacus/shared/router/route_names.dart';
 import 'package:ascento_abacus/shared/widgets/premium_data_table.dart';
+import 'package:ascento_abacus/features/attendance/presentation/widgets/attendance_form_dialog.dart';
 
 // Mock Provider for UI demonstration until API is connected
 final mockAttendanceProvider = FutureProvider.autoDispose<List<AttendanceRecord>>((ref) async {
@@ -107,7 +108,10 @@ class AttendanceManagementView extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          // TODO: Add Attendance
+          showDialog(
+            context: context,
+            builder: (context) => const AttendanceFormDialog(),
+          );
         },
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,

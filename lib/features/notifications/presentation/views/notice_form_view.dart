@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ascento_abacus/core/theme/app_colors.dart';
 import 'package:ascento_abacus/shared/models/notice_model.dart';
 import 'package:ascento_abacus/features/notifications/presentation/providers/notices_provider.dart';
+import 'package:ascento_abacus/core/services/storage_service.dart';
 
 class NoticeFormView extends ConsumerStatefulWidget {
   final NoticeModel? notice;
@@ -32,7 +33,7 @@ class _NoticeFormViewState extends ConsumerState<NoticeFormView> {
     _contentController = TextEditingController(text: widget.notice?.content ?? '');
     if (widget.notice != null) {
       _selectedType = widget.notice!.type;
-      _isPublished = widget.notice!.isPublished ?? false;
+      _isPublished = widget.notice!.isPublished;
     }
   }
 
@@ -48,11 +49,14 @@ class _NoticeFormViewState extends ConsumerState<NoticeFormView> {
 
     setState(() => _isLoading = true);
     
+    final currentUser = ref.read(storageServiceProvider).getCurrentUser();
+    
     final data = {
       'title': _titleController.text,
       'content': _contentController.text,
       'type': _selectedType,
       'is_published': _isPublished,
+      if (currentUser != null) 'created_by': currentUser.id,
     };
 
     try {
@@ -72,10 +76,13 @@ class _NoticeFormViewState extends ConsumerState<NoticeFormView> {
       }
     } catch (e) {
       if (mounted) {
+        String errorMessage = e.toString().replaceFirst('Exception: ', '');
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: AppColors.error,
+            content: Text(errorMessage), 
+            backgroundColor: AppColors.error, 
+            duration: const Duration(seconds: 4)
           ),
         );
       }
@@ -116,7 +123,7 @@ class _NoticeFormViewState extends ConsumerState<NoticeFormView> {
                 
                 _buildLabel('Notice Type', theme),
                 DropdownButtonFormField<String>(
-                  value: _selectedType,
+                  initialValue: _selectedType,
                   decoration: _inputDecoration('', isDark),
                   items: _types.map((type) {
                     return DropdownMenuItem(
@@ -146,7 +153,7 @@ class _NoticeFormViewState extends ConsumerState<NoticeFormView> {
                   ),
                   subtitle: const Text('If turned off, this notice will be saved as a draft.'),
                   value: _isPublished,
-                  activeColor: AppColors.primary,
+                  activeThumbColor: AppColors.primary,
                   onChanged: (val) => setState(() => _isPublished = val),
                   contentPadding: EdgeInsets.zero,
                 ),
