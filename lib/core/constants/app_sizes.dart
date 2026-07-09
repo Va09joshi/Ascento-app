@@ -30,7 +30,7 @@ class AppSizes {
   static const double iconXl = 48.0;
 
   // Common button heights
-  static const double buttonHeight = 52.0;
+  static const double buttonHeight = 56.0;
   static const double buttonHeightSm = 36.0;
 
   // Dynamic spacer widgets for clean code

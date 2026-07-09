@@ -98,10 +98,7 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(
-                horizontal: AppSpacing.p24,
-                vertical: 16.h,
-              ),
+             
               child: TweenAnimationBuilder<double>(
                 tween: Tween(begin: 0.0, end: 1.0),
                 duration: const Duration(milliseconds: 600),
