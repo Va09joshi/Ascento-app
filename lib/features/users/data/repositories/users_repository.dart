@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:dio/dio.dart';
 import 'package:ascento_abacus/core/network/dio_client.dart';
 import 'package:ascento_abacus/core/network/api_exception.dart';
 import 'package:ascento_abacus/core/logging/app_logger.dart';
@@ -22,9 +23,15 @@ class UsersRepository {
     }
   }
 
-  Future<UserModel> createUser(Map<String, dynamic> payload) async {
+  Future<UserModel> createUser(Map<String, dynamic> payload, {String? avatarPath}) async {
     try {
-      final response = await _dioClient.post('/admin/users', data: payload);
+      dynamic data = payload;
+      if (avatarPath != null) {
+        final formData = FormData.fromMap(payload);
+        formData.files.add(MapEntry('avatar', await MultipartFile.fromFile(avatarPath)));
+        data = formData;
+      }
+      final response = await _dioClient.post('/admin/users', data: data);
       return UserModel.fromJson(response.data['data']);
     } catch (e) {
       AppLogger.error('Failed to create user', e);
@@ -38,9 +45,15 @@ class UsersRepository {
     }
   }
 
-  Future<UserModel> updateUser(String id, Map<String, dynamic> payload) async {
+  Future<UserModel> updateUser(String id, Map<String, dynamic> payload, {String? avatarPath}) async {
     try {
-      final response = await _dioClient.patch('/admin/users/$id', data: payload);
+      dynamic data = payload;
+      if (avatarPath != null) {
+        final formData = FormData.fromMap(payload);
+        formData.files.add(MapEntry('avatar', await MultipartFile.fromFile(avatarPath)));
+        data = formData;
+      }
+      final response = await _dioClient.patch('/admin/users/$id', data: data);
       return UserModel.fromJson(response.data['data']);
     } catch (e) {
       AppLogger.error('Failed to update user', e);

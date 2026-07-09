@@ -168,6 +168,7 @@ class _TimetableManagementViewState extends ConsumerState<TimetableManagementVie
                         SizedBox(
                           width: 200.w,
                           child: DropdownButtonFormField<String>(
+                            isExpanded: true,
                             decoration: const InputDecoration(labelText: 'Class', border: OutlineInputBorder()),
                             value: selectedClassId,
                             items: classesAsync.valueOrNull?.map((c) => DropdownMenuItem(value: c.id, child: Text(c.name))).toList() ?? [],
@@ -181,6 +182,7 @@ class _TimetableManagementViewState extends ConsumerState<TimetableManagementVie
                         SizedBox(
                           width: 200.w,
                           child: DropdownButtonFormField<String>(
+                            isExpanded: true,
                             decoration: const InputDecoration(labelText: 'Section', border: OutlineInputBorder()),
                             value: selectedSectionId,
                             items: sectionsAsync.valueOrNull
@@ -195,6 +197,7 @@ class _TimetableManagementViewState extends ConsumerState<TimetableManagementVie
                         SizedBox(
                           width: 200.w,
                           child: DropdownButtonFormField<String>(
+                            isExpanded: true,
                             decoration: const InputDecoration(labelText: 'Academic Year', border: OutlineInputBorder()),
                             value: selectedAcademicYearId,
                             items: yearsAsync.valueOrNull?.map((y) => DropdownMenuItem(value: y.id, child: Text(y.name))).toList() ?? [],

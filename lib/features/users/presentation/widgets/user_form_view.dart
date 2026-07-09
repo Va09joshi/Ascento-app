@@ -8,7 +8,8 @@ import 'package:ascento_abacus/features/users/data/repositories/users_repository
 import 'package:ascento_abacus/features/users/presentation/providers/users_provider.dart';
 import 'package:ascento_abacus/features/domains/presentation/providers/domains_provider.dart';
 import 'package:ascento_abacus/shared/models/user_model.dart';
-
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 class UserFormView extends ConsumerStatefulWidget {
   final String initialRole;
   final UserModel? userToEdit;
@@ -22,6 +23,16 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
   final _formKey = GlobalKey<FormState>();
   late String _selectedRole;
   bool _isLoading = false;
+
+  XFile? _selectedAvatar;
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickAvatar() async {
+    final picked = await _picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      setState(() => _selectedAvatar = picked);
+    }
+  }
 
   // Student details
   final _nameController = TextEditingController();
@@ -97,9 +108,9 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
       };
       
       if (_isEdit) {
-        await repo.updateUser(widget.userToEdit!.id, payload);
+        await repo.updateUser(widget.userToEdit!.id, payload, avatarPath: _selectedAvatar?.path);
       } else {
-        await repo.createUser(payload);
+        await repo.createUser(payload, avatarPath: _selectedAvatar?.path);
       }
       
       ref.invalidate(usersListProvider(_selectedRole));
@@ -163,6 +174,40 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+              Center(
+                child: GestureDetector(
+                  onTap: _pickAvatar,
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 50.r,
+                        backgroundColor: Colors.grey.shade200,
+                        backgroundImage: _selectedAvatar != null
+                            ? FileImage(File(_selectedAvatar!.path))
+                            : (widget.userToEdit?.avatarUrl != null
+                                ? NetworkImage(widget.userToEdit!.avatarUrl!) as ImageProvider
+                                : null),
+                        child: (_selectedAvatar == null && widget.userToEdit?.avatarUrl == null)
+                            ? Icon(Icons.person, size: 50.r, color: Colors.grey.shade400)
+                            : null,
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          padding: EdgeInsets.all(4.r),
+                          decoration: const BoxDecoration(
+                            color: AppColors.primary,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(Icons.camera_alt, color: Colors.white, size: 16.r),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 24.h),
               Container(
                 padding: EdgeInsets.all(12.w),
                 decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(8.r)),

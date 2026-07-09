@@ -11,6 +11,7 @@ class UserModel {
   final String name;
   final String email;
   final UserRole role;
+  final String? avatarUrl;
   final int starsCount;
   final int completedLevels;
 
@@ -19,6 +20,7 @@ class UserModel {
     required this.name,
     required this.email,
     required this.role,
+    this.avatarUrl,
     this.starsCount = 0,
     this.completedLevels = 0,
   });
@@ -30,6 +32,7 @@ class UserModel {
       'name': name,
       'email': email,
       'role': role.name,
+      'avatarUrl': avatarUrl,
       'starsCount': starsCount,
       'completedLevels': completedLevels,
     };
@@ -41,6 +44,7 @@ class UserModel {
       id: json['id'] as String? ?? '',
       name: (json['full_name'] ?? json['name']) as String? ?? 'Guest User',
       email: json['email'] as String? ?? '',
+      avatarUrl: json['avatar_url'] as String? ?? json['profile_image_url'] as String?,
       role: UserRole.values.firstWhere(
         (r) {
           final roleString = json['role'] as String?;
@@ -59,6 +63,7 @@ class UserModel {
     String? name,
     String? email,
     UserRole? role,
+    String? avatarUrl,
     int? starsCount,
     int? completedLevels,
   }) {
@@ -67,6 +72,7 @@ class UserModel {
       name: name ?? this.name,
       email: email ?? this.email,
       role: role ?? this.role,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
       starsCount: starsCount ?? this.starsCount,
       completedLevels: completedLevels ?? this.completedLevels,
     );
