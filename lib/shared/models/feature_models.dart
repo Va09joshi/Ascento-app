@@ -248,14 +248,30 @@ class TimetableSlot {
   });
 
   factory TimetableSlot.fromJson(Map<String, dynamic> json) {
+    int parseDay(dynamic dayVal) {
+      if (dayVal is int) return dayVal;
+      if (dayVal is String) {
+        switch (dayVal.toLowerCase()) {
+          case 'monday': return 1;
+          case 'tuesday': return 2;
+          case 'wednesday': return 3;
+          case 'thursday': return 4;
+          case 'friday': return 5;
+          case 'saturday': return 6;
+          case 'sunday': return 7;
+        }
+      }
+      return 1;
+    }
+
     return TimetableSlot(
       id: json['id'] as String? ?? '',
-      subject: json['subject'] as String? ?? '',
-      teacherName: json['teacherName'] as String? ?? '',
-      room: json['room'] as String? ?? '',
-      startTime: json['startTime'] as String? ?? '',
-      endTime: json['endTime'] as String? ?? '',
-      dayOfWeek: json['dayOfWeek'] as int? ?? 1,
+      subject: json['subjects']?['name'] as String? ?? json['subject'] as String? ?? '',
+      teacherName: json['users']?['full_name'] as String? ?? json['teacherName'] as String? ?? '',
+      room: json['room_name'] as String? ?? json['room'] as String? ?? '',
+      startTime: json['start_time'] as String? ?? json['startTime'] as String? ?? '',
+      endTime: json['end_time'] as String? ?? json['endTime'] as String? ?? '',
+      dayOfWeek: parseDay(json['day_of_week'] ?? json['dayOfWeek']),
     );
   }
 }
