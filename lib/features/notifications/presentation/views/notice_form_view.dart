@@ -149,7 +149,10 @@ class _NoticeFormViewState extends ConsumerState<NoticeFormView> {
                 SwitchListTile(
                   title: Text(
                     'Publish Notice',
-                    style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                    ),
                   ),
                   subtitle: const Text('If turned off, this notice will be saved as a draft.'),
                   value: _isPublished,
@@ -185,11 +188,15 @@ class _NoticeFormViewState extends ConsumerState<NoticeFormView> {
   }
 
   Widget _buildLabel(String text, ThemeData theme) {
+    final isDark = theme.brightness == Brightness.dark;
     return Padding(
       padding: EdgeInsets.only(bottom: 8.h),
       child: Text(
         text,
-        style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
+        style: theme.textTheme.labelLarge?.copyWith(
+          fontWeight: FontWeight.w600,
+          color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+        ),
       ),
     );
   }
