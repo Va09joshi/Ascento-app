@@ -52,7 +52,7 @@ class NoticesRepository {
   Future<void> deleteNotice(String id) async {
     try {
       final response = await _dio.delete('/notices/$id');
-      if (response.data['status'] != 'success') {
+      if (response.statusCode != 200 && response.statusCode != 204) {
         throw Exception('Failed to delete notice');
       }
     } catch (e) {
