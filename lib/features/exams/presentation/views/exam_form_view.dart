@@ -8,6 +8,7 @@ import 'package:ascento_abacus/core/widgets/custom_textfield.dart';
 import 'package:ascento_abacus/features/exams/data/repositories/exams_repository.dart';
 import 'package:ascento_abacus/features/exams/presentation/providers/exams_provider.dart';
 import 'package:ascento_abacus/features/academics/presentation/providers/academics_provider.dart';
+import 'package:ascento_abacus/shared/models/feature_models.dart';
 
 class ExamFormView extends ConsumerStatefulWidget {
   final ExamSchedule? examToEdit;
