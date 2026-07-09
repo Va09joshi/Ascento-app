@@ -5,170 +5,152 @@ import 'package:ascento_abacus/core/theme/app_colors.dart';
 import 'package:ascento_abacus/core/widgets/custom_button.dart';
 import 'package:ascento_abacus/features/domains/presentation/providers/domains_provider.dart';
 import 'package:ascento_abacus/features/domains/presentation/widgets/domain_form_dialog.dart';
+import 'package:ascento_abacus/shared/models/domain_model.dart';
+import 'package:ascento_abacus/shared/widgets/premium_data_table.dart';
 
 class DomainsManagementView extends ConsumerWidget {
   const DomainsManagementView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final domainsState = ref.watch(domainsListProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (_) => const DomainFormDialog(),
+          );
+        },
+        icon: const Icon(Icons.add_rounded),
+        label: const Text('Add Domain', style: TextStyle(fontWeight: FontWeight.bold)),
+      ),
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(24.w),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              PremiumDataTable<DomainModel>(
+                title: 'Domains Management',
+                subtitle: 'Manage academic domains (e.g. Abacus, Vedic Maths)',
+                isLoading: domainsState.isLoading,
+                error: domainsState.hasError ? domainsState.error.toString() : null,
+                data: domainsState.valueOrNull ?? [],
+                columns: const ['Domain', 'Status', 'Actions'],
+                rowBuilder: (domain) => [
+                  // Domain Name and Icon
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        'Domains Management',
-                        style: TextStyle(fontSize: 28.sp, fontWeight: FontWeight.bold, color: AppColors.primary),
+                      Container(
+                        padding: EdgeInsets.all(8.w),
+                        decoration: BoxDecoration(
+                          color: (isDark ? AppColors.darkPrimary : AppColors.primary).withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        child: Icon(Icons.category, color: isDark ? AppColors.darkPrimary : AppColors.primary, size: 16.sp),
                       ),
-                      SizedBox(height: 4.h),
-                      Text(
-                        'Manage academic domains (e.g. Abacus, Vedic Math)',
-                        style: TextStyle(fontSize: 16.sp, color: Colors.grey.shade600),
+                      SizedBox(width: 12.w),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            domain.name,
+                            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp),
+                          ),
+                          SizedBox(
+                            width: 250.w,
+                            child: Text(
+                              domain.description ?? 'No description provided',
+                              style: TextStyle(color: AppColors.textMuted, fontSize: 11.sp),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  SizedBox(
-                    width: 180.w,
-                    child: CustomButton(
-                      text: 'Add Domain',
-                      icon: Icons.add,
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (_) => const DomainFormDialog(),
-                        );
-                      },
+                  // Status Badge
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                    decoration: BoxDecoration(
+                      color: domain.isActive ? AppColors.success.withValues(alpha: 0.1) : (isDark ? AppColors.darkSurfaceDarker : AppColors.surfaceDarker),
+                      borderRadius: BorderRadius.circular(12.r),
                     ),
-                  )
-                ],
-              ),
-              SizedBox(height: 32.h),
-              
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16.r),
-                    boxShadow: [
-                      BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+                    child: Text(
+                      domain.isActive ? 'Active' : 'Inactive',
+                      style: TextStyle(
+                        color: domain.isActive ? AppColors.success : (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  // Actions
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit_outlined, size: 20),
+                        color: AppColors.info,
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (_) => DomainFormDialog(domain: domain),
+                          );
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline, size: 20),
+                        color: AppColors.error,
+                        onPressed: () => _showDeleteDialog(context, domain, ref),
+                      ),
                     ],
                   ),
-                  child: domainsState.when(
-                    loading: () => const Center(child: CircularProgressIndicator()),
-                    error: (e, _) => Center(child: Text('Error: $e', style: const TextStyle(color: AppColors.error))),
-                    data: (domains) {
-                      if (domains.isEmpty) {
-                        return Center(
-                          child: Text('No domains found.', style: TextStyle(color: Colors.grey.shade500, fontSize: 16.sp)),
-                        );
-                      }
-                      
-                      return ListView.separated(
-                        itemCount: domains.length,
-                        separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey.shade200),
-                        itemBuilder: (context, index) {
-                          final domain = domains[index];
-                          return ListTile(
-                            contentPadding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
-                            leading: Container(
-                              padding: EdgeInsets.all(12.w),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary.withOpacity(0.1),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.category, color: AppColors.primary),
-                            ),
-                            title: Text(domain.name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp)),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(height: 4.h),
-                                Text(domain.description ?? 'No description provided', style: TextStyle(color: Colors.grey.shade600)),
-                              ],
-                            ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                                  decoration: BoxDecoration(
-                                    color: domain.isActive ? AppColors.success.withOpacity(0.1) : Colors.grey.shade200,
-                                    borderRadius: BorderRadius.circular(12.r),
-                                  ),
-                                  child: Text(
-                                    domain.isActive ? 'Active' : 'Inactive',
-                                    style: TextStyle(
-                                      color: domain.isActive ? AppColors.success : Colors.grey.shade600,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12.sp,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 16.w),
-                                IconButton(
-                                  icon: const Icon(Icons.edit, color: AppColors.primary),
-                                  onPressed: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (_) => DomainFormDialog(domain: domain),
-                                    );
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete_outline, color: AppColors.error),
-                                  onPressed: () async {
-                                    final confirm = await showDialog<bool>(
-                                      context: context,
-                                      builder: (ctx) => AlertDialog(
-                                        title: const Text('Delete Domain'),
-                                        content: Text('Are you sure you want to delete ${domain.name}?'),
-                                        actions: [
-                                          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-                                          TextButton(
-                                            onPressed: () => Navigator.pop(ctx, true), 
-                                            child: const Text('Delete', style: TextStyle(color: AppColors.error)),
-                                          ),
-                                        ],
-                                      )
-                                    );
-                                    
-                                    if (confirm == true) {
-                                      try {
-                                        await ref.read(domainsListProvider.notifier).deleteDomain(domain.id);
-                                        if (context.mounted) {
-                                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Domain deleted'), backgroundColor: AppColors.success));
-                                        }
-                                      } catch (e) {
-                                        if (context.mounted) {
-                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString().replaceFirst('Exception: ', '')), backgroundColor: AppColors.error));
-                                        }
-                                      }
-                                    }
-                                  },
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-                      );
-                    }
-                  ),
-                ),
+                ],
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _showDeleteDialog(BuildContext context, DomainModel domain, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Domain'),
+        content: Text('Are you sure you want to delete ${domain.name}?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                await ref.read(domainsListProvider.notifier).deleteDomain(domain.id);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Domain deleted'), backgroundColor: AppColors.success));
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString().replaceFirst('Exception: ', '')), backgroundColor: AppColors.error));
+                }
+              }
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+          ),
+        ],
       ),
     );
   }
