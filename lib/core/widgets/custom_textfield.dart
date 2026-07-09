@@ -6,7 +6,7 @@ import 'package:ascento_abacus/core/theme/app_colors.dart';
 class CustomTextField extends StatelessWidget {
   final TextEditingController? controller;
   final String label;
-  final String hint;
+  final String? hint;
   final IconData? prefixIcon;
   final IconData? suffixIcon;
   final VoidCallback? onSuffixIconPressed;
@@ -27,7 +27,7 @@ class CustomTextField extends StatelessWidget {
     super.key,
     this.controller,
     required this.label,
-    required this.hint,
+    this.hint,
     this.prefixIcon,
     this.suffixIcon,
     this.onSuffixIconPressed,

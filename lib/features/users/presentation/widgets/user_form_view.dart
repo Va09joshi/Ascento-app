@@ -7,7 +7,6 @@ import 'package:ascento_abacus/core/widgets/custom_textfield.dart';
 import 'package:ascento_abacus/features/users/data/repositories/users_repository.dart';
 import 'package:ascento_abacus/features/users/presentation/providers/users_provider.dart';
 import 'package:ascento_abacus/shared/models/user_model.dart';
-import 'package:go_router/go_router.dart';
 
 class UserFormView extends ConsumerStatefulWidget {
   final String initialRole;
@@ -47,7 +46,6 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
   String? _selectedStatus = 'Active';
   String? _selectedGender = 'Male';
   DateTime? _selectedDateOfBirth;
-  DateTime? _selectedJoiningDate;
 
   bool get _isEdit => widget.userToEdit != null;
 
