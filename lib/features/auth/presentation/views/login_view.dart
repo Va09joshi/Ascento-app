@@ -115,8 +115,10 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
                     ),
                   );
                 },
-                child: Container(
-                  padding: EdgeInsets.all(AppSpacing.p32),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 450),
+                  child: Container(
+                    padding: EdgeInsets.all(AppSpacing.p32),
                   child: Form(
                       key: _formKey,
                       child: Column(
@@ -296,6 +298,7 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
                     ),
                   ),
                 ),
+              ),
               ),
             ),
           ),
