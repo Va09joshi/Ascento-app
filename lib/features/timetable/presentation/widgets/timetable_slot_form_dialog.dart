@@ -10,8 +10,9 @@ import 'package:ascento_abacus/features/timetable/presentation/providers/timetab
 
 class TimetableSlotFormDialog extends ConsumerStatefulWidget {
   final String sectionId;
+  final String academicYearId;
 
-  const TimetableSlotFormDialog({super.key, required this.sectionId});
+  const TimetableSlotFormDialog({super.key, required this.sectionId, required this.academicYearId});
 
   @override
   ConsumerState<TimetableSlotFormDialog> createState() => _TimetableSlotFormDialogState();
@@ -22,20 +23,20 @@ class _TimetableSlotFormDialogState extends ConsumerState<TimetableSlotFormDialo
   
   String? _selectedSubjectId;
   String? _selectedTeacherId;
-  int? _selectedDayOfWeek;
+  String? _selectedDayOfWeek;
   TimeOfDay? _startTime;
   TimeOfDay? _endTime;
 
   bool _isLoading = false;
 
   final List<Map<String, dynamic>> _days = [
-    {'value': 1, 'label': 'Monday'},
-    {'value': 2, 'label': 'Tuesday'},
-    {'value': 3, 'label': 'Wednesday'},
-    {'value': 4, 'label': 'Thursday'},
-    {'value': 5, 'label': 'Friday'},
-    {'value': 6, 'label': 'Saturday'},
-    {'value': 7, 'label': 'Sunday'},
+    {'value': 'monday', 'label': 'Monday'},
+    {'value': 'tuesday', 'label': 'Tuesday'},
+    {'value': 'wednesday', 'label': 'Wednesday'},
+    {'value': 'thursday', 'label': 'Thursday'},
+    {'value': 'friday', 'label': 'Friday'},
+    {'value': 'saturday', 'label': 'Saturday'},
+    {'value': 'sunday', 'label': 'Sunday'},
   ];
 
   Future<void> _selectTime(BuildContext context, bool isStart) async {
@@ -63,7 +64,7 @@ class _TimetableSlotFormDialogState extends ConsumerState<TimetableSlotFormDialo
   String _formatTimeOfDay(TimeOfDay time) {
     final hour = time.hour.toString().padLeft(2, '0');
     final minute = time.minute.toString().padLeft(2, '0');
-    return '$hour:$minute:00';
+    return '$hour:$minute';
   }
 
   Future<void> _submit() async {
@@ -81,6 +82,7 @@ class _TimetableSlotFormDialogState extends ConsumerState<TimetableSlotFormDialo
     try {
       final payload = {
         'section_id': widget.sectionId,
+        'academic_year_id': widget.academicYearId,
         'subject_id': _selectedSubjectId,
         'teacher_id': _selectedTeacherId,
         'day_of_week': _selectedDayOfWeek,
@@ -172,13 +174,13 @@ class _TimetableSlotFormDialogState extends ConsumerState<TimetableSlotFormDialo
                 SizedBox(height: 16.h),
 
                 // Day of Week
-                DropdownButtonFormField<int>(
+                DropdownButtonFormField<String>(
                   decoration: InputDecoration(
                     labelText: 'Select Day',
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
                   ),
                   initialValue: _selectedDayOfWeek,
-                  items: _days.map((d) => DropdownMenuItem<int>(value: d['value'], child: Text(d['label']))).toList(),
+                  items: _days.map((d) => DropdownMenuItem<String>(value: d['value'], child: Text(d['label']))).toList(),
                   onChanged: (val) => setState(() => _selectedDayOfWeek = val),
                   validator: (val) => val == null ? 'Required' : null,
                 ),

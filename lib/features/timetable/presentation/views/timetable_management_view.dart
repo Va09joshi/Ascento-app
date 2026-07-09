@@ -139,13 +139,16 @@ class _TimetableManagementViewState extends ConsumerState<TimetableManagementVie
                             ),
                             ElevatedButton.icon(
                               onPressed: () {
-                                if (selectedSectionId == null) {
-                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select a section first')));
+                                if (selectedSectionId == null || selectedAcademicYearId == null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select an Academic Year and Section first')));
                                   return;
                                 }
                                 showDialog(
                                   context: context, 
-                                  builder: (_) => TimetableSlotFormDialog(sectionId: selectedSectionId!)
+                                  builder: (_) => TimetableSlotFormDialog(
+                                    sectionId: selectedSectionId!,
+                                    academicYearId: selectedAcademicYearId!,
+                                  )
                                 );
                               },
                               style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent, foregroundColor: Colors.white),
@@ -281,7 +284,10 @@ class _TimetableManagementViewState extends ConsumerState<TimetableManagementVie
                                           onPressed: () {
                                             showDialog(
                                               context: context, 
-                                              builder: (_) => TimetableSlotFormDialog(sectionId: selectedSectionId!)
+                                              builder: (_) => TimetableSlotFormDialog(
+                                                sectionId: selectedSectionId!,
+                                                academicYearId: selectedAcademicYearId!,
+                                              )
                                             );
                                           },
                                           icon: const Icon(Icons.add, size: 14, color: Colors.grey),
