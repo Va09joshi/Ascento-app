@@ -14,6 +14,11 @@ class UserModel {
   final String? avatarUrl;
   final int starsCount;
   final int completedLevels;
+  final String? phone;
+  final String? gender;
+  final String? status;
+  final String? address;
+  final String? domainId;
 
   const UserModel({
     required this.id,
@@ -23,6 +28,11 @@ class UserModel {
     this.avatarUrl,
     this.starsCount = 0,
     this.completedLevels = 0,
+    this.phone,
+    this.gender,
+    this.status,
+    this.address,
+    this.domainId,
   });
 
   // Convert to JSON map
@@ -35,6 +45,11 @@ class UserModel {
       'avatarUrl': avatarUrl,
       'starsCount': starsCount,
       'completedLevels': completedLevels,
+      'phone': phone,
+      'gender': gender,
+      'status': status,
+      'address': address,
+      'domainId': domainId,
     };
   }
 
@@ -55,6 +70,11 @@ class UserModel {
       ),
       starsCount: json['starsCount'] as int? ?? 0,
       completedLevels: json['completedLevels'] as int? ?? 0,
+      phone: json['phone'] as String?,
+      gender: json['gender'] as String?,
+      status: json['status'] as String?,
+      address: json['address'] as String?,
+      domainId: json['domain_id'] as String?,
     );
   }
 
@@ -66,6 +86,11 @@ class UserModel {
     String? avatarUrl,
     int? starsCount,
     int? completedLevels,
+    String? phone,
+    String? gender,
+    String? status,
+    String? address,
+    String? domainId,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -75,6 +100,11 @@ class UserModel {
       avatarUrl: avatarUrl ?? this.avatarUrl,
       starsCount: starsCount ?? this.starsCount,
       completedLevels: completedLevels ?? this.completedLevels,
+      phone: phone ?? this.phone,
+      gender: gender ?? this.gender,
+      status: status ?? this.status,
+      address: address ?? this.address,
+      domainId: domainId ?? this.domainId,
     );
   }
 }

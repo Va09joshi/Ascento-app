@@ -65,9 +65,35 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
   void initState() {
     super.initState();
     _selectedRole = widget.userToEdit?.role.name ?? widget.initialRole;
-    if (_isEdit) {
-      _nameController.text = widget.userToEdit!.name;
-      _emailController.text = widget.userToEdit!.email;
+    if (_isEdit && widget.userToEdit != null) {
+      final user = widget.userToEdit!;
+      _nameController.text = user.name;
+      _emailController.text = user.email;
+      
+      if (_selectedRole == 'student') {
+        _parentEmailController.text = user.email;
+        if (user.phone != null) _parentPhoneController.text = user.phone!;
+      } else {
+        if (user.phone != null) _phoneController.text = user.phone!;
+      }
+      
+      if (user.address != null) _addressController.text = user.address!;
+      
+      if (user.gender != null) {
+        final g = user.gender!.toLowerCase();
+        if (g == 'male' || g == 'female') {
+          _selectedGender = g == 'male' ? 'Male' : 'Female';
+        }
+      }
+      if (user.status != null) {
+        final s = user.status!.toLowerCase();
+        if (s == 'active' || s == 'inactive') {
+          _selectedStatus = s == 'active' ? 'Active' : 'Inactive';
+        }
+      }
+      if (user.domainId != null) {
+        _selectedDomain = user.domainId;
+      }
     }
   }
 
