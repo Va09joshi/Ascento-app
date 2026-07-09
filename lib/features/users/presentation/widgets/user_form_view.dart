@@ -133,13 +133,16 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
         backgroundColor: Colors.white,
         elevation: 1,
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(24.w),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(24.w),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
               Container(
                 padding: EdgeInsets.all(12.w),
                 decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(8.r)),
@@ -314,6 +317,8 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
             ],
           ),
         ),
+      ),
+      ),
       ),
     );
   }
