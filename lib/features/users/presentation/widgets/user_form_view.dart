@@ -90,7 +90,7 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
         'email': _selectedRole == 'student' ? _parentEmailController.text.trim() : _emailController.text.trim(),
         'phone': _selectedRole == 'student' ? _parentPhoneController.text.trim() : _phoneController.text.trim(),
         'role': _selectedRole,
-        'gender': _selectedGender,
+        'gender': _selectedGender?.toLowerCase(),
         'status': _selectedStatus,
         'address': _addressController.text.trim(),
         if (_selectedDomain != null) 'domain_id': _selectedDomain,
