@@ -48,39 +48,45 @@ class _TimetableManagementViewState extends ConsumerState<TimetableManagementVie
                 gradient: const LinearGradient(colors: [Color(0xFF6A11CB), Color(0xFF2575FC)]),
                 borderRadius: BorderRadius.circular(16.r),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('SCHEDULE STUDIO', style: TextStyle(color: Colors.white70, fontSize: 12.sp, letterSpacing: 1.5)),
-                        SizedBox(height: 8.h),
-                        Text('Timetable', style: TextStyle(color: Colors.white, fontSize: 28.sp, fontWeight: FontWeight.bold)),
-                        SizedBox(height: 8.h),
-                        Text(
-                          'A real timetable board for period planning with cleaner actions and better readability.', 
-                          style: TextStyle(color: Colors.white70, fontSize: 14.sp),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final isMobile = constraints.maxWidth < 600;
+                  
+                  return Flex(
+                    direction: isMobile ? Axis.vertical : Axis.horizontal,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: isMobile ? CrossAxisAlignment.stretch : CrossAxisAlignment.center,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('SCHEDULE STUDIO', style: TextStyle(color: Colors.white70, fontSize: 12.sp, letterSpacing: 1.5)),
+                          SizedBox(height: 8.h),
+                          Text('Timetable', style: TextStyle(color: Colors.white, fontSize: 28.sp, fontWeight: FontWeight.bold)),
+                          SizedBox(height: 8.h),
+                          Text(
+                            'A real timetable board for period planning with cleaner actions and better readability.', 
+                            style: TextStyle(color: Colors.white70, fontSize: 14.sp),
+                          ),
+                        ],
+                      ),
+                      if (isMobile) SizedBox(height: 16.h) else SizedBox(width: 16.w),
+                      Container(
+                        width: isMobile ? double.infinity : 200.w,
+                        height: 80.h,
+                        padding: EdgeInsets.symmetric(horizontal: 16.w),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12.r),
+                          border: Border.all(color: Colors.white24)
                         ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: 16.w),
-                  Container(
-                    width: 200.w,
-                    height: 80.h,
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12.r),
-                      border: Border.all(color: Colors.white24)
-                    ),
-                    child: const Center(
-                      child: Text('Weekly Timetable Layout', style: TextStyle(color: Colors.white), textAlign: TextAlign.center),
-                    ),
-                  )
-                ],
+                        child: const Center(
+                          child: Text('Weekly Timetable Layout', style: TextStyle(color: Colors.white), textAlign: TextAlign.center),
+                        ),
+                      )
+                    ],
+                  );
+                }
               ),
             ),
             SizedBox(height: 24.h),
