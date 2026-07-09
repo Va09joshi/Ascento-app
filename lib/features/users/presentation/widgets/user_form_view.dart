@@ -6,9 +6,6 @@ import 'package:ascento_abacus/core/widgets/custom_button.dart';
 import 'package:ascento_abacus/core/widgets/custom_textfield.dart';
 import 'package:ascento_abacus/features/users/data/repositories/users_repository.dart';
 import 'package:ascento_abacus/features/users/presentation/providers/users_provider.dart';
-import 'package:ascento_abacus/features/academics/presentation/providers/academics_provider.dart';
-import 'package:ascento_abacus/features/branches/presentation/providers/branches_provider.dart';
-
 import 'package:ascento_abacus/shared/models/user_model.dart';
 import 'package:go_router/go_router.dart';
 
@@ -26,22 +23,31 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
   late String _selectedRole;
   bool _isLoading = false;
 
+  // Student details
   final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
+  final _emailController = TextEditingController(); // Or teacher email
   final _phoneController = TextEditingController();
-
-  // Student specific
-  final _rollNumberController = TextEditingController();
-
-  String? _selectedClassId;
-  String? _selectedSectionId;
-  String? _selectedAcademicYearId;
+  final _ageController = TextEditingController();
   
-  // Shared
-  String? _selectedBranchId;
+  // Parent details
+  final _parentNameController = TextEditingController();
+  final _parentPhoneController = TextEditingController();
+  final _parentEmailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
-  String? _selectedGender;
+  // Academic & Address / Teacher info
+  final _addressController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _stateController = TextEditingController();
+  final _countryController = TextEditingController();
+  final _qualificationController = TextEditingController();
+  final _experienceController = TextEditingController();
+
+  String? _selectedDomain;
+  String? _selectedStatus = 'Active';
+  String? _selectedGender = 'Male';
   DateTime? _selectedDateOfBirth;
+  DateTime? _selectedJoiningDate;
 
   bool get _isEdit => widget.userToEdit != null;
 
@@ -52,7 +58,6 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
     if (_isEdit) {
       _nameController.text = widget.userToEdit!.name;
       _emailController.text = widget.userToEdit!.email;
-      // Note: phone, classId, sectionId, rollNumber might not be available in base UserModel
     }
   }
 
@@ -61,329 +66,264 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
     _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
-    _rollNumberController.dispose();
+    _ageController.dispose();
+    _parentNameController.dispose();
+    _parentPhoneController.dispose();
+    _parentEmailController.dispose();
+    _passwordController.dispose();
+    _addressController.dispose();
+    _cityController.dispose();
+    _stateController.dispose();
+    _countryController.dispose();
+    _qualificationController.dispose();
+    _experienceController.dispose();
     super.dispose();
   }
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    
     setState(() => _isLoading = true);
     
     try {
-      final nameParts = _nameController.text.trim().split(' ');
-      final payload = <String, dynamic>{
+      final repo = ref.read(usersRepositoryProvider);
+      final payload = {
         'full_name': _nameController.text.trim(),
-        'name': _nameController.text.trim(),
-        'first_name': nameParts.isNotEmpty ? nameParts.first : '',
-        'last_name': nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '',
+        'email': _selectedRole == 'student' ? _parentEmailController.text.trim() : _emailController.text.trim(),
+        'phone': _selectedRole == 'student' ? _parentPhoneController.text.trim() : _phoneController.text.trim(),
+        'role': _selectedRole,
+        'gender': _selectedGender,
+        'status': _selectedStatus,
+        'address': _addressController.text.trim(),
       };
       
-      if (!_isEdit) {
-        payload['role'] = _selectedRole;
-        payload['email'] = _emailController.text.trim();
-      }
-      
-      if (_phoneController.text.isNotEmpty) {
-        payload['phone'] = _phoneController.text.trim();
-      }
-      
-      if (_selectedGender != null) {
-        payload['gender'] = _selectedGender;
-      }
-      
-      if (_selectedDateOfBirth != null) {
-        payload['date_of_birth'] = _selectedDateOfBirth!.toIso8601String().split('T').first;
-      }
-      
-      if (!_isEdit && _selectedBranchId != null) {
-        payload['branch_id'] = _selectedBranchId!;
-      }
-      
-      if (_selectedRole == 'student' && !_isEdit) {
-        payload['class_id'] = _selectedClassId!;
-        payload['section_id'] = _selectedSectionId!;
-        payload['roll_number'] = _rollNumberController.text.trim();
-        payload['academic_year_id'] = _selectedAcademicYearId!;
-      }
-      final repo = ref.read(usersRepositoryProvider);
       if (_isEdit) {
         await repo.updateUser(widget.userToEdit!.id, payload);
       } else {
         await repo.createUser(payload);
       }
       
-      // Invalidate provider so list refreshes
       ref.invalidate(usersListProvider(_selectedRole));
-      if (_isEdit && _selectedRole != widget.initialRole) {
-        ref.invalidate(usersListProvider(widget.initialRole));
-      }
-      
       if (mounted) {
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_isEdit ? 'User updated successfully' : 'User created successfully')));
       }
     } catch (e) {
       if (mounted) {
-        final errorMsg = e.toString().replaceFirst('Exception: ', '');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorMsg), 
-            backgroundColor: AppColors.error,
-            behavior: SnackBarBehavior.floating,
-          )
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
       }
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 12.h),
+      child: Text(
+        title,
+        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey.shade600, fontSize: 12.sp, letterSpacing: 1.2),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final branchesAsync = ref.watch(branchesListProvider);
-    final classesAsync = ref.watch(classesListProvider);
-    final sectionsAsync = ref.watch(sectionsListProvider);
-    final academicYearsAsync = ref.watch(academicYearsListProvider);
-
+    final isStudent = _selectedRole == 'student';
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(
-          _isEdit ? 'Edit User' : 'Add New User',
-          style: TextStyle(color: isDark ? Colors.white : AppColors.textPrimary, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: isDark ? Colors.white : AppColors.textPrimary),
-          onPressed: () => context.pop(),
-        ),
+        title: Text(_isEdit ? 'Update ${_selectedRole.capitalize()}' : 'Create ${_selectedRole.capitalize()}', style: TextStyle(color: AppColors.textPrimary)),
+        backgroundColor: Colors.white,
+        elevation: 1,
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(24.w),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Container(
-                  padding: EdgeInsets.all(24.w),
-                  decoration: BoxDecoration(
-                    color: isDark ? AppColors.darkSurface : AppColors.surface,
-                    borderRadius: BorderRadius.circular(24.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: isDark ? Colors.black.withValues(alpha: 0.2) : AppColors.primary.withValues(alpha: 0.05),
-                        blurRadius: 20,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      DropdownButtonFormField<String>(
-                        value: _selectedRole,
-                        decoration: InputDecoration(
-                          labelText: 'Role',
-                          prefixIcon: const Icon(Icons.shield_rounded),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                            borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                            borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12),
-                          ),
-                        ),
-                        items: const [
-                          DropdownMenuItem(value: 'admin', child: Text('Admin')),
-                          DropdownMenuItem(value: 'teacher', child: Text('Teacher')),
-                          DropdownMenuItem(value: 'student', child: Text('Student')),
-                          DropdownMenuItem(value: 'parent', child: Text('Parent')),
-                        ],
-                        onChanged: (val) {
-                          if (val != null) setState(() => _selectedRole = val);
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(24.w),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                padding: EdgeInsets.all(12.w),
+                decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(8.r)),
+                child: Text(
+                  isStudent 
+                    ? 'Fill student and parent details. On mobile, fields are shown in a single-column flow for easier input.'
+                    : 'Fill user details. Passwords are auto-generated if left blank.',
+                  style: TextStyle(color: Colors.blue.shade800, fontSize: 13.sp),
+                ),
+              ),
+              SizedBox(height: 16.h),
+
+              if (isStudent) ...[
+                _buildSectionTitle('STUDENT DETAILS'),
+                Row(
+                  children: [
+                    Expanded(child: CustomTextField(controller: _nameController, label: 'Full Name')),
+                    SizedBox(width: 16.w),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () async {
+                          final date = await showDatePicker(context: context, initialDate: DateTime(2010), firstDate: DateTime(1990), lastDate: DateTime.now());
+                          if (date != null) setState(() => _selectedDateOfBirth = date);
                         },
-                      ),
-                      SizedBox(height: 20.h),
-                      CustomTextField(
-                        controller: _nameController,
-                        label: 'Full Name',
-                        hint: 'John Doe',
-                        prefixIcon: Icons.person_rounded,
-                        validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                      ),
-                      SizedBox(height: 20.h),
-                      CustomTextField(
-                        controller: _emailController,
-                        label: 'Email Address',
-                        hint: 'john@example.com',
-                        prefixIcon: Icons.email_rounded,
-                        validator: (v) => v == null || !v.contains('@') ? 'Invalid email' : null,
-                      ),
-                      SizedBox(height: 20.h),
-                      CustomTextField(
-                        controller: _phoneController,
-                        label: 'Phone Number (Optional)',
-                        hint: '+91 9876543210',
-                        prefixIcon: Icons.phone_rounded,
-                      ),
-                      SizedBox(height: 20.h),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
-                              value: _selectedGender,
-                              decoration: InputDecoration(
-                                labelText: 'Gender (Optional)',
-                                prefixIcon: const Icon(Icons.people_rounded),
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12)),
-                                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12)),
-                              ),
-                              items: const [
-                                DropdownMenuItem(value: 'male', child: Text('Male')),
-                                DropdownMenuItem(value: 'female', child: Text('Female')),
-                                DropdownMenuItem(value: 'other', child: Text('Other')),
-                              ],
-                              onChanged: (val) => setState(() => _selectedGender = val),
-                            ),
-                          ),
-                          SizedBox(width: 16.w),
-                          Expanded(
-                            child: InkWell(
-                              onTap: () async {
-                                final date = await showDatePicker(
-                                  context: context,
-                                  initialDate: _selectedDateOfBirth ?? DateTime.now().subtract(const Duration(days: 365 * 10)),
-                                  firstDate: DateTime(1900),
-                                  lastDate: DateTime.now(),
-                                );
-                                if (date != null) setState(() => _selectedDateOfBirth = date);
-                              },
-                              child: InputDecorator(
-                                decoration: InputDecoration(
-                                  labelText: 'Date of Birth (Optional)',
-                                  prefixIcon: const Icon(Icons.cake_rounded),
-                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12)),
-                                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12)),
-                                ),
-                                child: Text(_selectedDateOfBirth == null ? 'Select Date' : '${_selectedDateOfBirth!.day}/${_selectedDateOfBirth!.month}/${_selectedDateOfBirth!.year}'),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      if (!_isEdit) ...[
-                        SizedBox(height: 20.h),
-                        branchesAsync.when(
-                          data: (branches) => DropdownButtonFormField<String>(
-                            decoration: InputDecoration(
-                              labelText: 'Select Branch',
-                              prefixIcon: const Icon(Icons.business_rounded),
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12)),
-                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12)),
-                            ),
-                            value: _selectedBranchId,
-                            items: branches.map((b) => DropdownMenuItem(value: b.id, child: Text(b.name))).toList(),
-                            onChanged: (val) => setState(() => _selectedBranchId = val),
-                            validator: (value) => value == null ? 'Required' : null,
-                          ),
-                          loading: () => const Center(child: CircularProgressIndicator()),
-                          error: (e, s) => Text('Error loading branches: $e'),
+                        child: InputDecorator(
+                          decoration: InputDecoration(labelText: 'DOB', suffixIcon: const Icon(Icons.calendar_today)),
+                          child: Text(_selectedDateOfBirth?.toString().split(' ').first ?? 'mm/dd/yyyy'),
                         ),
-                      ],
-
-                      if (_selectedRole == 'student' && !_isEdit) ...[
-                        SizedBox(height: 20.h),
-                        Divider(color: isDark ? Colors.white24 : Colors.black12),
-                        SizedBox(height: 20.h),
-                        Text('Academic Details', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-                        SizedBox(height: 16.h),
-                        classesAsync.when(
-                          data: (classes) => DropdownButtonFormField<String>(
-                            decoration: InputDecoration(
-                              labelText: 'Select Class',
-                              prefixIcon: const Icon(Icons.class_rounded),
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12)),
-                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12)),
-                            ),
-                            value: _selectedClassId,
-                            items: classes.map((c) => DropdownMenuItem(value: c.id, child: Text(c.name))).toList(),
-                            onChanged: (val) => setState(() => _selectedClassId = val),
-                            validator: (value) => value == null ? 'Required' : null,
-                          ),
-                          loading: () => const Center(child: CircularProgressIndicator()),
-                          error: (e, s) => Text('Error loading classes: $e'),
-                        ),
-                        SizedBox(height: 20.h),
-                        sectionsAsync.when(
-                          data: (sections) {
-                            // Filter sections by selected class if one is selected
-                            final filteredSections = _selectedClassId != null
-                              ? sections.where((s) => s.classId == _selectedClassId).toList()
-                              : sections;
-                            return DropdownButtonFormField<String>(
-                              decoration: InputDecoration(
-                                labelText: 'Select Section',
-                                prefixIcon: const Icon(Icons.view_comfy_rounded),
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12)),
-                                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12)),
-                              ),
-                              value: _selectedSectionId,
-                              items: filteredSections.map((s) => DropdownMenuItem(value: s.id, child: Text(s.name))).toList(),
-                              onChanged: (val) => setState(() => _selectedSectionId = val),
-                              validator: (value) => value == null ? 'Required' : null,
-                            );
-                          },
-                          loading: () => const Center(child: CircularProgressIndicator()),
-                          error: (e, s) => Text('Error loading sections: $e'),
-                        ),
-                        SizedBox(height: 20.h),
-                        academicYearsAsync.when(
-                          data: (years) => DropdownButtonFormField<String>(
-                            decoration: InputDecoration(
-                              labelText: 'Select Academic Year',
-                              prefixIcon: const Icon(Icons.calendar_month_rounded),
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12)),
-                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12)),
-                            ),
-                            value: _selectedAcademicYearId,
-                            items: years.map((y) => DropdownMenuItem(value: y.id, child: Text(y.name))).toList(),
-                            onChanged: (val) => setState(() => _selectedAcademicYearId = val),
-                            validator: (value) => value == null ? 'Required' : null,
-                          ),
-                          loading: () => const Center(child: CircularProgressIndicator()),
-                          error: (e, s) => Text('Error loading years: $e'),
-                        ),
-                        SizedBox(height: 20.h),
-                        CustomTextField(
-                          controller: _rollNumberController,
-                          label: 'Roll Number',
-                          hint: 'A-101',
-                          prefixIcon: Icons.format_list_numbered_rounded,
-                        ),
-                      ],
-                    ],
-                  ),
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 32.h),
-                CustomButton(
-                  text: _isEdit ? 'Update User' : 'Create User',
-                  isLoading: _isLoading,
-                  onPressed: _submit,
+                SizedBox(height: 16.h),
+                Row(
+                  children: [
+                    Expanded(child: CustomTextField(controller: _ageController, label: 'Age')),
+                    SizedBox(width: 16.w),
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(labelText: 'Gender'),
+                        value: _selectedGender,
+                        items: ['Male', 'Female'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                        onChanged: (v) => setState(() => _selectedGender = v),
+                      ),
+                    ),
+                  ],
                 ),
+
+                _buildSectionTitle('PARENT DETAILS'),
+                Row(
+                  children: [
+                    Expanded(child: CustomTextField(controller: _parentNameController, label: 'Parent Name')),
+                    SizedBox(width: 16.w),
+                    Expanded(child: CustomTextField(controller: _parentPhoneController, label: 'Parent Phone')),
+                  ],
+                ),
+                SizedBox(height: 16.h),
+                Row(
+                  children: [
+                    Expanded(child: CustomTextField(controller: _parentEmailController, label: 'Parent Email')),
+                    SizedBox(width: 16.w),
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(labelText: 'Domain'),
+                        value: _selectedDomain,
+                        items: ['Select domain', 'Abacus', 'Vedic Math'].map((e) => DropdownMenuItem(value: e == 'Select domain' ? null : e, child: Text(e))).toList(),
+                        onChanged: (v) => setState(() => _selectedDomain = v),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16.h),
+                CustomTextField(controller: _passwordController, label: 'Password (Optional)', hint: 'Leave blank to auto-generate temporary'),
+                
+                _buildSectionTitle('ACADEMIC & ADDRESS'),
+                DropdownButtonFormField<String>(
+                  decoration: const InputDecoration(labelText: 'Status'),
+                  value: _selectedStatus,
+                  items: ['Active', 'Inactive'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                  onChanged: (v) => setState(() => _selectedStatus = v),
+                ),
+                SizedBox(height: 16.h),
+                CustomTextField(controller: _addressController, label: 'Address'),
+                SizedBox(height: 16.h),
+                Row(
+                  children: [
+                    Expanded(child: CustomTextField(controller: _cityController, label: 'City')),
+                    SizedBox(width: 16.w),
+                    Expanded(child: CustomTextField(controller: _stateController, label: 'State')),
+                  ],
+                ),
+              ] else ...[
+                Row(
+                  children: [
+                    Expanded(child: CustomTextField(controller: _nameController, label: 'Name')),
+                    SizedBox(width: 16.w),
+                    Expanded(child: CustomTextField(controller: _emailController, label: 'Email')),
+                  ],
+                ),
+                SizedBox(height: 16.h),
+                Row(
+                  children: [
+                    Expanded(child: CustomTextField(controller: _phoneController, label: 'Phone')),
+                    SizedBox(width: 16.w),
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(labelText: 'Domain'),
+                        value: _selectedDomain,
+                        items: ['Select domain', 'Abacus', 'Vedic Math'].map((e) => DropdownMenuItem(value: e == 'Select domain' ? null : e, child: Text(e))).toList(),
+                        onChanged: (v) => setState(() => _selectedDomain = v),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16.h),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(labelText: 'Status'),
+                        value: _selectedStatus,
+                        items: ['Active', 'Inactive'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                        onChanged: (v) => setState(() => _selectedStatus = v),
+                      ),
+                    ),
+                    SizedBox(width: 16.w),
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(labelText: 'Gender'),
+                        value: _selectedGender,
+                        items: ['Male', 'Female'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                        onChanged: (v) => setState(() => _selectedGender = v),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16.h),
+                Row(
+                  children: [
+                    Expanded(child: CustomTextField(controller: _qualificationController, label: 'Qualification')),
+                    SizedBox(width: 16.w),
+                    Expanded(child: CustomTextField(controller: _experienceController, label: 'Experience (Years)')),
+                  ],
+                ),
+                SizedBox(height: 16.h),
+                CustomTextField(controller: _addressController, label: 'Address'),
+                SizedBox(height: 16.h),
+                Row(
+                  children: [
+                    Expanded(child: CustomTextField(controller: _cityController, label: 'City')),
+                    SizedBox(width: 16.w),
+                    Expanded(child: CustomTextField(controller: _stateController, label: 'State')),
+                  ],
+                ),
+                SizedBox(height: 16.h),
+                CustomTextField(controller: _countryController, label: 'Country'),
               ],
-            ),
+
+              SizedBox(height: 32.h),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
+                  SizedBox(width: 16.w),
+                  CustomButton(
+                    text: _isEdit ? 'Update ${_selectedRole.capitalize()}' : 'Create ${_selectedRole.capitalize()}',
+                    isLoading: _isLoading,
+                    onPressed: _submit,
+                  ),
+                ],
+              )
+            ],
           ),
         ),
       ),
     );
+  }
+}
+
+extension StringExtension on String {
+  String capitalize() {
+    if (isEmpty) return this;
+    return "${this[0].toUpperCase()}${substring(1)}";
   }
 }

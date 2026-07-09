@@ -1,295 +1,227 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ascento_abacus/core/theme/app_colors.dart';
-import 'package:ascento_abacus/core/widgets/app_card.dart';
-import 'package:ascento_abacus/core/widgets/app_components.dart';
-import 'package:ascento_abacus/core/widgets/custom_button.dart';
-import 'package:ascento_abacus/core/widgets/custom_textfield.dart';
-import 'package:ascento_abacus/core/widgets/responsive_builder.dart';
-import 'package:ascento_abacus/shared/validators/form_validators.dart';
 
-class EnquiryView extends StatefulWidget {
+class EnquiryView extends ConsumerStatefulWidget {
   const EnquiryView({super.key});
 
   @override
-  State<EnquiryView> createState() => _EnquiryViewState();
+  ConsumerState<EnquiryView> createState() => _EnquiryViewState();
 }
 
-class _EnquiryViewState extends State<EnquiryView> {
-  final _formKey = GlobalKey<FormState>();
-  final _parentNameController = TextEditingController();
-  final _studentNameController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _messageController = TextEditingController();
-
-  String? _selectedProgram;
-  String? _selectedClassLevel;
-  String? _selectedTimeSlot;
-  bool _isSubmitting = false;
-
-  static const _programs = [
-    'Abacus Foundation',
-    'Vedic Maths',
-    'Mental Arithmetic',
-    'Handwriting Improvement',
-    'Combo Learning Plan',
-  ];
-
-  static const _classLevels = [
-    'Nursery to UKG',
-    'Class 1 to 3',
-    'Class 4 to 6',
-    'Class 7 to 9',
-    'Class 10 and above',
-  ];
-
-  static const _timeSlots = [
-    'Morning batch',
-    'Afternoon batch',
-    'Evening batch',
-    'Weekend only',
-    'Need counsellor callback',
-  ];
-
-  @override
-  void dispose() {
-    _parentNameController.dispose();
-    _studentNameController.dispose();
-    _phoneController.dispose();
-    _emailController.dispose();
-    _messageController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _submitForm() async {
-    final formState = _formKey.currentState;
-    if (formState == null || !formState.validate()) {
-      return;
-    }
-
-    setState(() => _isSubmitting = true);
-    await Future<void>.delayed(const Duration(milliseconds: 800));
-
-    if (!mounted) return;
-
-    _formKey.currentState?.reset();
-    _parentNameController.clear();
-    _studentNameController.clear();
-    _phoneController.clear();
-    _emailController.clear();
-    _messageController.clear();
-
-    setState(() {
-      _isSubmitting = false;
-      _selectedProgram = null;
-      _selectedClassLevel = null;
-      _selectedTimeSlot = null;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Enquiry submitted successfully.'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  String? _optionalEmailValidator(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return null;
-    }
-    return FormValidators.validateEmail(value);
-  }
+class _EnquiryViewState extends ConsumerState<EnquiryView> {
+  String? selectedStatus;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isMobile = ResponsiveBuilder.isMobile(context);
-
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.grey.shade50,
       body: SingleChildScrollView(
-        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        child: ResponsiveContent(
-          maxWidth: ResponsiveBuilder.formMaxWidth(context),
-          padding: EdgeInsets.fromLTRB(
-            ResponsiveBuilder.horizontalPadding(context),
-            18.h,
-            ResponsiveBuilder.horizontalPadding(context),
-            28.h,
-          ),
-          child: AppCard(
-            margin: EdgeInsets.zero,
-            padding: EdgeInsets.all(18.w),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        padding: EdgeInsets.all(24.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Header
+            Container(
+              padding: EdgeInsets.all(24.w),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(colors: [Color(0xFFE91E63), Color(0xFFFF5252)]),
+                borderRadius: BorderRadius.circular(16.r),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Enquiry Form',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  SizedBox(height: 6.h),
-                  Text(
-                    'Fill the details below and our team will contact you.',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textMuted,
-                    ),
-                  ),
-                  SizedBox(height: 18.h),
-                  _AdaptiveFieldRow(
-                    isMobile: isMobile,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CustomTextField(
-                        controller: _parentNameController,
-                        label: 'Parent / Guardian Name',
-                        hint: 'Enter full name',
-                        prefixIcon: Icons.person_outline_rounded,
-                        validator: FormValidators.validateName,
-                        textCapitalization: TextCapitalization.words,
-                      ),
-                      CustomTextField(
-                        controller: _studentNameController,
-                        label: 'Student Name',
-                        hint: 'Enter student name',
-                        prefixIcon: Icons.child_care_rounded,
-                        validator: FormValidators.validateName,
-                        textCapitalization: TextCapitalization.words,
-                      ),
+                      Text('ADMISSIONS DESK', style: TextStyle(color: Colors.white70, fontSize: 12.sp, letterSpacing: 1.5)),
+                      SizedBox(height: 8.h),
+                      Text('Enquiries', style: TextStyle(color: Colors.white, fontSize: 28.sp, fontWeight: FontWeight.bold)),
+                      SizedBox(height: 8.h),
+                      Text('Better enquiry pipeline view with clean updates, safe delete, and AI-style visual support.', style: TextStyle(color: Colors.white70, fontSize: 14.sp)),
+                      SizedBox(height: 4.h),
+                      Row(
+                        children: [
+                          Icon(Icons.auto_awesome, color: Colors.white70, size: 14.sp),
+                          SizedBox(width: 4.w),
+                          Text('AI generated enquiry visual cards', style: TextStyle(color: Colors.white70, fontSize: 12.sp)),
+                        ],
+                      )
                     ],
                   ),
-                  SizedBox(height: 14.h),
-                  _AdaptiveFieldRow(
-                    isMobile: isMobile,
-                    children: [
-                      CustomTextField(
-                        controller: _phoneController,
-                        label: 'Mobile Number',
-                        hint: '98XXXXXXXX',
-                        prefixIcon: Icons.phone_outlined,
-                        keyboardType: TextInputType.phone,
-                        validator: FormValidators.validatePhone,
-                      ),
-                      CustomTextField(
-                        controller: _emailController,
-                        label: 'Email Address',
-                        hint: 'Optional',
-                        prefixIcon: Icons.mail_outline_rounded,
-                        keyboardType: TextInputType.emailAddress,
-                        validator: _optionalEmailValidator,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 14.h),
-                  AppDropdown<String>(
-                    value: _selectedProgram,
-                    items: _programs,
-                    label: 'Program Interested In',
-                    hint: 'Select course',
-                    prefixIcon: Icons.auto_stories_rounded,
-                    itemLabel: (value) => value,
-                    onChanged: (value) => setState(() => _selectedProgram = value),
-                    validator: (value) =>
-                        value == null ? 'Please select a program' : null,
-                  ),
-                  SizedBox(height: 14.h),
-                  _AdaptiveFieldRow(
-                    isMobile: isMobile,
-                    children: [
-                      AppDropdown<String>(
-                        value: _selectedClassLevel,
-                        items: _classLevels,
-                        label: 'Student Class Range',
-                        hint: 'Choose class group',
-                        prefixIcon: Icons.groups_2_outlined,
-                        itemLabel: (value) => value,
-                        onChanged: (value) =>
-                            setState(() => _selectedClassLevel = value),
-                        validator: (value) =>
-                            value == null ? 'Please select a class group' : null,
-                      ),
-                      AppDropdown<String>(
-                        value: _selectedTimeSlot,
-                        items: _timeSlots,
-                        label: 'Preferred Timing',
-                        hint: 'Choose slot',
-                        prefixIcon: Icons.schedule_rounded,
-                        itemLabel: (value) => value,
-                        onChanged: (value) =>
-                            setState(() => _selectedTimeSlot = value),
-                        validator: (value) =>
-                            value == null ? 'Please select a time slot' : null,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 14.h),
-                  CustomTextField(
-                    controller: _messageController,
-                    label: 'Message',
-                    hint: 'Write your requirement here',
-                    prefixIcon: Icons.edit_note_rounded,
-                    keyboardType: TextInputType.multiline,
-                    textCapitalization: TextCapitalization.sentences,
-                    minLines: 4,
-                    maxLines: 5,
-                    validator: (value) => FormValidators.validateLength(
-                      value,
-                      min: 12,
-                      max: 240,
-                      fieldName: 'Message',
+                  Container(
+                    width: 350.w,
+                    padding: EdgeInsets.all(16.w),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(color: Colors.white24)
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 48.w, height: 48.h,
+                          decoration: BoxDecoration(
+                            color: Colors.orangeAccent,
+                            borderRadius: BorderRadius.circular(8.r)
+                          ),
+                          child: Icon(Icons.change_history, color: Colors.white, size: 24.sp),
+                        ),
+                        SizedBox(width: 16.w),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('AI Enquiry Insight Card', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.sp)),
+                              SizedBox(height: 4.h),
+                              Text('Visual context for faster counselling follow-up in update form.', style: TextStyle(color: Colors.white70, fontSize: 12.sp)),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+            SizedBox(height: 24.h),
+
+            // Stats
+            Row(
+              children: [
+                _buildStatCard('Total Enquiries', '0'),
+                SizedBox(width: 16.w),
+                _buildStatCard('In Progress', '0'),
+                SizedBox(width: 16.w),
+                _buildStatCard('Visible Rows', '0'),
+              ],
+            ),
+            SizedBox(height: 24.h),
+
+            // Content Card
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16.r),
+                border: Border.all(color: Colors.grey.shade200),
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Toolbar
+                  Padding(
+                    padding: EdgeInsets.all(24.w),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.email_outlined, color: Colors.pink),
+                            SizedBox(width: 8.w),
+                            Text('Enquiry List', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                        OutlinedButton.icon(
+                          onPressed: () {},
+                          icon: const Icon(Icons.refresh, size: 18),
+                          label: const Text('Refresh'),
+                        ),
+                      ],
                     ),
                   ),
-                  SizedBox(height: 20.h),
-                  CustomButton(
-                    text: 'Submit Enquiry',
-                    icon: Icons.send_rounded,
-                    isLoading: _isSubmitting,
-                    onPressed: _isSubmitting ? null : _submitForm,
+
+                  // Filters
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 24.w),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: TextField(
+                            decoration: InputDecoration(
+                              hintText: 'Search name, email, phone, course, message',
+                              prefixIcon: const Icon(Icons.search),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 16.w),
+                        Expanded(
+                          flex: 1,
+                          child: DropdownButtonFormField<String>(
+                            decoration: InputDecoration(border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r))),
+                            value: selectedStatus,
+                            items: ['All Status', 'New', 'In Progress', 'Converted', 'Closed'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                            onChanged: (v) => setState(() => selectedStatus = v),
+                            hint: const Text('All Status'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  SizedBox(height: 24.h),
+
+                  // Table
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 24.w),
+                      child: DataTable(
+                        headingRowColor: WidgetStateProperty.resolveWith((states) => Colors.grey.shade50),
+                        border: TableBorder(bottom: BorderSide(color: Colors.grey.shade200)),
+                        columns: const [
+                          DataColumn(label: Text('Contact', style: TextStyle(color: Colors.grey))),
+                          DataColumn(label: Text('Interest', style: TextStyle(color: Colors.grey))),
+                          DataColumn(label: Text('Message', style: TextStyle(color: Colors.grey))),
+                          DataColumn(label: Text('Status', style: TextStyle(color: Colors.grey))),
+                          DataColumn(label: Text('Created', style: TextStyle(color: Colors.grey))),
+                          DataColumn(label: Text('Action', style: TextStyle(color: Colors.grey))),
+                        ],
+                        rows: [],
+                      ),
+                    ),
+                  ),
+                  
+                  Padding(
+                    padding: EdgeInsets.all(48.w),
+                    child: Center(child: Text('No enquiries found for current filters.', style: TextStyle(color: Colors.grey.shade600))),
                   ),
                 ],
               ),
             ),
-          ),
+            
+            Padding(
+              padding: EdgeInsets.only(top: 16.h),
+              child: Text('API coverage: GET /admin/enquiries, PUT /admin/enquiries/:id, DELETE /admin/enquiries/:id', style: TextStyle(color: Colors.grey, fontSize: 10.sp)),
+            )
+          ],
         ),
       ),
     );
   }
-}
 
-class _AdaptiveFieldRow extends StatelessWidget {
-  final bool isMobile;
-  final List<Widget> children;
-
-  const _AdaptiveFieldRow({
-    required this.isMobile,
-    required this.children,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    if (isMobile) {
-      return Column(
-        children: [
-          for (var index = 0; index < children.length; index++) ...[
-            children[index],
-            if (index != children.length - 1) SizedBox(height: 14.h),
+  Widget _buildStatCard(String title, String value) {
+    return Expanded(
+      child: Container(
+        padding: EdgeInsets.all(20.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: TextStyle(color: Colors.grey.shade600, fontSize: 12.sp)),
+            SizedBox(height: 8.h),
+            Text(value, style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold)),
           ],
-        ],
-      );
-    }
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        for (var index = 0; index < children.length; index++) ...[
-          Expanded(child: children[index]),
-          if (index != children.length - 1) SizedBox(width: 14.w),
-        ],
-      ],
+        ),
+      ),
     );
   }
 }
