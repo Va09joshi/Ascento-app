@@ -91,6 +91,7 @@ class _CustomButtonState extends State<CustomButton>
         scale: _scaleAnimation,
         child: Container(
           height: AppSizes.buttonHeight,
+          padding: const EdgeInsets.symmetric(horizontal: AppSizes.p24),
           decoration: BoxDecoration(
             color: widget.onPressed == null
                 ? theme.disabledColor.withOpacity(0.12)
