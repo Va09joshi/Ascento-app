@@ -139,7 +139,7 @@ class _TimetableManagementViewState extends ConsumerState<TimetableManagementVie
                                 }
                                 showDialog(
                                   context: context, 
-                                  builder: (_) => const TimetableSlotFormDialog()
+                                  builder: (_) => TimetableSlotFormDialog(sectionId: selectedSectionId!)
                                 );
                               },
                               style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent, foregroundColor: Colors.white),
@@ -272,7 +272,7 @@ class _TimetableManagementViewState extends ConsumerState<TimetableManagementVie
                                           onPressed: () {
                                             showDialog(
                                               context: context, 
-                                              builder: (_) => const TimetableSlotFormDialog()
+                                              builder: (_) => TimetableSlotFormDialog(sectionId: selectedSectionId!)
                                             );
                                           },
                                           icon: const Icon(Icons.add, size: 14, color: Colors.grey),
