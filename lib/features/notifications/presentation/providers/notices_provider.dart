@@ -8,7 +8,7 @@ class NoticesNotifier extends AutoDisposeAsyncNotifier<List<NoticeModel>> {
     return ref.watch(noticesRepositoryProvider).getNotices();
   }
 
-  Future<void> createNotice(Map<String, dynamic> data) async {
+  Future<void> createNotice(dynamic data) async {
     final repository = ref.read(noticesRepositoryProvider);
     final newNotice = await repository.createNotice(data);
     if (state.hasValue) {
@@ -18,7 +18,7 @@ class NoticesNotifier extends AutoDisposeAsyncNotifier<List<NoticeModel>> {
     }
   }
 
-  Future<void> updateNotice(String id, Map<String, dynamic> data) async {
+  Future<void> updateNotice(String id, dynamic data) async {
     final repository = ref.read(noticesRepositoryProvider);
     final updatedNotice = await repository.updateNotice(id, data);
     if (state.hasValue) {

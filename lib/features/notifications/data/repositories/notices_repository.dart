@@ -23,7 +23,7 @@ class NoticesRepository {
     }
   }
 
-  Future<NoticeModel> createNotice(Map<String, dynamic> data) async {
+  Future<NoticeModel> createNotice(dynamic data) async {
     try {
       final response = await _dio.post('/notices', data: data);
       if (response.data['status'] == 'success' && response.data['data'] != null) {
@@ -36,9 +36,9 @@ class NoticesRepository {
     }
   }
 
-  Future<NoticeModel> updateNotice(String id, Map<String, dynamic> data) async {
+  Future<NoticeModel> updateNotice(String id, dynamic data) async {
     try {
-      final response = await _dio.put('/notices/$id', data: data);
+      final response = await _dio.patch('/notices/$id', data: data);
       if (response.data['status'] == 'success' && response.data['data'] != null) {
         return NoticeModel.fromJson(response.data['data']);
       }

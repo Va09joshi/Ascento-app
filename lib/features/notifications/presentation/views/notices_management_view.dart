@@ -46,12 +46,17 @@ class NoticesManagementView extends ConsumerWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
-                        padding: EdgeInsets.all(8.w),
+                        padding: notice.bannerUrl != null ? EdgeInsets.zero : EdgeInsets.all(8.w),
                         decoration: BoxDecoration(
                           color: (isDark ? AppColors.darkPrimary : AppColors.primary).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8.r),
                         ),
-                        child: Icon(_getTypeIcon(notice.type), color: isDark ? AppColors.darkPrimary : AppColors.primary, size: 16.sp),
+                        child: notice.bannerUrl != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(8.r),
+                                child: Image.network(notice.bannerUrl!, width: 36.w, height: 36.w, fit: BoxFit.cover),
+                              )
+                            : Icon(_getTypeIcon(notice.type), color: isDark ? AppColors.darkPrimary : AppColors.primary, size: 16.sp),
                       ),
                       SizedBox(width: 12.w),
                       Column(

@@ -6,6 +6,8 @@ import 'package:ascento_abacus/core/theme/app_colors.dart';
 import 'package:ascento_abacus/shared/models/notice_model.dart';
 import 'package:ascento_abacus/features/notifications/presentation/providers/notices_provider.dart';
 import 'package:ascento_abacus/core/services/storage_service.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:dio/dio.dart';
 
 class NoticeFormView extends ConsumerStatefulWidget {
   final NoticeModel? notice;
@@ -23,6 +25,8 @@ class _NoticeFormViewState extends ConsumerState<NoticeFormView> {
   String _selectedType = 'news';
   bool _isPublished = true;
   bool _isLoading = false;
+  XFile? _selectedImage;
+  final ImagePicker _picker = ImagePicker();
 
   final List<String> _types = ['event', 'news', 'update', 'alert'];
 
@@ -51,13 +55,27 @@ class _NoticeFormViewState extends ConsumerState<NoticeFormView> {
     
     final currentUser = ref.read(storageServiceProvider).getCurrentUser();
     
-    final data = {
-      'title': _titleController.text,
-      'content': _contentController.text,
-      'type': _selectedType,
-      'is_published': _isPublished,
-      if (currentUser != null) 'created_by': currentUser.id,
-    };
+    dynamic data;
+    
+    if (_selectedImage != null) {
+      final bytes = await _selectedImage!.readAsBytes();
+      data = FormData.fromMap({
+        'title': _titleController.text,
+        'content': _contentController.text,
+        'type': _selectedType,
+        'is_published': _isPublished,
+        if (currentUser != null) 'created_by': currentUser.id,
+        'image': MultipartFile.fromBytes(bytes, filename: _selectedImage!.name),
+      });
+    } else {
+      data = {
+        'title': _titleController.text,
+        'content': _contentController.text,
+        'type': _selectedType,
+        'is_published': _isPublished,
+        if (currentUser != null) 'created_by': currentUser.id,
+      };
+    }
 
     try {
       if (widget.notice == null) {
@@ -143,6 +161,43 @@ class _NoticeFormViewState extends ConsumerState<NoticeFormView> {
                   maxLines: 6,
                   decoration: _inputDecoration('Enter notice details...', isDark),
                   validator: (value) => value == null || value.isEmpty ? 'Content is required' : null,
+                ),
+                SizedBox(height: 20.h),
+                
+                _buildLabel('Banner Image (Optional)', theme),
+                GestureDetector(
+                  onTap: () async {
+                    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+                    if (image != null) {
+                      setState(() => _selectedImage = image);
+                    }
+                  },
+                  child: Container(
+                    height: 150.h,
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.darkSurface : AppColors.surface,
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
+                    ),
+                    child: _selectedImage != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(12.r),
+                            child: Image.network(_selectedImage!.path, fit: BoxFit.cover, errorBuilder: (ctx, err, st) => const Icon(Icons.image)),
+                          )
+                        : widget.notice?.bannerUrl != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(12.r),
+                                child: Image.network(widget.notice!.bannerUrl!, fit: BoxFit.cover),
+                              )
+                            : Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.add_photo_alternate_outlined, size: 48.r, color: Colors.grey),
+                                  SizedBox(height: 8.h),
+                                  Text('Tap to upload a banner image', style: TextStyle(color: Colors.grey, fontSize: 14.sp)),
+                                ],
+                              ),
+                  ),
                 ),
                 SizedBox(height: 20.h),
                 
