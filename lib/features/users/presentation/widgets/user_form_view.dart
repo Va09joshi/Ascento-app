@@ -6,6 +6,7 @@ import 'package:ascento_abacus/core/widgets/custom_button.dart';
 import 'package:ascento_abacus/core/widgets/custom_textfield.dart';
 import 'package:ascento_abacus/features/users/data/repositories/users_repository.dart';
 import 'package:ascento_abacus/features/users/presentation/providers/users_provider.dart';
+import 'package:ascento_abacus/features/domains/presentation/providers/domains_provider.dart';
 import 'package:ascento_abacus/shared/models/user_model.dart';
 
 class UserFormView extends ConsumerStatefulWidget {
@@ -92,6 +93,7 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
         'gender': _selectedGender,
         'status': _selectedStatus,
         'address': _addressController.text.trim(),
+        if (_selectedDomain != null) 'domain_id': _selectedDomain,
       };
       
       if (_isEdit) {
@@ -120,6 +122,24 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
         title,
         style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey.shade600, fontSize: 12.sp, letterSpacing: 1.2),
       ),
+    );
+  }
+
+  Widget _buildResponsiveRow(List<Widget> children) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth > 500) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: children.map((c) => Expanded(child: Padding(padding: EdgeInsets.symmetric(horizontal: 8.w), child: c))).toList(),
+          );
+        } else {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: children.map((c) => Padding(padding: EdgeInsets.only(bottom: 16.h), child: c)).toList(),
+          );
+        }
+      },
     );
   }
 
@@ -157,63 +177,51 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
 
               if (isStudent) ...[
                 _buildSectionTitle('STUDENT DETAILS'),
-                Row(
-                  children: [
-                    Expanded(child: CustomTextField(controller: _nameController, label: 'Full Name')),
-                    SizedBox(width: 16.w),
-                    Expanded(
-                      child: InkWell(
-                        onTap: () async {
-                          final date = await showDatePicker(context: context, initialDate: DateTime(2010), firstDate: DateTime(1990), lastDate: DateTime.now());
-                          if (date != null) setState(() => _selectedDateOfBirth = date);
-                        },
-                        child: InputDecorator(
-                          decoration: InputDecoration(labelText: 'DOB', suffixIcon: const Icon(Icons.calendar_today)),
-                          child: Text(_selectedDateOfBirth?.toString().split(' ').first ?? 'mm/dd/yyyy'),
-                        ),
-                      ),
+                _buildResponsiveRow([
+                  CustomTextField(controller: _nameController, label: 'Full Name'),
+                  InkWell(
+                    onTap: () async {
+                      final date = await showDatePicker(context: context, initialDate: DateTime(2010), firstDate: DateTime(1990), lastDate: DateTime.now());
+                      if (date != null) setState(() => _selectedDateOfBirth = date);
+                    },
+                    child: InputDecorator(
+                      decoration: InputDecoration(labelText: 'DOB', suffixIcon: const Icon(Icons.calendar_today)),
+                      child: Text(_selectedDateOfBirth?.toString().split(' ').first ?? 'mm/dd/yyyy'),
                     ),
-                  ],
-                ),
+                  ),
+                ]),
                 SizedBox(height: 16.h),
-                Row(
-                  children: [
-                    Expanded(child: CustomTextField(controller: _ageController, label: 'Age')),
-                    SizedBox(width: 16.w),
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(labelText: 'Gender'),
-                        value: _selectedGender,
-                        items: ['Male', 'Female'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                        onChanged: (v) => setState(() => _selectedGender = v),
-                      ),
-                    ),
-                  ],
-                ),
-
+                _buildResponsiveRow([
+                  CustomTextField(controller: _ageController, label: 'Age'),
+                  DropdownButtonFormField<String>(
+                    decoration: const InputDecoration(labelText: 'Gender'),
+                    value: _selectedGender,
+                    items: ['Male', 'Female'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                    onChanged: (v) => setState(() => _selectedGender = v),
+                  ),
+                ]),
                 _buildSectionTitle('PARENT DETAILS'),
-                Row(
-                  children: [
-                    Expanded(child: CustomTextField(controller: _parentNameController, label: 'Parent Name')),
-                    SizedBox(width: 16.w),
-                    Expanded(child: CustomTextField(controller: _parentPhoneController, label: 'Parent Phone')),
-                  ],
-                ),
+                _buildResponsiveRow([
+                  CustomTextField(controller: _parentNameController, label: 'Parent Name'),
+                  CustomTextField(controller: _parentPhoneController, label: 'Parent Phone'),
+                ]),
                 SizedBox(height: 16.h),
-                Row(
-                  children: [
-                    Expanded(child: CustomTextField(controller: _parentEmailController, label: 'Parent Email')),
-                    SizedBox(width: 16.w),
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(labelText: 'Domain'),
-                        value: _selectedDomain,
-                        items: ['Select domain', 'Abacus', 'Vedic Math'].map((e) => DropdownMenuItem(value: e == 'Select domain' ? null : e, child: Text(e))).toList(),
-                        onChanged: (v) => setState(() => _selectedDomain = v),
-                      ),
+                _buildResponsiveRow([
+                  CustomTextField(controller: _parentEmailController, label: 'Parent Email'),
+                  ref.watch(domainsListProvider).when(
+                    data: (domains) => DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(labelText: 'Domain'),
+                      value: _selectedDomain,
+                      items: [
+                        const DropdownMenuItem(value: null, child: Text('Select domain')),
+                        ...domains.where((d) => d.isActive).map((e) => DropdownMenuItem(value: e.id, child: Text(e.name)))
+                      ],
+                      onChanged: (v) => setState(() => _selectedDomain = v),
                     ),
-                  ],
-                ),
+                    loading: () => const Center(child: CircularProgressIndicator()),
+                    error: (e, s) => const Text('Error loading domains'),
+                  ),
+                ]),
                 SizedBox(height: 16.h),
                 CustomTextField(controller: _passwordController, label: 'Password (Optional)', hint: 'Leave blank to auto-generate temporary'),
                 
@@ -227,76 +235,59 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
                 SizedBox(height: 16.h),
                 CustomTextField(controller: _addressController, label: 'Address'),
                 SizedBox(height: 16.h),
-                Row(
-                  children: [
-                    Expanded(child: CustomTextField(controller: _cityController, label: 'City')),
-                    SizedBox(width: 16.w),
-                    Expanded(child: CustomTextField(controller: _stateController, label: 'State')),
-                  ],
-                ),
+                _buildResponsiveRow([
+                  CustomTextField(controller: _cityController, label: 'City'),
+                  CustomTextField(controller: _stateController, label: 'State'),
+                ]),
               ] else ...[
-                Row(
-                  children: [
-                    Expanded(child: CustomTextField(controller: _nameController, label: 'Name')),
-                    SizedBox(width: 16.w),
-                    Expanded(child: CustomTextField(controller: _emailController, label: 'Email')),
-                  ],
-                ),
+                _buildResponsiveRow([
+                  CustomTextField(controller: _nameController, label: 'Name'),
+                  CustomTextField(controller: _emailController, label: 'Email'),
+                ]),
                 SizedBox(height: 16.h),
-                Row(
-                  children: [
-                    Expanded(child: CustomTextField(controller: _phoneController, label: 'Phone')),
-                    SizedBox(width: 16.w),
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(labelText: 'Domain'),
-                        value: _selectedDomain,
-                        items: ['Select domain', 'Abacus', 'Vedic Math'].map((e) => DropdownMenuItem(value: e == 'Select domain' ? null : e, child: Text(e))).toList(),
-                        onChanged: (v) => setState(() => _selectedDomain = v),
-                      ),
+                _buildResponsiveRow([
+                  CustomTextField(controller: _phoneController, label: 'Phone'),
+                  ref.watch(domainsListProvider).when(
+                    data: (domains) => DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(labelText: 'Domain'),
+                      value: _selectedDomain,
+                      items: [
+                        const DropdownMenuItem(value: null, child: Text('Select domain')),
+                        ...domains.where((d) => d.isActive).map((e) => DropdownMenuItem(value: e.id, child: Text(e.name)))
+                      ],
+                      onChanged: (v) => setState(() => _selectedDomain = v),
                     ),
-                  ],
-                ),
+                    loading: () => const Center(child: CircularProgressIndicator()),
+                    error: (e, s) => const Text('Error loading domains'),
+                  ),
+                ]),
                 SizedBox(height: 16.h),
-                Row(
-                  children: [
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(labelText: 'Status'),
-                        value: _selectedStatus,
-                        items: ['Active', 'Inactive'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                        onChanged: (v) => setState(() => _selectedStatus = v),
-                      ),
-                    ),
-                    SizedBox(width: 16.w),
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(labelText: 'Gender'),
-                        value: _selectedGender,
-                        items: ['Male', 'Female'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                        onChanged: (v) => setState(() => _selectedGender = v),
-                      ),
-                    ),
-                  ],
-                ),
+                _buildResponsiveRow([
+                  DropdownButtonFormField<String>(
+                    decoration: const InputDecoration(labelText: 'Status'),
+                    value: _selectedStatus,
+                    items: ['Active', 'Inactive'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                    onChanged: (v) => setState(() => _selectedStatus = v),
+                  ),
+                  DropdownButtonFormField<String>(
+                    decoration: const InputDecoration(labelText: 'Gender'),
+                    value: _selectedGender,
+                    items: ['Male', 'Female'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                    onChanged: (v) => setState(() => _selectedGender = v),
+                  ),
+                ]),
                 SizedBox(height: 16.h),
-                Row(
-                  children: [
-                    Expanded(child: CustomTextField(controller: _qualificationController, label: 'Qualification')),
-                    SizedBox(width: 16.w),
-                    Expanded(child: CustomTextField(controller: _experienceController, label: 'Experience (Years)')),
-                  ],
-                ),
+                _buildResponsiveRow([
+                  CustomTextField(controller: _qualificationController, label: 'Qualification'),
+                  CustomTextField(controller: _experienceController, label: 'Experience (Years)'),
+                ]),
                 SizedBox(height: 16.h),
                 CustomTextField(controller: _addressController, label: 'Address'),
                 SizedBox(height: 16.h),
-                Row(
-                  children: [
-                    Expanded(child: CustomTextField(controller: _cityController, label: 'City')),
-                    SizedBox(width: 16.w),
-                    Expanded(child: CustomTextField(controller: _stateController, label: 'State')),
-                  ],
-                ),
+                _buildResponsiveRow([
+                  CustomTextField(controller: _cityController, label: 'City'),
+                  CustomTextField(controller: _stateController, label: 'State'),
+                ]),
                 SizedBox(height: 16.h),
                 CustomTextField(controller: _countryController, label: 'Country'),
               ],

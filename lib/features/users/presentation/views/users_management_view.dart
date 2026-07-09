@@ -90,121 +90,155 @@ class _UsersManagementViewState extends ConsumerState<UsersManagementView> with 
   }
 }
 
-class _UserListTab extends ConsumerWidget {
+class _UserListTab extends ConsumerStatefulWidget {
   final String role;
   
   const _UserListTab({required this.role});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final usersAsync = ref.watch(usersListProvider(role));
+  ConsumerState<_UserListTab> createState() => _UserListTabState();
+}
+
+class _UserListTabState extends ConsumerState<_UserListTab> {
+  String _searchQuery = '';
+
+  @override
+  Widget build(BuildContext context) {
+    final usersAsync = ref.watch(usersListProvider(widget.role));
+    
+    final allUsers = usersAsync.value ?? [];
+    final filteredUsers = allUsers.where((u) {
+      if (_searchQuery.isEmpty) return true;
+      final query = _searchQuery.toLowerCase();
+      return u.name.toLowerCase().contains(query) || u.email.toLowerCase().contains(query);
+    }).toList();
     
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
-      child: PremiumDataTable<UserModel>(
-        title: '${role[0].toUpperCase()}${role.substring(1)}s Management',
-        subtitle: 'Manage all $role accounts in the system.',
-        isLoading: usersAsync.isLoading,
-        onRowTap: (user) {
-          showDialog(
-            context: context,
-            builder: (ctx) => AlertDialog(
-              title: Text('User Details'),
-              content: Column(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          TextField(
+            decoration: InputDecoration(
+              hintText: 'Search by name or email...',
+              prefixIcon: const Icon(Icons.search),
+              filled: true,
+              fillColor: Theme.of(context).brightness == Brightness.dark ? AppColors.darkSurfaceDarker : AppColors.surfaceDarker,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12.r),
+                borderSide: BorderSide.none,
+              ),
+              contentPadding: EdgeInsets.symmetric(vertical: 12.h),
+            ),
+            onChanged: (val) => setState(() => _searchQuery = val),
+          ),
+          SizedBox(height: 16.h),
+          PremiumDataTable<UserModel>(
+            title: '${widget.role[0].toUpperCase()}${widget.role.substring(1)}s Management',
+            subtitle: 'Manage all ${widget.role} accounts in the system.',
+            isLoading: usersAsync.isLoading,
+            onRowTap: (user) {
+              showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: Text('User Details'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('ID: ${user.id}'),
+                      SizedBox(height: 8.h),
+                      Text('Name: ${user.name}'),
+                      SizedBox(height: 8.h),
+                      Text('Email: ${user.email}'),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close'))
+                  ],
+                ),
+              );
+            },
+            data: filteredUsers,
+            columns: const ['User', 'Email', 'Role', 'Status', 'Actions'],
+            rowBuilder: (user) => [
+              // User Avatar & Name
+              Row(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('ID: ${user.id}'),
-                  SizedBox(height: 8.h),
-                  Text('Name: ${user.name}'),
-                  SizedBox(height: 8.h),
-                  Text('Email: ${user.email}'),
+                  Container(
+                    width: 32.w,
+                    height: 32.h,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14.sp,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Text(
+                    user.name,
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp),
+                  ),
                 ],
               ),
-              actions: [
-                TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close'))
-              ],
-            ),
-          );
-        },
-        data: usersAsync.value ?? [],
-        columns: const ['User', 'Email', 'Role', 'Status', 'Actions'],
-        rowBuilder: (user) => [
-          // User Avatar & Name
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
+              // Email
+              Text(user.email),
+              // Role Badge
               Container(
-                width: 32.w,
-                height: 32.h,
-                alignment: Alignment.center,
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
+                  color: AppColors.info.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(4.r),
                 ),
                 child: Text(
-                  user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
+                  user.role.name.toUpperCase(),
                   style: TextStyle(
-                    color: AppColors.primary,
+                    color: AppColors.info,
+                    fontSize: 10.sp,
                     fontWeight: FontWeight.bold,
-                    fontSize: 14.sp,
                   ),
                 ),
               ),
-              SizedBox(width: 12.w),
-              Text(
-                user.name,
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp),
+              // Status Badge
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: AppColors.success.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(4.r),
+                ),
+                child: Text(
+                  'ACTIVE',
+                  style: TextStyle(
+                    color: AppColors.success,
+                    fontSize: 10.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-            ],
-          ),
-          // Email
-          Text(user.email),
-          // Role Badge
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-            decoration: BoxDecoration(
-              color: AppColors.info.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(4.r),
-            ),
-            child: Text(
-              user.role.name.toUpperCase(),
-              style: TextStyle(
-                color: AppColors.info,
-                fontSize: 10.sp,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          // Status Badge
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-            decoration: BoxDecoration(
-              color: AppColors.success.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(4.r),
-            ),
-            child: Text(
-              'ACTIVE',
-              style: TextStyle(
-                color: AppColors.success,
-                fontSize: 10.sp,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          // Actions
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.edit_outlined, size: 20),
-                color: AppColors.info,
-                onPressed: () => context.push(RoutePaths.editUser, extra: user),
-              ),
-              IconButton(
-                icon: const Icon(Icons.delete_outline, size: 20),
-                color: AppColors.error,
-                onPressed: () => _showDeleteDialog(context, ref, user, role),
+              // Actions
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.edit_outlined, size: 20),
+                    color: AppColors.info,
+                    onPressed: () => context.push(RoutePaths.editUser, extra: user),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline, size: 20),
+                    color: AppColors.error,
+                    onPressed: () => _showDeleteDialog(context, ref, user, widget.role),
+                  ),
+                ],
               ),
             ],
           ),
