@@ -58,8 +58,8 @@ class CustomTextField extends StatelessWidget {
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.bold,
             color: isDark
-                ? theme.colorScheme.onSurface
-                : theme.colorScheme.onSurface.withOpacity(0.85),
+                ? AppColors.darkTextPrimary
+                : AppColors.textPrimary,
           ),
         ),
         AppSizes.h8,
