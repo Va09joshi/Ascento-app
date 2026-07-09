@@ -37,87 +37,191 @@ class DomainsManagementView extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              PremiumDataTable<DomainModel>(
-                title: 'Domains Management',
-                subtitle: 'Manage academic domains (e.g. Abacus, Vedic Maths)',
-                isLoading: domainsState.isLoading,
-                error: domainsState.hasError ? domainsState.error.toString() : null,
-                data: domainsState.valueOrNull ?? [],
-                columns: const ['Domain', 'Status', 'Actions'],
-                rowBuilder: (domain) => [
-                  // Domain Name and Icon
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(8.w),
-                        decoration: BoxDecoration(
-                          color: (isDark ? AppColors.darkPrimary : AppColors.primary).withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8.r),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Domains Management',
+                          style: TextStyle(
+                            fontSize: 22.sp,
+                            fontWeight: FontWeight.w800,
+                            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                          ),
                         ),
-                        child: Icon(Icons.category, color: isDark ? AppColors.darkPrimary : AppColors.primary, size: 16.sp),
-                      ),
-                      SizedBox(width: 12.w),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            domain.name,
-                            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp),
+                        SizedBox(height: 4.h),
+                        Text(
+                          'Manage academic domains (e.g. Abacus, Vedic Maths)',
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                           ),
-                          SizedBox(
-                            width: 250.w,
-                            child: Text(
-                              domain.description ?? 'No description provided',
-                              style: TextStyle(color: AppColors.textMuted, fontSize: 11.sp),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  // Status Badge
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
-                    decoration: BoxDecoration(
-                      color: domain.isActive ? AppColors.success.withValues(alpha: 0.1) : (isDark ? AppColors.darkSurfaceDarker : AppColors.surfaceDarker),
-                      borderRadius: BorderRadius.circular(12.r),
+                        ),
+                      ],
                     ),
-                    child: Text(
-                      domain.isActive ? 'Active' : 'Inactive',
-                      style: TextStyle(
-                        color: domain.isActive ? AppColors.success : (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
-                        fontSize: 11.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  // Actions
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit_outlined, size: 20),
-                        color: AppColors.info,
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (_) => DomainFormDialog(domain: domain),
-                          );
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline, size: 20),
-                        color: AppColors.error,
-                        onPressed: () => _showDeleteDialog(context, domain, ref),
-                      ),
-                    ],
                   ),
                 ],
               ),
+              SizedBox(height: 24.h),
+              
+              if (domainsState.isLoading)
+                const Center(child: CircularProgressIndicator())
+              else if (domainsState.hasError)
+                Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 40.h),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.error_outline, color: AppColors.error, size: 48.sp),
+                        SizedBox(height: 16.h),
+                        Text(
+                          'Failed to load domains',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp, color: AppColors.error),
+                        ),
+                        SizedBox(height: 8.h),
+                        Text(
+                          domainsState.error.toString().replaceFirst('Exception: ', ''),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else if (domainsState.valueOrNull == null || domainsState.valueOrNull!.isEmpty)
+                Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 40.h),
+                    child: Text(
+                      'No domains found. Create one to get started!',
+                      style: TextStyle(color: isDark ? AppColors.darkTextMuted : AppColors.textMuted),
+                    ),
+                  ),
+                )
+              else
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: domainsState.value!.length,
+                  separatorBuilder: (_, __) => SizedBox(height: 12.h),
+                  itemBuilder: (context, index) {
+                    final domain = domainsState.value![index];
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: isDark ? AppColors.darkSurface : AppColors.surface,
+                        borderRadius: BorderRadius.circular(16.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.04),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                        border: Border.all(
+                          color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.05),
+                        ),
+                      ),
+                      padding: EdgeInsets.all(16.w),
+                      child: Row(
+                        children: [
+                          // Domain Icon
+                          Container(
+                            padding: EdgeInsets.all(12.w),
+                            decoration: BoxDecoration(
+                              color: (isDark ? AppColors.darkPrimary : AppColors.primary).withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            child: Icon(Icons.category, color: isDark ? AppColors.darkPrimary : AppColors.primary, size: 24.sp),
+                          ),
+                          SizedBox(width: 16.w),
+                          
+                          // Domain Details
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        domain.name,
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    SizedBox(width: 8.w),
+                                    // Status Badge
+                                    Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                                      decoration: BoxDecoration(
+                                        color: domain.isActive 
+                                            ? AppColors.success.withValues(alpha: 0.1) 
+                                            : (isDark ? AppColors.darkSurfaceDarker : AppColors.surfaceDarker),
+                                        borderRadius: BorderRadius.circular(8.r),
+                                      ),
+                                      child: Text(
+                                        domain.isActive ? 'Active' : 'Inactive',
+                                        style: TextStyle(
+                                          color: domain.isActive 
+                                              ? AppColors.success 
+                                              : (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
+                                          fontSize: 10.sp,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 4.h),
+                                Text(
+                                  domain.description ?? 'No description provided',
+                                  style: TextStyle(color: AppColors.textMuted, fontSize: 12.sp),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(width: 12.w),
+                          
+                          // Action Buttons
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit_outlined),
+                                color: AppColors.info,
+                                iconSize: 20.sp,
+                                constraints: const BoxConstraints(),
+                                padding: EdgeInsets.all(6.w),
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (_) => DomainFormDialog(domain: domain),
+                                  );
+                                },
+                              ),
+                              SizedBox(height: 8.h),
+                              IconButton(
+                                icon: const Icon(Icons.delete_outline),
+                                color: AppColors.error,
+                                iconSize: 20.sp,
+                                constraints: const BoxConstraints(),
+                                padding: EdgeInsets.all(6.w),
+                                onPressed: () => _showDeleteDialog(context, domain, ref),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
             ],
           ),
         ),
