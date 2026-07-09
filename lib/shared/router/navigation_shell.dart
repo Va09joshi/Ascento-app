@@ -188,6 +188,13 @@ class NavigationShell extends ConsumerWidget {
                         onTap: () => _go(context, RoutePaths.manageUsers),
                       ),
                       _DrawerItem(
+                        icon: Icons.category_rounded,
+                        label: 'Manage Domains',
+                        active: currentPath == RoutePaths.manageDomains,
+                        accent: const Color(0xFFD946EF),
+                        onTap: () => _go(context, RoutePaths.manageDomains),
+                      ),
+                      _DrawerItem(
                         icon: Icons.school_rounded,
                         label: 'Academics Config',
                         active: currentPath == RoutePaths.academicsConfig,
@@ -538,6 +545,7 @@ class NavigationShell extends ConsumerWidget {
   String _getTabTitle() {
     if (currentPath == RoutePaths.dashboard) return 'Ascento Abacus';
     if (currentPath == RoutePaths.manageUsers) return 'Users & Roles';
+    if (currentPath == RoutePaths.manageDomains) return 'Manage Domains';
     if (currentPath == RoutePaths.programs) return 'Flagship Programs';
     if (currentPath == RoutePaths.attendance) return 'Attendance';
     if (currentPath == RoutePaths.exams) return 'Exams';

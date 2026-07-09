@@ -25,6 +25,7 @@ import 'package:ascento_abacus/features/courses/presentation/views/courses_manag
 import 'package:ascento_abacus/features/lessons/presentation/views/lessons_view.dart';
 import 'package:ascento_abacus/features/users/presentation/views/users_management_view.dart';
 import 'package:ascento_abacus/features/users/presentation/widgets/user_form_view.dart';
+import 'package:ascento_abacus/features/domains/presentation/views/domains_management_view.dart';
 
 import 'package:ascento_abacus/shared/router/route_names.dart';
 import 'package:ascento_abacus/shared/router/route_guard.dart';
@@ -159,6 +160,17 @@ final routerProvider = Provider<GoRouter>((ref) {
             pageBuilder: (context, state) => CustomTransitionPage(
               key: state.pageKey,
               child: const BranchesManagementView(),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+            ),
+          ),
+          GoRoute(
+            path: RoutePaths.manageDomains,
+            name: RouteNames.manageDomains,
+            pageBuilder: (context, state) => CustomTransitionPage(
+              key: state.pageKey,
+              child: const DomainsManagementView(),
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                 return FadeTransition(opacity: animation, child: child);
               },

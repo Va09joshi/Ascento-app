@@ -18,6 +18,7 @@ class RouteNames {
   static const String studentDashboard = 'studentDashboard';
   static const String manageUsers = 'manageUsers';
   static const String manageBranches = 'manageBranches';
+  static const String manageDomains = 'manageDomains';
   static const String academicsConfig = 'academicsConfig';
   static const String addUser = 'addUser';
   static const String editUser = 'editUser';
@@ -70,6 +71,7 @@ class RoutePaths {
   static const String studentDashboard = '/student-dashboard';
   static const String manageUsers = '/manage-users';
   static const String manageBranches = '/manage-branches';
+  static const String manageDomains = '/manage-domains';
   static const String academicsConfig = '/academics-config';
   static const String addUser = '/manage-users/add';
   static const String editUser = '/manage-users/edit';
