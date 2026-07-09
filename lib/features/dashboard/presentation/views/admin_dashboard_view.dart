@@ -493,15 +493,17 @@ Widget _buildRecentNoticeCard(NoticeModel notice, ThemeData theme) {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-      subtitle: Padding(
-        padding: EdgeInsets.only(top: 4.h),
-        child: Text(
-          notice.content,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(fontSize: 12.sp, color: AppColors.textMuted),
-        ),
-      ),
+      subtitle: notice.content.isNotEmpty
+          ? Padding(
+              padding: EdgeInsets.only(top: 4.h),
+              child: Text(
+                notice.content,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 12.sp, color: AppColors.textMuted),
+              ),
+            )
+          : null,
       contentPadding: EdgeInsets.zero,
     ),
   );
