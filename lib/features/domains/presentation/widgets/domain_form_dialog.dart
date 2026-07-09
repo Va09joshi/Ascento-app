@@ -91,9 +91,11 @@ class _DomainFormDialogState extends ConsumerState<DomainFormDialog> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    widget.domain == null ? 'Create New Domain' : 'Edit Domain',
-                    style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold),
+                  Expanded(
+                    child: Text(
+                      widget.domain == null ? 'Create New Domain' : 'Edit Domain',
+                      style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold),
+                    ),
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),
