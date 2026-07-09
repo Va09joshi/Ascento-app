@@ -7,6 +7,7 @@ import 'package:ascento_abacus/shared/models/feature_models.dart';
 import 'package:ascento_abacus/features/timetable/presentation/providers/timetable_provider.dart';
 import 'package:ascento_abacus/features/academics/presentation/providers/academics_provider.dart';
 import 'package:ascento_abacus/features/timetable/presentation/widgets/timetable_slot_form_dialog.dart';
+import 'package:ascento_abacus/features/timetable/data/repositories/timetable_repository.dart';
 
 class TimetableManagementView extends ConsumerStatefulWidget {
   const TimetableManagementView({super.key});

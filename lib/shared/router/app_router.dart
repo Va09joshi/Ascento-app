@@ -27,6 +27,7 @@ import 'package:ascento_abacus/features/users/presentation/views/users_managemen
 import 'package:ascento_abacus/features/users/presentation/widgets/user_form_view.dart';
 import 'package:ascento_abacus/features/domains/presentation/views/domains_management_view.dart';
 
+import 'package:ascento_abacus/shared/models/feature_models.dart';
 import 'package:ascento_abacus/shared/router/route_names.dart';
 import 'package:ascento_abacus/shared/router/route_guard.dart';
 import 'package:ascento_abacus/shared/router/navigation_shell.dart';
