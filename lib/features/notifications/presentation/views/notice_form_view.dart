@@ -188,10 +188,10 @@ class _NoticeFormViewState extends ConsumerState<NoticeFormView> {
                                 ? Image.network(_selectedImage!.path, fit: BoxFit.cover, errorBuilder: (ctx, err, st) => const Icon(Icons.image))
                                 : Image.file(File(_selectedImage!.path), fit: BoxFit.cover, errorBuilder: (ctx, err, st) => const Icon(Icons.image)),
                           )
-                        : widget.notice?.bannerUrl != null
+                        : (widget.notice?.bannerUrl != null && widget.notice!.bannerUrl!.isNotEmpty)
                             ? ClipRRect(
                                 borderRadius: BorderRadius.circular(12.r),
-                                child: Image.network(widget.notice!.bannerUrl!, fit: BoxFit.cover),
+                                child: Image.network(widget.notice!.bannerUrl!, fit: BoxFit.cover, errorBuilder: (ctx, err, st) => const Icon(Icons.broken_image)),
                               )
                             : Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
