@@ -378,7 +378,7 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
                       value: _selectedAcademicYearId,
                       items: [
                         const DropdownMenuItem(value: null, child: Text('Select Year')),
-                        ...years.where((y) => y.isActive).map((e) => DropdownMenuItem(value: e.id, child: Text(e.name)))
+                        ...years.map((e) => DropdownMenuItem(value: e.id, child: Text(e.name)))
                       ],
                       onChanged: (v) => setState(() => _selectedAcademicYearId = v),
                     ),
@@ -391,7 +391,7 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
                       value: _selectedClassId,
                       items: [
                         const DropdownMenuItem(value: null, child: Text('Select Class')),
-                        ...classes.where((c) => c.isActive).map((e) => DropdownMenuItem(value: e.id, child: Text(e.name)))
+                        ...classes.map((e) => DropdownMenuItem(value: e.id, child: Text(e.name)))
                       ],
                       onChanged: (v) => setState(() => _selectedClassId = v),
                     ),
@@ -404,8 +404,8 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
                   ref.watch(sectionsListProvider).when(
                     data: (sections) {
                       final filteredSections = _selectedClassId != null
-                          ? sections.where((s) => s.classId == _selectedClassId && s.isActive).toList()
-                          : sections.where((s) => s.isActive).toList();
+                          ? sections.where((s) => s.classId == _selectedClassId).toList()
+                          : sections.toList();
                       return DropdownButtonFormField<String>(
                         decoration: const InputDecoration(labelText: 'Section'),
                         value: filteredSections.any((s) => s.id == _selectedSectionId) ? _selectedSectionId : null,
