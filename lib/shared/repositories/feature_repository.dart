@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ascento_abacus/core/logging/app_logger.dart';
 import 'package:ascento_abacus/core/network/dio_client.dart';
 import 'package:ascento_abacus/core/constants/api_endpoints.dart';
+import 'package:dio/dio.dart';
 import 'package:ascento_abacus/shared/models/feature_models.dart';
 
 import '../models/user_model.dart';
