@@ -88,7 +88,7 @@ class _ClassFormViewState extends ConsumerState<ClassFormView> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(
           widget.classModel == null ? 'Add Class' : 'Edit Class',

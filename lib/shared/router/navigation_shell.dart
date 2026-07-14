@@ -86,7 +86,7 @@ class NavigationShell extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       // --- School Management Drawer Menu ---
       drawer: Drawer(
         backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,

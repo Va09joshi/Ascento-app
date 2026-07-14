@@ -119,7 +119,7 @@ class _NoticeFormViewState extends ConsumerState<NoticeFormView> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(widget.notice == null ? 'Create Notice' : 'Edit Notice'),
         backgroundColor: Colors.transparent,

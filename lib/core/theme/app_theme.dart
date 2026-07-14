@@ -29,7 +29,7 @@ class AppTheme {
         onSurface: AppColors.textPrimary,
         outline: AppColors.border,
       ),
-      scaffoldBackgroundColor: AppColors.background,
+      scaffoldBackgroundColor: Colors.transparent,
       dividerColor: AppColors.border,
     );
 
@@ -114,7 +114,7 @@ class AppTheme {
         onSurface: AppColors.darkTextPrimary,
         outline: AppColors.darkBorder,
       ),
-      scaffoldBackgroundColor: AppColors.darkBackground,
+      scaffoldBackgroundColor: Colors.transparent,
       dividerColor: AppColors.darkBorder,
     );
 

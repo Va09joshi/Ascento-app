@@ -36,7 +36,7 @@ class _ExamViewState extends ConsumerState<ExamView>
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       body: Column(
         children: [
           Padding(

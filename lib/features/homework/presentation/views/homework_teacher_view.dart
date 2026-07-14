@@ -23,7 +23,7 @@ class _HomeworkTeacherViewState extends ConsumerState<HomeworkTeacherView> {
     final hwAsync = ref.watch(homeworkListProvider);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: const Text('Manage Homework'),
         backgroundColor: Colors.transparent,

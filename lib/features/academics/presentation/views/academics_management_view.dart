@@ -38,7 +38,7 @@ class _AcademicsManagementViewState extends ConsumerState<AcademicsManagementVie
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: Column(
           children: [

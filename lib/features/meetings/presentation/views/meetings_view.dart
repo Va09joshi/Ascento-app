@@ -28,7 +28,7 @@ class _MeetingsViewState extends ConsumerState<MeetingsView> {
     final canCreate = currentUser?.role == UserRole.admin || currentUser?.role == UserRole.teacher;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: const Text('Live Meetings'),
         backgroundColor: Colors.transparent,

@@ -24,6 +24,21 @@ class MyApp extends ConsumerWidget {
           themeMode: themeMode,
           theme: AppTheme.lightTheme(),
           darkTheme: AppTheme.darkTheme(),
+          builder: (context, child) {
+            final isDark = Theme.of(context).brightness == Brightness.dark;
+            return Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isDark
+                      ? [const Color(0xFF2C1B2E), const Color(0xFF1B263B)]
+                      : [const Color(0xFFFFE5E5), const Color(0xFFE5F0FF)],
+                ),
+              ),
+              child: child,
+            );
+          },
           routerConfig: router,
         );
       },

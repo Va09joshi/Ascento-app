@@ -95,7 +95,7 @@ class _BranchFormViewState extends ConsumerState<BranchFormView> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(
           widget.branch == null ? 'Add Branch' : 'Edit Branch',

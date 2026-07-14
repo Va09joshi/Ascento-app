@@ -51,7 +51,7 @@ class _SplashViewState extends ConsumerState<SplashView> with SingleTickerProvid
     final bool isError = splashState.status == SplashStatus.error;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),

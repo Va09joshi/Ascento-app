@@ -87,7 +87,7 @@ class _SubjectFormViewState extends ConsumerState<SubjectFormView> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(
           widget.subject == null ? 'Add Subject' : 'Edit Subject',

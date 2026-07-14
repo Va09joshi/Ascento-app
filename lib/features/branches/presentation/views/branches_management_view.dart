@@ -24,7 +24,7 @@ class _BranchesManagementViewState extends ConsumerState<BranchesManagementView>
     final branchesAsync = ref.watch(branchesListProvider);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,

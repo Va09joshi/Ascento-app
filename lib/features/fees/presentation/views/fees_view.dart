@@ -72,7 +72,7 @@ class FeesView extends ConsumerWidget {
     final feesState = ref.watch(localFeesProvider);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       body: feesState.when(
         loading: () => ListView(
           padding: EdgeInsets.all(24.w),

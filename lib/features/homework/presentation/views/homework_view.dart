@@ -18,7 +18,7 @@ class HomeworkView extends ConsumerWidget {
     final hwAsync = ref.watch(homeworkListProvider(null));
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       body: hwAsync.when(
         loading: () => ListView(
           padding: EdgeInsets.all(24.w),

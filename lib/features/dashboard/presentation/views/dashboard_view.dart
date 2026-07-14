@@ -66,7 +66,7 @@ class DashboardView extends ConsumerWidget {
         .length;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
@@ -223,7 +223,7 @@ class DashboardView extends ConsumerWidget {
   // --- Centralized Dashboard Shimmer Skeleton Loader ---
   Widget _buildShimmerSkeleton(BuildContext context, bool isDark, ThemeData theme) {
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),

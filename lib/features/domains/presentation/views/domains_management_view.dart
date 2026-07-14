@@ -18,7 +18,7 @@ class DomainsManagementView extends ConsumerWidget {
     final domainsState = ref.watch(domainsListProvider);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,

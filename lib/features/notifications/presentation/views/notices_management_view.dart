@@ -20,7 +20,7 @@ class NoticesManagementView extends ConsumerWidget {
     final noticesAsync = ref.watch(noticesListProvider);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       floatingActionButton: isReadOnly ? null : FloatingActionButton.extended(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,

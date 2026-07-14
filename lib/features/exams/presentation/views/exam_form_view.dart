@@ -119,7 +119,7 @@ class _ExamFormViewState extends ConsumerState<ExamFormView> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(widget.examToEdit != null ? 'Edit Exam' : 'New Exam'),
         backgroundColor: Colors.transparent,

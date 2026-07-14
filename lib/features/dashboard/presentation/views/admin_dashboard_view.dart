@@ -27,7 +27,7 @@ class AdminDashboardView extends ConsumerWidget {
     final noticesAsync = ref.watch(noticesListProvider);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),

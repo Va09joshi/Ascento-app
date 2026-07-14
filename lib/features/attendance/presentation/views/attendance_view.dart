@@ -23,7 +23,7 @@ class AttendanceView extends ConsumerWidget {
     );
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       body: summaryAsync.when(
         loading: () => ListView(
           padding: EdgeInsets.all(24.w),

@@ -96,7 +96,7 @@ class _SectionFormViewState extends ConsumerState<SectionFormView> {
     final classesAsync = ref.watch(classesListProvider);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(
           widget.section == null ? 'Add Section' : 'Edit Section',

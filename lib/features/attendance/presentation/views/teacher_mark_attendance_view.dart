@@ -37,7 +37,7 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
     final sectionsAsync = ref.watch(sectionsListProvider);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: Column(
           children: [

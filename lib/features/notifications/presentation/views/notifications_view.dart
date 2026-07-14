@@ -18,7 +18,7 @@ class NotificationsView extends ConsumerWidget {
     final notifAsync = ref.watch(notificationsProvider);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       body: notifAsync.when(
         loading: () => ListView(
           padding: EdgeInsets.all(24.w),

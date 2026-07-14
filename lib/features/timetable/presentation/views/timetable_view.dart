@@ -76,7 +76,7 @@ class _TimetableViewState extends ConsumerState<TimetableView> {
     final timetableAsync = ref.watch(weeklyTimetableProvider);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       body: timetableAsync.when(
         loading: () => ListView(
           padding: EdgeInsets.all(20.w),

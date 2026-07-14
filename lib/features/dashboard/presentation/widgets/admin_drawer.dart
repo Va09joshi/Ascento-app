@@ -20,7 +20,7 @@ class AdminDrawer extends ConsumerWidget {
     final currentRoute = GoRouterState.of(context).uri.toString();
 
     return Drawer(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       child: Column(
         children: [
           // Header

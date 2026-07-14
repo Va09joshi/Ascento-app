@@ -24,7 +24,7 @@ class ProfileView extends ConsumerWidget {
 
     if (user != null && user.role != UserRole.student && user.role != UserRole.parent) {
       return Scaffold(
-        backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+        backgroundColor: Colors.transparent,
         body: _buildStaffProfile(context, user, ref, isDark),
       );
     }
@@ -32,7 +32,7 @@ class ProfileView extends ConsumerWidget {
     final profileAsync = ref.watch(studentProfileProvider);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       body: profileAsync.when(
         loading: () => ListView(
           padding: EdgeInsets.all(24.w),

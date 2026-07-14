@@ -24,7 +24,7 @@ class _ContentViewState extends ConsumerState<ContentView> {
     final contentAsync = ref.watch(contentListProvider);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: const Text('Study Materials'),
         backgroundColor: Colors.transparent,

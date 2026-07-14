@@ -43,7 +43,7 @@ class _UsersManagementViewState extends ConsumerState<UsersManagementView> with 
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       floatingActionButton: AnimatedBuilder(
         animation: _tabController,
         builder: (context, child) {

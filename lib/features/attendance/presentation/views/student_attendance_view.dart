@@ -20,7 +20,7 @@ class StudentAttendanceView extends ConsumerWidget {
     final summaryAsync = ref.watch(attendanceSummaryProvider);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
