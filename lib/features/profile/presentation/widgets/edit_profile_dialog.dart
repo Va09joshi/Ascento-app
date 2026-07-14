@@ -43,6 +43,43 @@ class _EditProfileDialogState extends ConsumerState<EditProfileDialog> {
     super.dispose();
   }
 
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: widget.profile.dateOfBirth ?? DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        final theme = Theme.of(context);
+        final isDark = theme.brightness == Brightness.dark;
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: isDark
+                ? const ColorScheme.dark(
+                    primary: AppColors.primary,
+                    onPrimary: Colors.white,
+                    surface: AppColors.darkSurface,
+                    onSurface: Colors.white,
+                  )
+                : const ColorScheme.light(
+                    primary: AppColors.primary,
+                    onPrimary: Colors.white,
+                    surface: AppColors.surface,
+                    onSurface: Colors.black,
+                  ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() {
+        _dobController.text =
+            '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+      });
+    }
+  }
+
   Future<void> _submit() async {
     setState(() => _isLoading = true);
     try {
@@ -80,32 +117,55 @@ class _EditProfileDialogState extends ConsumerState<EditProfileDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Edit Profile',
-              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Edit Profile',
+                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close_rounded),
+                  onPressed: () => Navigator.pop(context),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  splashRadius: 20,
+                ),
+              ],
             ),
-            SizedBox(height: 20.h),
-            CustomTextField(
-              controller: _phoneController,
-              label: 'Phone Number',
-              hint: 'Enter your phone number',
-              prefixIcon: Icons.phone,
-              keyboardType: TextInputType.phone,
-            ),
-            SizedBox(height: 16.h),
-            CustomTextField(
-              controller: _addressController,
-              label: 'Address',
-              hint: 'Enter your address',
-              prefixIcon: Icons.location_on,
-            ),
-            SizedBox(height: 16.h),
-            CustomTextField(
-              controller: _dobController,
-              label: 'Date of Birth (YYYY-MM-DD)',
-              hint: 'e.g. 2010-05-21',
-              prefixIcon: Icons.cake,
-              keyboardType: TextInputType.datetime,
+            SizedBox(height: 24.h),
+            Flexible(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CustomTextField(
+                      controller: _phoneController,
+                      label: 'Phone Number',
+                      hint: 'Enter your phone number',
+                      prefixIcon: Icons.phone,
+                      keyboardType: TextInputType.phone,
+                    ),
+                    SizedBox(height: 16.h),
+                    CustomTextField(
+                      controller: _addressController,
+                      label: 'Address',
+                      hint: 'Enter your address',
+                      prefixIcon: Icons.location_on,
+                    ),
+                    SizedBox(height: 16.h),
+                    CustomTextField(
+                      controller: _dobController,
+                      label: 'Date of Birth (YYYY-MM-DD)',
+                      hint: 'e.g. 2010-05-21',
+                      prefixIcon: Icons.cake,
+                      keyboardType: TextInputType.datetime,
+                      readOnly: true,
+                      onTap: () => _selectDate(context),
+                    ),
+                  ],
+                ),
+              ),
             ),
             SizedBox(height: 24.h),
             Row(
