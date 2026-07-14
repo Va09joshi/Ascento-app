@@ -1890,11 +1890,20 @@ class ContentItem {
       format: json['format'] as String,
       category: json['category'] as String,
       color: Color(int.parse(json['color'] as String)),
-      icon: IconData(json['icon'] as int, fontFamily: 'MaterialIcons'),
+      icon: _getIconData(json['icon'] as int),
       price: (json['price'] as num).toDouble(),
       isFree: json['isFree'] as bool,
       tag: json['tag'] as String,
     );
+  }
+
+  static IconData _getIconData(int codePoint) {
+    // Tree-shaking requires known IconData constants
+    // A mapping can be built here, but to satisfy the compiler and fallback safely:
+    if (codePoint == Icons.menu_book.codePoint) return Icons.menu_book;
+    if (codePoint == Icons.play_circle_fill.codePoint) return Icons.play_circle_fill;
+    if (codePoint == Icons.picture_as_pdf.codePoint) return Icons.picture_as_pdf;
+    return Icons.insert_drive_file_rounded;
   }
 
   Map<String, dynamic> toJson() {
