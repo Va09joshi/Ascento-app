@@ -128,36 +128,29 @@ class StudentDashboardView extends ConsumerWidget {
               SizedBox(height: 16.h),
               
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildQuickActionButton(
+                  _buildQuickActionCard(
                     context: context,
                     icon: Icons.schedule_rounded,
                     color: const Color(0xFF6366F1), // Indigo
                     label: 'Timetable',
                     onTap: () => context.go(RoutePaths.timetable),
                   ),
-                  _buildQuickActionButton(
-                    context: context,
-                    icon: Icons.trending_up_rounded,
-                    color: const Color(0xFF10B981), // Emerald
-                    label: 'Reports',
-                    onTap: () => context.go(RoutePaths.exams),
-                  ),
-                  _buildQuickActionButton(
+                  SizedBox(width: 12.w),
+                  _buildQuickActionCard(
                     context: context,
                     icon: Icons.menu_book_rounded,
                     color: const Color(0xFFF97316), // Orange
                     label: 'Homework',
-                    onTap: () {}, // Navigate to homework when available
+                    onTap: () => context.go(RoutePaths.homework),
                   ),
-                  _buildQuickActionButton(
+                  SizedBox(width: 12.w),
+                  _buildQuickActionCard(
                     context: context,
-                    icon: Icons.campaign_rounded,
-                    color: const Color(0xFFF59E0B), // Amber
-                    label: 'Enquiry',
-                    onTap: () {}, // Navigate to enquiry when available
+                    icon: Icons.person_rounded,
+                    color: const Color(0xFF10B981), // Emerald
+                    label: 'Profile',
+                    onTap: () => context.go(RoutePaths.profile),
                   ),
                 ],
               ),
@@ -331,7 +324,7 @@ class StudentDashboardView extends ConsumerWidget {
     );
   }
 
-  Widget _buildQuickActionButton({
+  Widget _buildQuickActionCard({
     required BuildContext context,
     required IconData icon,
     required Color color,
@@ -340,38 +333,48 @@ class StudentDashboardView extends ConsumerWidget {
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 64.w,
-            height: 64.h,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-              boxShadow: isDark ? [] : [
-                BoxShadow(
-                  color: color.withOpacity(0.3),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 16.h),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkSurface : Colors.white,
+            borderRadius: BorderRadius.circular(16.r),
+            boxShadow: isDark ? [] : [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.02),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+            border: Border.all(
+              color: isDark ? AppColors.darkBorder : const Color(0xFFF1F5F9),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: EdgeInsets.all(12.w),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.15),
+                  shape: BoxShape.circle,
                 ),
-              ],
-            ),
-            alignment: Alignment.center,
-            child: Icon(icon, color: Colors.white, size: 28.sp),
+                child: Icon(icon, color: color, size: 24.sp),
+              ),
+              SizedBox(height: 10.h),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
+                ),
+              ),
+            ],
           ),
-          SizedBox(height: 10.h),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w600,
-              color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
