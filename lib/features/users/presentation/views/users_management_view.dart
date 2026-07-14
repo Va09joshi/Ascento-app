@@ -152,6 +152,18 @@ class _UserListTabState extends ConsumerState<_UserListTab> {
                       Text('Name: ${user.name}'),
                       SizedBox(height: 8.h),
                       Text('Email: ${user.email}'),
+                      if (user.role == UserRole.student) ...[
+                        SizedBox(height: 8.h),
+                        if (user.className != null) Text('Class: ${user.className}'),
+                        if (user.sectionName != null) ...[
+                          SizedBox(height: 8.h),
+                          Text('Section: ${user.sectionName}'),
+                        ],
+                        if (user.rollNumber != null) ...[
+                          SizedBox(height: 8.h),
+                          Text('Roll No: ${user.rollNumber}'),
+                        ],
+                      ],
                     ],
                   ),
                   actions: [
@@ -185,9 +197,22 @@ class _UserListTabState extends ConsumerState<_UserListTab> {
                     ),
                   ),
                   SizedBox(width: 12.w),
-                  Text(
-                    user.name,
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        user.name,
+                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp),
+                      ),
+                      if (user.role == UserRole.student && user.rollNumber != null) ...[
+                        SizedBox(height: 2.h),
+                        Text(
+                          'Roll: ${user.rollNumber}',
+                          style: TextStyle(fontSize: 12.sp, color: AppColors.textMuted),
+                        ),
+                      ],
+                    ],
                   ),
                 ],
               ),

@@ -21,6 +21,9 @@ class UserModel {
   final String? domainId;
   final String? tempPassword;
   final bool mustChangePassword;
+  final String? rollNumber;
+  final String? className;
+  final String? sectionName;
 
   const UserModel({
     required this.id,
@@ -37,6 +40,9 @@ class UserModel {
     this.domainId,
     this.tempPassword,
     this.mustChangePassword = false,
+    this.rollNumber,
+    this.className,
+    this.sectionName,
   });
 
   // Convert to JSON map
@@ -61,6 +67,21 @@ class UserModel {
 
   // Parse from JSON map
   factory UserModel.fromJson(Map<String, dynamic> json) {
+    String? rNumber;
+    String? cName;
+    String? sName;
+    if (json['student_sections'] != null && (json['student_sections'] as List).isNotEmpty) {
+      final sec = json['student_sections'][0];
+      rNumber = sec['roll_number']?.toString();
+      final secDetails = sec['sections'];
+      if (secDetails != null) {
+        sName = secDetails['name'];
+        if (secDetails['classes'] != null) {
+          cName = secDetails['classes']['name'];
+        }
+      }
+    }
+
     return UserModel(
       id: json['id'] as String? ?? '',
       name: (json['full_name'] ?? json['name']) as String? ?? 'Guest User',
@@ -83,6 +104,9 @@ class UserModel {
       address: json['address'] as String?,
       domainId: json['domain_id'] as String?,
       mustChangePassword: json['must_change_password'] as bool? ?? false,
+      rollNumber: rNumber,
+      className: cName,
+      sectionName: sName,
     );
   }
 
