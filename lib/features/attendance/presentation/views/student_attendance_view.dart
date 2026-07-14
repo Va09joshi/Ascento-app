@@ -17,6 +17,7 @@ class StudentAttendanceView extends ConsumerWidget {
     final isDark = theme.brightness == Brightness.dark;
     final now = DateTime.now();
     final attendanceAsync = ref.watch(monthlyAttendanceProvider((month: now.month, year: now.year)));
+    final summaryAsync = ref.watch(attendanceSummaryProvider);
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
@@ -49,7 +50,7 @@ class StudentAttendanceView extends ConsumerWidget {
                     child: _buildStatCard(
                       context, 
                       'Total Classes', 
-                      '45', 
+                      summaryAsync.valueOrNull?.totalDays.toString() ?? '-', 
                       Icons.class_rounded, 
                       Colors.blue, 
                       isDark,
@@ -60,7 +61,7 @@ class StudentAttendanceView extends ConsumerWidget {
                     child: _buildStatCard(
                       context, 
                       'Present', 
-                      '42', 
+                      summaryAsync.valueOrNull?.presentDays.toString() ?? '-', 
                       Icons.check_circle_rounded, 
                       AppColors.success, 
                       isDark,
@@ -71,7 +72,7 @@ class StudentAttendanceView extends ConsumerWidget {
                     child: _buildStatCard(
                       context, 
                       'Absent', 
-                      '3', 
+                      summaryAsync.valueOrNull?.absentDays.toString() ?? '-', 
                       Icons.cancel_rounded, 
                       AppColors.error, 
                       isDark,
