@@ -35,9 +35,11 @@ class StudentDashboardView extends ConsumerWidget {
     
     // Count pending homeworks
     final pendingHomeworkCount = homeworkAsync.valueOrNull?.where((h) => h.status == HomeworkStatus.pending).length ?? 0;
+    final profileAsync = ref.watch(studentProfileProvider);
+    final profile = profileAsync.valueOrNull;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC),
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
@@ -45,7 +47,7 @@ class StudentDashboardView extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // User Header Card
-              _buildUserHeader(context, user, isDark),
+              _buildUserHeader(context, user, profile, isDark),
               SizedBox(height: 32.h),
 
               // Overview Section
@@ -166,7 +168,7 @@ class StudentDashboardView extends ConsumerWidget {
     );
   }
 
-  Widget _buildUserHeader(BuildContext context, dynamic user, bool isDark) {
+  Widget _buildUserHeader(BuildContext context, dynamic user, StudentProfile? profile, bool isDark) {
     final theme = Theme.of(context);
     
     return Container(
@@ -227,7 +229,12 @@ class StudentDashboardView extends ConsumerWidget {
                       ),
                     ),
                     Text(
-                      '- | Roll No. ${user?.id.substring(0, 4) ?? '---'}',
+                      profile != null && (profile.className.isNotEmpty || profile.rollNumber.isNotEmpty)
+                          ? [
+                              if (profile.className.isNotEmpty) '${profile.className}${profile.section.isNotEmpty ? ' - ${profile.section}' : ''}',
+                              if (profile.rollNumber.isNotEmpty) 'Roll No. ${profile.rollNumber}',
+                            ].join(' | ')
+                          : 'Not Assigned to Class',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: const Color(0xFF94A3B8),
                         fontWeight: FontWeight.w500,
