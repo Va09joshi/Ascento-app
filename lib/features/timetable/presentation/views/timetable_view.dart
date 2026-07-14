@@ -41,26 +41,7 @@ class _TimetableViewState extends ConsumerState<TimetableView> {
     Color(0xFF14B8A6),
   ];
 
-  static const _actionItems = [
-    _TimetableAction(
-      title: 'Upload Practice',
-      subtitle: 'Send worksheet or homework',
-      icon: Icons.upload_file_rounded,
-      color: Color(0xFF4FB6FF),
-    ),
-    _TimetableAction(
-      title: 'Upload Recording',
-      subtitle: 'Share class video or audio',
-      icon: Icons.video_file_rounded,
-      color: Color(0xFFFF7A59),
-    ),
-    _TimetableAction(
-      title: 'Pay Fees',
-      subtitle: 'Open online payment flow',
-      icon: Icons.payment_rounded,
-      color: Color(0xFF2FAE78),
-    ),
-  ];
+  // Action items removed
 
   int _selectedDay = _initialSelectedDay();
   TimetableViewMode _viewMode = TimetableViewMode.daily;
@@ -116,65 +97,7 @@ class _TimetableViewState extends ConsumerState<TimetableView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 46.w,
-                        height: 46.w,
-                        padding: EdgeInsets.all(8.w),
-                        decoration: BoxDecoration(
-                          color: (isDark
-                                  ? AppColors.darkSurface
-                                  : AppColors.surface)
-                              .withValues(alpha: 0.92),
-                          borderRadius: BorderRadius.circular(14.r),
-                          border: Border.all(
-                            color: isDark
-                                ? AppColors.darkBorder
-                                : AppColors.border,
-                          ),
-                        ),
-                        child: Image.asset(
-                          'assets/images/logo.png',
-                          fit: BoxFit.contain,
-                          errorBuilder: (_, __, ___) => Icon(
-                            Icons.schedule_rounded,
-                            color: AppColors.primary,
-                            size: 22.r,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 12.w),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Timetable Grid',
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              'Responsive schedule cards with better media-query handling.',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: AppColors.textMuted,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 14.h),
-                  Text(
-                    'View the daily schedule as a clean responsive list with quick upload and payment options.',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textMuted,
-                    ),
-                  ),
-                  SizedBox(height: 18.h),
+                  // The top descriptions are removed for a cleaner look.
 
                   // View Toggle Switcher (Daily Grid vs Weekly Matrix)
                   Container(
@@ -314,42 +237,7 @@ class _TimetableViewState extends ConsumerState<TimetableView> {
                     SizedBox(height: 18.h),
                   ],
 
-                  _HorizontalSectionHeader(
-                    title: 'Quick Actions',
-                    subtitle: 'Upload files or open payment from one place.',
-                  ),
-                  SizedBox(height: 10.h),
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final columns = _gridColumnsForWidth(
-                        constraints.maxWidth,
-                        mobile: 1,
-                        tablet: 2,
-                        desktop: 3,
-                      );
-                      final mainAxisExtent = columns == 1 ? 134.h : 128.h;
-
-                      return GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: _actionItems.length,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: columns,
-                          crossAxisSpacing: 12.w,
-                          mainAxisSpacing: 12.h,
-                          mainAxisExtent: mainAxisExtent,
-                        ),
-                        itemBuilder: (context, index) {
-                          final action = _actionItems[index];
-                          return _ActionCard(
-                            action: action,
-                            onTap: () => _showActionMessage(context, action.title),
-                          );
-                        },
-                      );
-                    },
-                  ),
-                  SizedBox(height: 18.h),
+                  // Quick actions removed for a cleaner look
 
                   // Render cross-fade between Daily and Weekly layouts
                   AnimatedCrossFade(
@@ -362,7 +250,7 @@ class _TimetableViewState extends ConsumerState<TimetableView> {
                       children: [
                         _HorizontalSectionHeader(
                           title: '${_dayNames[_selectedDay - 1]} Overview',
-                          subtitle: 'Adaptive summary grid for today\'s classes.',
+                          subtitle: '',
                         ),
                         SizedBox(height: 10.h),
                         LayoutBuilder(
@@ -424,7 +312,7 @@ class _TimetableViewState extends ConsumerState<TimetableView> {
                           title: '${_dayNames[_selectedDay - 1]} Session Grid',
                           subtitle: daySlots.isEmpty
                               ? 'No sessions are scheduled for this day.'
-                              : 'Highly responsive grid layout for class timing, classroom, and teacher.',
+                              : '',
                         ),
                         SizedBox(height: 10.h),
                         if (daySlots.isEmpty)
