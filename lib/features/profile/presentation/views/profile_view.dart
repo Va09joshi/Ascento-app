@@ -10,6 +10,7 @@ import 'package:ascento_abacus/core/widgets/custom_button.dart';
 import 'package:ascento_abacus/shared/providers/feature_providers.dart';
 import 'package:ascento_abacus/shared/models/user_model.dart';
 import 'package:ascento_abacus/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:ascento_abacus/features/profile/presentation/widgets/edit_profile_dialog.dart';
 
 class ProfileView extends ConsumerWidget {
   const ProfileView({super.key});
@@ -186,6 +187,17 @@ class ProfileView extends ConsumerWidget {
               ],
 
               SizedBox(height: 24.h),
+              CustomButton(
+                text: 'Edit Profile',
+                icon: Icons.edit_rounded,
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => EditProfileDialog(profile: profile),
+                  );
+                },
+              ),
+              SizedBox(height: 12.h),
               CustomButton(
                 text: 'Logout',
                 icon: Icons.logout_rounded,

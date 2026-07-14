@@ -5,6 +5,7 @@ import 'package:ascento_abacus/core/theme/app_colors.dart';
 import 'package:ascento_abacus/shared/models/user_model.dart';
 import 'package:ascento_abacus/features/academics/presentation/providers/academics_provider.dart';
 import 'package:ascento_abacus/core/widgets/custom_button.dart';
+import 'package:ascento_abacus/features/users/data/repositories/users_repository.dart';
 
 class AssignClassDialog extends ConsumerStatefulWidget {
   final UserModel student;
@@ -108,9 +109,15 @@ class _AssignClassDialogState extends ConsumerState<AssignClassDialog> {
   Future<void> _submitAssignment() async {
     setState(() => _isSubmitting = true);
     try {
-      // NOTE: Backend doesn't have a direct endpoint for assigning student to section.
-      // This is a placeholder for when the endpoint is created or we use updateUser.
-      await Future.delayed(const Duration(seconds: 1)); // Simulate API call
+      // Default academic year for now, in a real app this might be selected or fetched
+      const defaultAcademicYearId = '1ce37a6b-c744-4861-ab7d-686beeb59d99'; 
+
+      await ref.read(usersRepositoryProvider).assignStudentClass(
+        widget.student.id,
+        _selectedClassId!,
+        _selectedSectionId!,
+        defaultAcademicYearId,
+      );
       
       if (!mounted) return;
       Navigator.pop(context, true);

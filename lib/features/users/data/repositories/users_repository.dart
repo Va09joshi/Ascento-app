@@ -70,6 +70,20 @@ class UsersRepository {
     }
   }
 
+  Future<void> assignStudentClass(String studentId, String classId, String sectionId, String academicYearId) async {
+    try {
+      await _dioClient.patch('/students/$studentId', data: {
+        'class_id': classId,
+        'section_id': sectionId,
+        'academic_year_id': academicYearId,
+      });
+    } catch (e) {
+      AppLogger.error('Failed to assign student class', e);
+      if (e is ApiException) throw Exception(e.message);
+      throw Exception('Failed to assign student class.');
+    }
+  }
+
   Future<void> deleteUser(String id) async {
     try {
       await _dioClient.delete('/admin/users/$id');

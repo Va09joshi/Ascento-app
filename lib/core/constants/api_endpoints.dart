@@ -49,6 +49,7 @@ class ApiEndpoints {
   // -------------------------------------------------------------------------
   static const String students      = '/students';
   static const String studentDetail = '/students/{id}';
+  static const String studentProfile = '/students/my-profile';
 
   // -------------------------------------------------------------------------
   // Courses & Exams

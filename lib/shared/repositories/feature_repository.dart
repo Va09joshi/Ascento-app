@@ -127,19 +127,29 @@ class FeatureRepository {
   // ===========================================================================
 
   Future<StudentProfile> getStudentProfile() async {
-    try {
-      final response = await _client.get(ApiEndpoints.profile);
-      return StudentProfile.fromJson(response.data['data']);
-    } catch (_) {
-      AppLogger.warning('Using mock student profile');
-      return StudentProfile(
-        user: const UserModel(id: 'ASC-2026-9841', name: 'Vaibhav Kumar', email: 'vaibhav@ascento.com', role: UserRole.student, starsCount: 15, completedLevels: 2),
-        className: 'Class 8', section: 'A', rollNumber: '24',
-        fatherName: 'Mr. Rajesh Kumar', motherName: 'Mrs. Sunita Kumar',
-        phone: '9876543210', address: '42, Education Lane, New Delhi',
-        bloodGroup: 'B+', dateOfBirth: DateTime(2013, 8, 15),
-      );
-    }
+    final response = await _client.get(ApiEndpoints.studentProfile);
+    final data = response.data['data'];
+    
+    final sections = data['student_sections'] as List?;
+    final sectionData = (sections != null && sections.isNotEmpty) ? sections[0] : null;
+
+    // Transform backend data to fit StudentProfile model
+    return StudentProfile(
+      user: UserModel.fromJson(data),
+      className: sectionData?['sections']?['classes']?['name'] ?? '',
+      section: sectionData?['sections']?['name'] ?? '',
+      rollNumber: sectionData?['roll_number'] ?? '',
+      fatherName: data['parent_name'], 
+      motherName: null,
+      phone: data['phone'],
+      address: data['address'],
+      bloodGroup: null, 
+      dateOfBirth: data['date_of_birth'] != null ? DateTime.tryParse(data['date_of_birth']) : null,
+    );
+  }
+
+  Future<void> updateStudentProfile(Map<String, dynamic> data) async {
+    await _client.patch(ApiEndpoints.studentProfile, data: data);
   }
 }
 
