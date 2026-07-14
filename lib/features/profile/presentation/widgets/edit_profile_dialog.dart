@@ -1,6 +1,9 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:ascento_abacus/core/theme/app_colors.dart';
 import 'package:ascento_abacus/core/widgets/custom_button.dart';
 import 'package:ascento_abacus/core/widgets/custom_textfield.dart';
@@ -22,6 +25,21 @@ class _EditProfileDialogState extends ConsumerState<EditProfileDialog> {
   late TextEditingController _addressController;
   late TextEditingController _dobController;
   bool _isLoading = false;
+  XFile? _selectedAvatar;
+
+  Future<void> _pickAvatar() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 512,
+      maxHeight: 512,
+    );
+    if (image != null) {
+      setState(() {
+        _selectedAvatar = image;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -88,7 +106,10 @@ class _EditProfileDialogState extends ConsumerState<EditProfileDialog> {
       if (_addressController.text.isNotEmpty) data['address'] = _addressController.text;
       if (_dobController.text.isNotEmpty) data['date_of_birth'] = _dobController.text;
 
-      await ref.read(featureRepositoryProvider).updateStudentProfile(data);
+      await ref.read(featureRepositoryProvider).updateStudentProfile(
+        data,
+        avatarPath: _selectedAvatar?.path,
+      );
       // ignore: unused_result
       ref.refresh(studentProfileProvider);
       if (mounted) Navigator.pop(context);
@@ -139,6 +160,42 @@ class _EditProfileDialogState extends ConsumerState<EditProfileDialog> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    Center(
+                      child: GestureDetector(
+                        onTap: _pickAvatar,
+                        child: Stack(
+                          children: [
+                            CircleAvatar(
+                              radius: 50.r,
+                              backgroundColor: Colors.grey.shade200,
+                              backgroundImage: _selectedAvatar != null
+                                  ? (kIsWeb
+                                      ? NetworkImage(_selectedAvatar!.path)
+                                      : FileImage(File(_selectedAvatar!.path))) as ImageProvider
+                                  : (widget.profile.user.avatarUrl != null && widget.profile.user.avatarUrl!.isNotEmpty
+                                      ? NetworkImage(widget.profile.user.avatarUrl!) as ImageProvider
+                                      : null),
+                              child: (_selectedAvatar == null && (widget.profile.user.avatarUrl == null || widget.profile.user.avatarUrl!.isEmpty))
+                                  ? Icon(Icons.person, size: 50.r, color: Colors.grey.shade400)
+                                  : null,
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                padding: EdgeInsets.all(4.r),
+                                decoration: const BoxDecoration(
+                                  color: AppColors.primary,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(Icons.camera_alt, color: Colors.white, size: 16.r),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 24.h),
                     CustomTextField(
                       controller: _phoneController,
                       label: 'Phone Number',

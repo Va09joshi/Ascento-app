@@ -148,8 +148,17 @@ class FeatureRepository {
     );
   }
 
-  Future<void> updateStudentProfile(Map<String, dynamic> data) async {
-    await _client.patch(ApiEndpoints.studentProfile, data: data);
+  Future<void> updateStudentProfile(Map<String, dynamic> data, {String? avatarPath}) async {
+    if (avatarPath != null) {
+      final formData = FormData.fromMap(data);
+      formData.files.add(MapEntry(
+        'avatar',
+        await MultipartFile.fromFile(avatarPath),
+      ));
+      await _client.patch(ApiEndpoints.studentProfile, data: formData);
+    } else {
+      await _client.patch(ApiEndpoints.studentProfile, data: data);
+    }
   }
 }
 

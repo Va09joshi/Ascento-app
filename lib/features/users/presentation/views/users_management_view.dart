@@ -179,23 +179,30 @@ class _UserListTabState extends ConsumerState<_UserListTab> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    width: 32.w,
-                    height: 32.h,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Text(
-                      user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
-                      style: TextStyle(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14.sp,
+                  if (user.avatarUrl != null && user.avatarUrl!.isNotEmpty)
+                    CircleAvatar(
+                      radius: 16.w,
+                      backgroundImage: NetworkImage(user.avatarUrl!),
+                      onBackgroundImageError: (_, __) {},
+                    )
+                  else
+                    Container(
+                      width: 32.w,
+                      height: 32.h,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14.sp,
+                        ),
                       ),
                     ),
-                  ),
                   SizedBox(width: 12.w),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
