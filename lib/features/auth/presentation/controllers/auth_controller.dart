@@ -131,7 +131,26 @@ class AuthController extends StateNotifier<AuthUIState> {
     }
   }
 
-  // 5. Logout Session
+  // 5. Force Change Password
+  Future<void> changePassword(String newPassword) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      await _authService.changePassword(newPassword);
+      
+      // Update local state to reflect the change
+      final updatedUser = state.currentUser?.copyWith(mustChangePassword: false);
+      state = state.copyWith(isLoading: false, currentUser: updatedUser);
+    } catch (e) {
+      AppLogger.error('Password change submission error', e);
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString().replaceAll('Exception: ', ''),
+      );
+      rethrow;
+    }
+  }
+
+  // 6. Logout Session
   Future<void> logout(VoidCallback onDone) async {
     state = state.copyWith(isLoading: true);
     await _authService.endSession();

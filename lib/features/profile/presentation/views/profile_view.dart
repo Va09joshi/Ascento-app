@@ -92,13 +92,18 @@ class ProfileView extends ConsumerWidget {
                               color: Colors.white,
                             ),
                           ),
-                          SizedBox(height: 4.h),
-                          Text(
-                            '${profile.className} - ${profile.section} | Roll No. ${profile.rollNumber}',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: Colors.white70,
+                          if (profile.className.isNotEmpty || profile.rollNumber.isNotEmpty) ...[
+                            SizedBox(height: 4.h),
+                            Text(
+                              [
+                                if (profile.className.isNotEmpty) '${profile.className}${profile.section.isNotEmpty ? ' - ${profile.section}' : ''}',
+                                if (profile.rollNumber.isNotEmpty) 'Roll No. ${profile.rollNumber}',
+                              ].join(' | '),
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: Colors.white70,
+                              ),
                             ),
-                          ),
+                          ],
                         ],
                       ),
                     ),
@@ -351,9 +356,10 @@ class _InfoRow extends StatelessWidget {
           SizedBox(width: 16.w),
           Expanded(
             child: Text(
-              value,
+              value.trim().isEmpty ? 'N/A' : value,
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
+                color: value.trim().isEmpty ? AppColors.textMuted : null,
               ),
               textAlign: TextAlign.right,
               maxLines: 1,

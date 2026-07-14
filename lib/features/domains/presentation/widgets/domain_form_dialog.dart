@@ -139,8 +139,7 @@ class _DomainFormDialogState extends ConsumerState<DomainFormDialog> {
                     child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
                   ),
                   SizedBox(width: 16.w),
-                  SizedBox(
-                    width: 140.w,
+                  Expanded(
                     child: CustomButton(
                       text: widget.domain == null ? 'Create' : 'Save Changes',
                       isLoading: _isLoading,

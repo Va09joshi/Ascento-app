@@ -10,6 +10,7 @@ class RouteNames {
   static const String forgotPassword = 'forgotPassword';
   static const String otpVerify = 'otpVerify';
   static const String resetPassword = 'resetPassword';
+  static const String forceChangePassword = 'forceChangePassword';
 
   // Shell Dashboard Tabs / Drawer
   static const String dashboard = 'dashboard';
@@ -42,6 +43,7 @@ class RouteNames {
   static const String exams = 'exams';
   static const String fees = 'fees';
   static const String homework = 'homework';
+  static const String meetings = 'meetings';
   static const String notifications = 'notifications';
   static const String addNotice = 'addNotice';
   static const String editNotice = 'editNotice';
@@ -64,6 +66,7 @@ class RoutePaths {
   static const String forgotPassword = '/forgot-password';
   static const String otpVerify = '/otp-verify';
   static const String resetPassword = '/reset-password';
+  static const String forceChangePassword = '/force-change-password';
 
   static const String dashboard = '/dashboard'; // default fallback
   static const String adminDashboard = '/admin-dashboard';
@@ -95,6 +98,7 @@ class RoutePaths {
   static const String editExam = '/exams/edit';
   static const String fees = '/fees';
   static const String homework = '/homework';
+  static const String meetings = '/meetings';
   static const String notifications = '/notifications';
   static const String addNotice = '/notifications/add';
   static const String editNotice = '/notifications/edit';

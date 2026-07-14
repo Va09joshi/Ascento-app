@@ -45,7 +45,7 @@ class NavigationShell extends ConsumerWidget {
       ];
     } else {
       return [
-        _NavItem('Home', FontAwesomeIcons.house, FontAwesomeIcons.solidHouse, RoutePaths.dashboard),
+        _NavItem('Home', FontAwesomeIcons.house, FontAwesomeIcons.solidHouse, RoutePaths.studentDashboard),
         _NavItem('Attendance', FontAwesomeIcons.calendarCheck, FontAwesomeIcons.solidCalendarCheck, RoutePaths.attendance),
         _NavItem('Exams', FontAwesomeIcons.fileLines, FontAwesomeIcons.filePen, RoutePaths.exams),
         _NavItem('Fees', FontAwesomeIcons.creditCard, FontAwesomeIcons.solidCreditCard, RoutePaths.fees),
@@ -230,14 +230,6 @@ class NavigationShell extends ConsumerWidget {
                         accent: const Color(0xFFFF5400),
                         onTap: () => _go(context, RoutePaths.notifications),
                       ),
-                      _DrawerItem(
-                        icon: Icons.help_outline_rounded,
-                        label: 'Enquiries',
-                        active: currentPath == RoutePaths.enquiry,
-                        accent: const Color(0xFFFFC857),
-                        onTap: () => _go(context, RoutePaths.enquiry),
-                      ),
-
                     ] else if (user?.role == UserRole.teacher) ...[
                       _DrawerSection(title: 'Teacher Portal'),
                       _DrawerItem(
@@ -257,9 +249,9 @@ class NavigationShell extends ConsumerWidget {
                       _DrawerItem(
                         icon: Icons.how_to_reg_rounded,
                         label: 'Mark Attendance',
-                        active: false,
+                        active: currentPath == RoutePaths.attendance,
                         accent: const Color(0xFF2FAE78),
-                        onTap: () => _showComingSoon(context),
+                        onTap: () => _go(context, RoutePaths.attendance),
                       ),
                       _DrawerItem(
                         icon: Icons.assignment_turned_in_rounded,
@@ -276,89 +268,78 @@ class NavigationShell extends ConsumerWidget {
                         onTap: () => _go(context, RoutePaths.timetable),
                       ),
                     ] else ...[
-                      _DrawerSection(title: 'Account'),
+                      _DrawerSection(title: 'Student Portal'),
                       _DrawerItem(
-                        icon: Icons.person_outline_rounded,
-                        label: 'Profile',
-                        active: currentPath == RoutePaths.profile,
-                        accent: const Color(0xFF7B61FF),
-                        onTap: () => _go(context, RoutePaths.profile),
+                        icon: Icons.grid_view_rounded,
+                        label: 'Overview',
+                        active: currentPath == RoutePaths.studentDashboard,
+                        accent: const Color(0xFF5B67F4),
+                        onTap: () => _go(context, RoutePaths.studentDashboard),
                       ),
-                      _DrawerItem(
-                        icon: Icons.notifications_none_rounded,
-                        label: 'Notifications',
-                        active: currentPath == RoutePaths.notifications,
-                        accent: const Color(0xFFFF7A3A),
-                        onTap: () => _go(context, RoutePaths.notifications),
-                      ),
-                      SizedBox(height: 6.h),
-                      _DrawerSection(title: 'Academics'),
                       _DrawerItem(
                         icon: Icons.calendar_month_rounded,
-                        label: 'Attendance',
+                        label: 'My Timetable',
+                        active: currentPath == RoutePaths.timetable,
+                        accent: const Color(0xFF2FA2B9),
+                        onTap: () => _go(context, RoutePaths.timetable),
+                      ),
+                      _DrawerItem(
+                        icon: Icons.assignment_rounded,
+                        label: 'My Exams',
+                        active: currentPath == RoutePaths.exams,
+                        accent: const Color(0xFFE85A9A),
+                        onTap: () => _go(context, RoutePaths.exams),
+                      ),
+                      _DrawerItem(
+                        icon: Icons.check_circle_rounded,
+                        label: 'My Attendance',
                         active: currentPath == RoutePaths.attendance,
                         accent: const Color(0xFF2FAE78),
                         onTap: () => _go(context, RoutePaths.attendance),
                       ),
                       _DrawerItem(
-                        icon: Icons.access_time_rounded,
-                        label: 'Timetable',
-                        active: currentPath == RoutePaths.timetable,
-                        accent: const Color(0xFF5B67F4),
-                        onTap: () => _go(context, RoutePaths.timetable),
+                        icon: Icons.campaign_rounded,
+                        label: 'Notice Board',
+                        active: currentPath == RoutePaths.notifications,
+                        accent: const Color(0xFFFF7A3A),
+                        onTap: () => _go(context, RoutePaths.notifications),
                       ),
                       _DrawerItem(
-                        icon: Icons.menu_book_rounded,
-                        label: 'Homework',
+                        icon: Icons.assignment_turned_in_rounded,
+                        label: 'My Homework',
                         active: currentPath == RoutePaths.homework,
-                        accent: const Color(0xFFE85A9A),
+                        accent: const Color(0xFF8E44AD),
                         onTap: () => _go(context, RoutePaths.homework),
                       ),
                       _DrawerItem(
-                        icon: Icons.edit_calendar_rounded,
-                        label: 'Exams',
-                        active: currentPath == RoutePaths.exams,
-                        accent: const Color(0xFFFF8A34),
-                        onTap: () => _go(context, RoutePaths.exams),
+                        icon: Icons.video_camera_front_rounded,
+                        label: 'Live Meetings',
+                        active: currentPath == RoutePaths.meetings,
+                        accent: const Color(0xFFE74C3C),
+                        onTap: () => _go(context, RoutePaths.meetings),
                       ),
                       _DrawerItem(
-                        icon: Icons.account_balance_wallet_rounded,
-                        label: 'Fees',
-                        active: currentPath == RoutePaths.fees,
-                        accent: const Color(0xFF6C4ED9),
-                        onTap: () => _go(context, RoutePaths.fees),
-                      ),
-                      _DrawerItem(
-                        icon: Icons.auto_stories_rounded,
-                        label: 'Notes & Materials',
+                        icon: Icons.menu_book_rounded,
+                        label: 'Study Materials',
                         active: currentPath == RoutePaths.content,
-                        accent: const Color(0xFF8B5CF6),
+                        accent: const Color(0xFF3498DB),
                         onTap: () => _go(context, RoutePaths.content),
                       ),
-                      SizedBox(height: 6.h),
-                      _DrawerSection(title: 'Programs'),
                       _DrawerItem(
-                        icon: Icons.explore_rounded,
-                        label: 'Programs Overview',
-                        active: currentPath == RoutePaths.programs,
-                        accent: const Color(0xFF5B67F4),
-                        onTap: () => _go(context, RoutePaths.programs),
+                        icon: Icons.receipt_long_rounded,
+                        label: 'Fee Details',
+                        active: currentPath == RoutePaths.fees,
+                        accent: const Color(0xFF1ABC9C),
+                        onTap: () => _go(context, RoutePaths.fees),
                       ),
                       SizedBox(height: 6.h),
-                      _DrawerSection(title: 'Services'),
+                      _DrawerSection(title: 'Account'),
                       _DrawerItem(
-                        icon: Icons.event_note_rounded,
-                        label: 'Events',
-                        active: false,
-                        accent: const Color(0xFF6EDC5F),
-                        onTap: () => _showComingSoon(context),
-                      ),
-                      _DrawerItem(
-                        icon: Icons.help_outline_rounded,
-                        label: 'Enquiry Form',
-                        active: currentPath == RoutePaths.enquiry,
-                        accent: const Color(0xFFFFC857),
-                        onTap: () => _go(context, RoutePaths.enquiry),
+                        icon: Icons.person_outline_rounded,
+                        label: 'My Profile',
+                        active: currentPath == RoutePaths.profile,
+                        accent: const Color(0xFF6C5CE7),
+                        onTap: () => _go(context, RoutePaths.profile),
                       ),
                     ],
                     SizedBox(height: 12.h),
@@ -609,13 +590,12 @@ class _DrawerItem extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final Color activeColor = isDanger
         ? AppColors.error
-        : (accent ?? AppColors.primary);
+        : AppColors.primary;
     final Color iconColor = isDanger
         ? AppColors.error
         : (active
               ? activeColor
-              : (accent ??
-                    (isDark ? AppColors.darkTextMuted : AppColors.textMuted)));
+              : (isDark ? AppColors.darkTextMuted : AppColors.textMuted));
     final Color textColor = isDanger
         ? AppColors.error
         : (active
@@ -649,9 +629,9 @@ class _DrawerItem extends StatelessWidget {
               width: 30.w,
               height: 30.w,
               decoration: BoxDecoration(
-                color:
-                    (active ? activeColor : (accent ?? AppColors.primary))
-                        .withValues(alpha: 0.12),
+                color: active 
+                    ? activeColor.withValues(alpha: 0.12)
+                    : Colors.grey.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10.r),
               ),
               child: Icon(icon, color: iconColor, size: 18),

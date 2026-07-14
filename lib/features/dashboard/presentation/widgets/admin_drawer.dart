@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ascento_abacus/core/theme/app_colors.dart';
 import 'package:ascento_abacus/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:ascento_abacus/shared/models/user_model.dart';
 import 'package:ascento_abacus/shared/router/route_names.dart';
 
 class AdminDrawer extends ConsumerWidget {
@@ -101,82 +102,93 @@ class AdminDrawer extends ConsumerWidget {
                     icon: Icons.grid_view_rounded,
                     title: 'Overview',
                     iconColor: const Color(0xFF5B67F4),
-                    isSelected: currentRoute == RoutePaths.adminDashboard,
+                    isSelected: currentRoute == RoutePaths.adminDashboard || currentRoute == RoutePaths.dashboard || currentRoute == RoutePaths.teacherDashboard || currentRoute == RoutePaths.studentDashboard,
                     onTap: () {
                       Navigator.of(context).pop();
-                      context.go(RoutePaths.adminDashboard);
+                      final role = authState.currentUser?.role;
+                      if (role == UserRole.admin || role == UserRole.superAdmin) {
+                        context.go(RoutePaths.adminDashboard);
+                      } else if (role == UserRole.teacher) {
+                        context.go(RoutePaths.teacherDashboard);
+                      } else if (role == UserRole.student) {
+                        context.go(RoutePaths.studentDashboard);
+                      } else {
+                        context.go(RoutePaths.dashboard);
+                      }
                     },
                   ),
-                  _DrawerItem(
-                    icon: Icons.account_tree_rounded,
-                    title: 'Manage Branches',
-                    iconColor: const Color(0xFFFF8A34),
-                    isSelected: currentRoute.startsWith(RoutePaths.manageBranches),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      context.go(RoutePaths.manageBranches);
-                    },
-                  ),
-                  _DrawerItem(
-                    icon: Icons.manage_accounts_rounded,
-                    title: 'Users & Roles',
-                    iconColor: const Color(0xFF23B07D),
-                    isSelected: currentRoute.startsWith(RoutePaths.manageUsers),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      context.go(RoutePaths.manageUsers);
-                    },
-                  ),
-                  _DrawerItem(
-                    icon: Icons.school_rounded,
-                    title: 'Academics Config',
-                    iconColor: const Color(0xFF6C4ED9),
-                    isSelected: currentRoute.startsWith(RoutePaths.academicsConfig),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      context.go(RoutePaths.academicsConfig);
-                    },
-                  ),
-                  _DrawerItem(
-                    icon: Icons.calendar_month_rounded,
-                    title: 'Timetable Setup',
-                    iconColor: const Color(0xFF2FA2B9),
-                    isSelected: currentRoute.startsWith(RoutePaths.timetable),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      context.go(RoutePaths.timetable);
-                    },
-                  ),
-                  _DrawerItem(
-                    icon: Icons.assignment_rounded,
-                    title: 'Exams Config',
-                    iconColor: const Color(0xFFE85A9A),
-                    isSelected: currentRoute.startsWith(RoutePaths.exams),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      context.go(RoutePaths.exams);
-                    },
-                  ),
-                  _DrawerItem(
-                    icon: Icons.campaign_rounded,
-                    title: 'Notices Board',
-                    iconColor: const Color(0xFFFF7A3A),
-                    isSelected: currentRoute.startsWith(RoutePaths.notifications),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      context.go(RoutePaths.notifications);
-                    },
-                  ),
-                  _DrawerItem(
-                    icon: Icons.help_outline_rounded,
-                    title: 'Enquiries',
-                    iconColor: const Color(0xFFFFC857),
-                    isSelected: currentRoute.startsWith(RoutePaths.enquiry),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      context.go(RoutePaths.enquiry);
-                    },
-                  ),
+                  if (authState.currentUser?.role == UserRole.admin || authState.currentUser?.role == UserRole.superAdmin) ...[
+                    _DrawerItem(
+                      icon: Icons.account_tree_rounded,
+                      title: 'Manage Branches',
+                      iconColor: const Color(0xFFFF8A34),
+                      isSelected: currentRoute.startsWith(RoutePaths.manageBranches),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        context.go(RoutePaths.manageBranches);
+                      },
+                    ),
+                    _DrawerItem(
+                      icon: Icons.manage_accounts_rounded,
+                      title: 'Users & Roles',
+                      iconColor: const Color(0xFF23B07D),
+                      isSelected: currentRoute.startsWith(RoutePaths.manageUsers),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        context.go(RoutePaths.manageUsers);
+                      },
+                    ),
+                    _DrawerItem(
+                      icon: Icons.school_rounded,
+                      title: 'Academics Config',
+                      iconColor: const Color(0xFF6C4ED9),
+                      isSelected: currentRoute.startsWith(RoutePaths.academicsConfig),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        context.go(RoutePaths.academicsConfig);
+                      },
+                    ),
+                    _DrawerItem(
+                      icon: Icons.calendar_month_rounded,
+                      title: 'Timetable Setup',
+                      iconColor: const Color(0xFF2FA2B9),
+                      isSelected: currentRoute.startsWith(RoutePaths.timetable),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        context.go(RoutePaths.timetable);
+                      },
+                    ),
+                    _DrawerItem(
+                      icon: Icons.assignment_rounded,
+                      title: 'Exams Config',
+                      iconColor: const Color(0xFFE85A9A),
+                      isSelected: currentRoute.startsWith(RoutePaths.exams),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        context.go(RoutePaths.exams);
+                      },
+                    ),
+                    _DrawerItem(
+                      icon: Icons.campaign_rounded,
+                      title: 'Notices Board',
+                      iconColor: const Color(0xFFFF7A3A),
+                      isSelected: currentRoute.startsWith(RoutePaths.notifications),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        context.go(RoutePaths.notifications);
+                      },
+                    ),
+                    _DrawerItem(
+                      icon: Icons.help_outline_rounded,
+                      title: 'Enquiries',
+                      iconColor: const Color(0xFFFFC857),
+                      isSelected: currentRoute.startsWith(RoutePaths.enquiry),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        context.go(RoutePaths.enquiry);
+                      },
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -243,22 +255,22 @@ class _DrawerItem extends StatelessWidget {
       child: ListTile(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
         selected: isSelected,
-        selectedTileColor: iconColor.withValues(alpha: 0.12),
+        selectedTileColor: AppColors.primary.withValues(alpha: 0.12),
         contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 2.h),
         leading: Container(
           padding: EdgeInsets.all(8.r),
           decoration: BoxDecoration(
-            color: isSelected ? Colors.transparent : iconColor.withValues(alpha: 0.1),
+            color: isSelected ? Colors.transparent : Colors.grey.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(10.r),
           ),
-          child: Icon(icon, color: iconColor, size: 20),
+          child: Icon(icon, color: isSelected ? AppColors.primary : Colors.grey.shade600, size: 20),
         ),
         title: Text(
           title,
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
             color: isSelected 
-                ? iconColor 
+                ? AppColors.primary 
                 : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
           ),
         ),

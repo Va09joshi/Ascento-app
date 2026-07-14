@@ -56,8 +56,20 @@ class RouteGuard {
       return null; // Let them view login / OTP pages
     }
 
-    // If user IS logged in, and tries to visit auth pages, direct to dashboard
-    if (isAuthRoute) {
+    // If user IS logged in:
+    final currentUser = authService.getCurrentUser();
+
+    // 4. Force Change Password Check
+    if (currentUser?.mustChangePassword == true) {
+      if (path != RoutePaths.forceChangePassword) {
+        AppLogger.warning('User must change password. Redirecting to force change password view.');
+        return RoutePaths.forceChangePassword;
+      }
+      return null; // Let them view the change password page
+    }
+
+    // If user tries to visit auth pages, direct to dashboard
+    if (isAuthRoute || path == RoutePaths.forceChangePassword) {
       final currentUser = authService.getCurrentUser();
       AppLogger.info('User is already logged in. Bypassing auth views to role-specific dashboard.');
       if (currentUser != null) {
@@ -76,7 +88,6 @@ class RouteGuard {
     }
 
     // 4. Role-Based Navigation Authorization
-    final currentUser = authService.getCurrentUser();
     if (currentUser != null) {
       if (path.startsWith(RoutePaths.adminDashboard) && 
           currentUser.role != UserRole.admin && 
@@ -87,6 +98,16 @@ class RouteGuard {
         return RoutePaths.error;
       }
       if (path.startsWith(RoutePaths.studentDashboard) && currentUser.role != UserRole.student) {
+        return RoutePaths.error;
+      }
+
+      // Block non-admins from Admin-only views
+      if ((path.startsWith(RoutePaths.manageUsers) || 
+           path.startsWith(RoutePaths.manageBranches) || 
+           path.startsWith(RoutePaths.academicsConfig)) && 
+          currentUser.role != UserRole.admin && 
+          currentUser.role != UserRole.superAdmin) {
+        AppLogger.warning('Unauthorized role access to admin-only areas.');
         return RoutePaths.error;
       }
       // Example role restriction: simulate a scenario where only Accountant or Admin can reach specific routes

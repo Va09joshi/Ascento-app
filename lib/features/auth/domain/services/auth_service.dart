@@ -55,12 +55,29 @@ class AuthService {
     }
   }
 
-  // Submit password replacement
+  // Submit password replacement (forgot password flow)
   Future<void> submitNewPassword(String email, String code, String newPassword) async {
     try {
       await _authRepository.resetPassword(email, code, newPassword);
     } catch (e) {
-      AppLogger.error('Password reset finalize failure', e);
+      AppLogger.error('Password reset failure', e);
+      rethrow;
+    }
+  }
+
+  // Force change password (first login flow)
+  Future<void> changePassword(String newPassword) async {
+    try {
+      await _authRepository.changePassword(newPassword);
+      
+      // Update the local cache to reflect that the password change requirement has been fulfilled
+      final currentUser = _storageService.getCurrentUser();
+      if (currentUser != null) {
+        final updatedUser = currentUser.copyWith(mustChangePassword: false);
+        await _storageService.setCurrentUser(updatedUser);
+      }
+    } catch (e) {
+      AppLogger.error('Change password failure', e);
       rethrow;
     }
   }

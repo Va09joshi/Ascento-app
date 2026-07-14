@@ -100,6 +100,69 @@ class HomeworkItem {
 }
 
 // =============================================================================
+// Content Models
+// =============================================================================
+
+class ContentItem {
+  final String id;
+  final String title;
+  final String description;
+  final String type; // 'pdf', 'image', 'video'
+  final String publicUrl;
+  final DateTime createdAt;
+
+  const ContentItem({
+    required this.id, required this.title, required this.description,
+    required this.type, required this.publicUrl, required this.createdAt,
+  });
+
+  factory ContentItem.fromJson(Map<String, dynamic> json) {
+    return ContentItem(
+      id: json['id'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      type: json['type'] as String? ?? 'document',
+      publicUrl: json['public_url'] as String? ?? '',
+      createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ?? DateTime.now(),
+    );
+  }
+}
+
+// =============================================================================
+// Meeting Models
+// =============================================================================
+
+class MeetingItem {
+  final String id;
+  final String title;
+  final String meetLink;
+  final DateTime meetDate;
+  final String startTime;
+  final String endTime;
+  final String? className;
+  final String? sectionName;
+
+  const MeetingItem({
+    required this.id, required this.title, required this.meetLink,
+    required this.meetDate, required this.startTime, required this.endTime,
+    this.className, this.sectionName,
+  });
+
+  factory MeetingItem.fromJson(Map<String, dynamic> json) {
+    return MeetingItem(
+      id: json['id'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      meetLink: json['meet_link'] as String? ?? '',
+      meetDate: DateTime.tryParse(json['meet_date'] as String? ?? '') ?? DateTime.now(),
+      startTime: json['start_time'] as String? ?? '',
+      endTime: json['end_time'] as String? ?? '',
+      className: json['classes']?['name'] as String?,
+      sectionName: json['sections']?['name'] as String?,
+    );
+  }
+}
+
+// =============================================================================
 // Fees Models
 // =============================================================================
 
@@ -339,7 +402,7 @@ class StudentProfile {
 
   factory StudentProfile.fromJson(Map<String, dynamic> json) {
     return StudentProfile(
-      user: UserModel.fromJson(json['user'] as Map<String, dynamic>? ?? {}),
+      user: UserModel.fromJson(json['user'] as Map<String, dynamic>? ?? json),
       className: json['className'] as String? ?? '',
       section: json['section'] as String? ?? '',
       rollNumber: json['rollNumber'] as String? ?? '',

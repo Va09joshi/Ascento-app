@@ -16,29 +16,13 @@ class FeatureRepository {
   // ===========================================================================
 
   Future<AttendanceSummary> getAttendanceSummary() async {
-    try {
-      final response = await _client.get(ApiEndpoints.attendanceReport);
-      return AttendanceSummary.fromJson(response.data);
-    } catch (_) {
-      AppLogger.warning('Using mock attendance summary');
-      return const AttendanceSummary(
-        totalDays: 120, presentDays: 108, absentDays: 5,
-        lateDays: 3, holidays: 4, percentage: 90.0,
-      );
-    }
+    final response = await _client.get(ApiEndpoints.attendanceReport);
+    return AttendanceSummary.fromJson(response.data);
   }
 
   Future<List<AttendanceRecord>> getMonthlyAttendance(int month, int year) async {
-    try {
-      final response = await _client.get(ApiEndpoints.attendance, queryParameters: {'month': month, 'year': year});
-      return (response.data['data'] as List).map((e) => AttendanceRecord.fromJson(e)).toList();
-    } catch (_) {
-      AppLogger.warning('Using mock monthly attendance');
-      return List.generate(30, (i) => AttendanceRecord(
-        id: 'att_$i', date: DateTime(year, month, i + 1),
-        status: i % 7 == 0 ? AttendanceStatus.holiday : (i % 5 == 0 ? AttendanceStatus.absent : AttendanceStatus.present),
-      ));
-    }
+    final response = await _client.get(ApiEndpoints.attendance, queryParameters: {'month': month, 'year': year});
+    return (response.data['data'] as List).map((e) => AttendanceRecord.fromJson(e)).toList();
   }
 
   // ===========================================================================
@@ -46,18 +30,8 @@ class FeatureRepository {
   // ===========================================================================
 
   Future<List<HomeworkItem>> getHomeworkList({String? subject}) async {
-    try {
-      final response = await _client.get(ApiEndpoints.homework, queryParameters: subject != null ? {'subject': subject} : null);
-      return (response.data['data'] as List).map((e) => HomeworkItem.fromJson(e)).toList();
-    } catch (_) {
-      AppLogger.warning('Using mock homework list');
-      return [
-        HomeworkItem(id: 'hw1', title: 'Chapter 5 Exercises', subject: 'Mathematics', description: 'Complete Q1-Q15 from NCERT', dueDate: DateTime.now().add(const Duration(days: 2)), status: HomeworkStatus.pending, teacherName: 'Mrs. Sharma'),
-        HomeworkItem(id: 'hw2', title: 'Essay on Environment', subject: 'English', description: 'Write 500 words essay', dueDate: DateTime.now().add(const Duration(days: 4)), status: HomeworkStatus.pending, teacherName: 'Mr. Verma'),
-        HomeworkItem(id: 'hw3', title: 'Science Lab Report', subject: 'Science', description: 'Photosynthesis experiment', dueDate: DateTime.now().subtract(const Duration(days: 1)), status: HomeworkStatus.submitted, teacherName: 'Ms. Patel', marks: 18, totalMarks: 20),
-        HomeworkItem(id: 'hw4', title: 'Hindi Poem Recitation', subject: 'Hindi', description: 'Learn and record poem', dueDate: DateTime.now().subtract(const Duration(days: 3)), status: HomeworkStatus.graded, teacherName: 'Mrs. Gupta', marks: 9, totalMarks: 10),
-      ];
-    }
+    final response = await _client.get(ApiEndpoints.homework, queryParameters: subject != null ? {'subject': subject} : null);
+    return (response.data['data'] as List).map((e) => HomeworkItem.fromJson(e)).toList();
   }
 
   // ===========================================================================
@@ -84,30 +58,20 @@ class FeatureRepository {
   // ===========================================================================
 
   Future<List<ExamSchedule>> getExamSchedule() async {
-    try {
-      final response = await _client.get('/exams');
-      return (response.data['data'] as List).map((e) {
-        return ExamSchedule(
-          id: e['id']?.toString() ?? '',
-          examName: e['title']?.toString() ?? 'Exam',
-          subject: (e['subjects'] != null && e['subjects'] is Map) 
-              ? e['subjects']['name']?.toString() ?? 'Unknown' 
-              : 'Unknown',
-          date: DateTime.tryParse(e['exam_date']?.toString() ?? '') ?? DateTime.now(),
-          time: e['start_time']?.toString() ?? 'TBD',
-          room: 'TBD',
-          totalMarks: (e['total_marks'] as num?)?.toInt() ?? 100,
-        );
-      }).toList();
-    } catch (e) {
-      AppLogger.warning('Using mock exam schedule due to error: $e');
-      return [
-        ExamSchedule(id: 'e1', examName: 'Mid-Term', subject: 'Mathematics', date: DateTime(2026, 6, 15), time: '09:00 AM', room: 'Hall A', totalMarks: 100),
-        ExamSchedule(id: 'e2', examName: 'Mid-Term', subject: 'Science', date: DateTime(2026, 6, 17), time: '09:00 AM', room: 'Hall B', totalMarks: 100),
-        ExamSchedule(id: 'e3', examName: 'Mid-Term', subject: 'English', date: DateTime(2026, 6, 19), time: '10:00 AM', room: 'Hall A', totalMarks: 100),
-        ExamSchedule(id: 'e4', examName: 'Mid-Term', subject: 'Hindi', date: DateTime(2026, 6, 21), time: '09:00 AM', room: 'Room 12', totalMarks: 80),
-      ];
-    }
+    final response = await _client.get('/exams');
+    return (response.data['data'] as List).map((e) {
+      return ExamSchedule(
+        id: e['id']?.toString() ?? '',
+        examName: e['title']?.toString() ?? 'Exam',
+        subject: (e['subjects'] != null && e['subjects'] is Map) 
+            ? e['subjects']['name']?.toString() ?? 'Unknown' 
+            : 'Unknown',
+        date: DateTime.tryParse(e['exam_date']?.toString() ?? '') ?? DateTime.now(),
+        time: e['start_time']?.toString() ?? 'TBD',
+        room: 'TBD',
+        totalMarks: (e['total_marks'] as num?)?.toInt() ?? 100,
+      );
+    }).toList();
   }
 
   Future<ReportCard> getReportCard(String examId) async {
@@ -137,22 +101,8 @@ class FeatureRepository {
   // ===========================================================================
 
   Future<List<TimetableSlot>> getWeeklyTimetable() async {
-    try {
-      final response = await _client.get(ApiEndpoints.timetable);
-      return (response.data['data'] as List).map((e) => TimetableSlot.fromJson(e)).toList();
-    } catch (_) {
-      AppLogger.warning('Using mock timetable');
-      return [
-        const TimetableSlot(id: 't1', subject: 'Mathematics', teacherName: 'Mrs. Sharma', room: 'Room 12', startTime: '08:00', endTime: '08:45', dayOfWeek: 1),
-        const TimetableSlot(id: 't2', subject: 'English', teacherName: 'Mr. Verma', room: 'Room 14', startTime: '08:50', endTime: '09:35', dayOfWeek: 1),
-        const TimetableSlot(id: 't3', subject: 'Science', teacherName: 'Ms. Patel', room: 'Lab 2', startTime: '09:40', endTime: '10:25', dayOfWeek: 1),
-        const TimetableSlot(id: 't4', subject: 'Hindi', teacherName: 'Mrs. Gupta', room: 'Room 12', startTime: '10:45', endTime: '11:30', dayOfWeek: 1),
-        const TimetableSlot(id: 't5', subject: 'Social Studies', teacherName: 'Mr. Khan', room: 'Room 16', startTime: '11:35', endTime: '12:20', dayOfWeek: 1),
-        const TimetableSlot(id: 't6', subject: 'Art & Craft', teacherName: 'Ms. Jain', room: 'Art Room', startTime: '01:00', endTime: '01:45', dayOfWeek: 1),
-        const TimetableSlot(id: 't7', subject: 'Mathematics', teacherName: 'Mrs. Sharma', room: 'Room 12', startTime: '08:00', endTime: '08:45', dayOfWeek: 2),
-        const TimetableSlot(id: 't8', subject: 'Science', teacherName: 'Ms. Patel', room: 'Lab 2', startTime: '08:50', endTime: '09:35', dayOfWeek: 2),
-      ];
-    }
+    final response = await _client.get(ApiEndpoints.timetable);
+    return (response.data['data'] as List).map((e) => TimetableSlot.fromJson(e)).toList();
   }
 
   // ===========================================================================
@@ -160,19 +110,8 @@ class FeatureRepository {
   // ===========================================================================
 
   Future<List<NotificationItem>> getNotifications() async {
-    try {
-      final response = await _client.get(ApiEndpoints.notifications);
-      return (response.data['data'] as List).map((e) => NotificationItem.fromJson(e)).toList();
-    } catch (_) {
-      AppLogger.warning('Using mock notifications');
-      return [
-        NotificationItem(id: 'n1', title: 'Fee Reminder', body: 'Q2 tuition fee of ₹25,000 is due by July 15.', type: NotificationType.fees, createdAt: DateTime.now().subtract(const Duration(hours: 2))),
-        NotificationItem(id: 'n2', title: 'New Homework', body: 'Mathematics: Chapter 5 exercises due in 2 days.', type: NotificationType.homework, createdAt: DateTime.now().subtract(const Duration(hours: 5)), isRead: true),
-        NotificationItem(id: 'n3', title: 'PTM Scheduled', body: 'Parent-Teacher meeting on June 10th at 10 AM.', type: NotificationType.event, createdAt: DateTime.now().subtract(const Duration(days: 1))),
-        NotificationItem(id: 'n4', title: 'Attendance Alert', body: 'Your ward was marked absent on May 18.', type: NotificationType.attendance, createdAt: DateTime.now().subtract(const Duration(days: 2)), isRead: true),
-        NotificationItem(id: 'n5', title: 'Exam Schedule Released', body: 'Mid-term examination starts June 15.', type: NotificationType.academic, createdAt: DateTime.now().subtract(const Duration(days: 3))),
-      ];
-    }
+    final response = await _client.get(ApiEndpoints.notifications, queryParameters: {'target_role': 'student'});
+    return (response.data['data'] as List).map((e) => NotificationItem.fromJson(e)).toList();
   }
 
   Future<void> markNotificationRead(String id) async {

@@ -3,12 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ascento_abacus/core/theme/app_colors.dart';
+import 'package:ascento_abacus/core/widgets/app_shimmer.dart';
 import 'package:ascento_abacus/shared/models/notice_model.dart';
 import 'package:ascento_abacus/features/notifications/presentation/providers/notices_provider.dart';
 import 'package:ascento_abacus/shared/router/route_names.dart';
 
 class NoticesManagementView extends ConsumerWidget {
-  const NoticesManagementView({super.key});
+  final bool isReadOnly;
+
+  const NoticesManagementView({super.key, this.isReadOnly = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -18,7 +21,7 @@ class NoticesManagementView extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: isReadOnly ? null : FloatingActionButton.extended(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         onPressed: () {
@@ -44,7 +47,18 @@ class NoticesManagementView extends ConsumerWidget {
               ),
               SizedBox(height: 24.h),
               if (noticesAsync.isLoading)
-                const Center(child: CircularProgressIndicator())
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 400.w,
+                    childAspectRatio: 0.8,
+                    crossAxisSpacing: 24.w,
+                    mainAxisSpacing: 24.h,
+                  ),
+                  itemCount: 4,
+                  itemBuilder: (context, index) => AppShimmer.card(),
+                )
               else if (noticesAsync.hasError)
                 Center(child: Text('Error: ${noticesAsync.error}'))
               else if (noticesAsync.valueOrNull == null || noticesAsync.valueOrNull!.isEmpty)

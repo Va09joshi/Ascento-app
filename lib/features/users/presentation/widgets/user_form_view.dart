@@ -11,6 +11,7 @@ import 'package:ascento_abacus/shared/models/user_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io';
+import 'package:flutter/services.dart';
 class UserFormView extends ConsumerStatefulWidget {
   final String initialRole;
   final UserModel? userToEdit;
@@ -123,25 +124,80 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
     
     try {
       final repo = ref.read(usersRepositoryProvider);
+      final email = _emailController.text.trim();
       final payload = {
         'full_name': _nameController.text.trim(),
-        'email': _selectedRole == 'student' ? _parentEmailController.text.trim() : _emailController.text.trim(),
-        'phone': _selectedRole == 'student' ? _parentPhoneController.text.trim() : _phoneController.text.trim(),
+        if (email.isNotEmpty) 'email': email,
+        'phone': _phoneController.text.trim(),
         'role': _selectedRole,
         'gender': _selectedGender?.toLowerCase(),
         'status': _selectedStatus,
         'address': _addressController.text.trim(),
         if (_selectedDomain != null) 'domain_id': _selectedDomain,
+        if (_selectedRole == 'student') 'parent_name': _parentNameController.text.trim(),
+        if (_selectedRole == 'student') 'parent_email': _parentEmailController.text.trim(),
+        if (_selectedRole == 'student') 'parent_phone': _parentPhoneController.text.trim(),
       };
       
+      UserModel? createdUser;
       if (_isEdit) {
         await repo.updateUser(widget.userToEdit!.id, payload, avatarFile: _selectedAvatar);
       } else {
-        await repo.createUser(payload, avatarFile: _selectedAvatar);
+        createdUser = await repo.createUser(payload, avatarFile: _selectedAvatar);
       }
       
       ref.invalidate(usersListProvider(_selectedRole));
       if (mounted) {
+        if (createdUser?.tempPassword != null) {
+          await showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (ctx) => AlertDialog(
+              title: const Text('User Created Successfully', style: TextStyle(color: AppColors.textPrimary)),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Please share these login details with the user:\n'),
+                  Row(
+                    children: [
+                      Expanded(child: SelectableText('Email: ${createdUser!.email}')),
+                      IconButton(
+                        icon: const Icon(Icons.copy, size: 18, color: AppColors.primary),
+                        onPressed: () {
+                          Clipboard.setData(ClipboardData(text: createdUser!.email));
+                          ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Email copied!')));
+                        },
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(child: SelectableText('Password: ${createdUser!.tempPassword}')),
+                      IconButton(
+                        icon: const Icon(Icons.copy, size: 18, color: AppColors.primary),
+                        onPressed: () {
+                          Clipboard.setData(ClipboardData(text: createdUser!.tempPassword!));
+                          ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Password copied!')));
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  const Text('They will be asked to change this password on their first login.'),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                  },
+                  child: const Text('Done'),
+                ),
+              ],
+            ),
+          );
+        }
         Navigator.of(context).pop();
       }
     } catch (e) {
@@ -213,10 +269,10 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
                             ? (kIsWeb 
                                 ? NetworkImage(_selectedAvatar!.path) 
                                 : FileImage(File(_selectedAvatar!.path))) as ImageProvider
-                            : (widget.userToEdit?.avatarUrl != null
+                            : (widget.userToEdit?.avatarUrl != null && widget.userToEdit!.avatarUrl!.isNotEmpty
                                 ? NetworkImage(widget.userToEdit!.avatarUrl!) as ImageProvider
                                 : null),
-                        child: (_selectedAvatar == null && widget.userToEdit?.avatarUrl == null)
+                        child: (_selectedAvatar == null && (widget.userToEdit?.avatarUrl == null || widget.userToEdit!.avatarUrl!.isEmpty))
                             ? Icon(Icons.person, size: 50.r, color: Colors.grey.shade400)
                             : null,
                       ),

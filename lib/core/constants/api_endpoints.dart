@@ -64,6 +64,7 @@ class ApiEndpoints {
   // -------------------------------------------------------------------------
   static const String attendance       = '/attendance';
   static const String attendanceBulk   = '/attendance/bulk';
+  static const String attendanceSheet  = '/attendance/sheet';
   static const String attendanceReport = '/attendance/report';
 
   // -------------------------------------------------------------------------
@@ -75,10 +76,11 @@ class ApiEndpoints {
   static const String feeHistory  = '/billing/history';
 
   // -------------------------------------------------------------------------
-  // Homework & Timetable
+  // Homework, Timetable, Meetings
   // -------------------------------------------------------------------------
   static const String homework    = '/homework';
   static const String timetable   = '/timetable';
+  static const String meetings    = '/meetings';
 
   // -------------------------------------------------------------------------
   // Notifications

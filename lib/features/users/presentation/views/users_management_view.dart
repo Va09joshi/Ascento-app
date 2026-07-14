@@ -8,6 +8,7 @@ import 'package:ascento_abacus/shared/models/user_model.dart';
 import 'package:ascento_abacus/features/users/data/repositories/users_repository.dart';
 import 'package:ascento_abacus/shared/router/route_names.dart';
 import 'package:ascento_abacus/shared/widgets/premium_data_table.dart';
+import 'package:ascento_abacus/features/users/presentation/widgets/assign_class_dialog.dart';
 
 class UsersManagementView extends ConsumerStatefulWidget {
   const UsersManagementView({super.key});
@@ -160,7 +161,7 @@ class _UserListTabState extends ConsumerState<_UserListTab> {
               );
             },
             data: filteredUsers,
-            columns: const ['User', 'Email', 'Role', 'Status', 'Actions'],
+            columns: const ['User', 'Email', 'Phone', 'Domain', 'Role', 'Status', 'Actions'],
             rowBuilder: (user) => [
               // User Avatar & Name
               Row(
@@ -192,6 +193,10 @@ class _UserListTabState extends ConsumerState<_UserListTab> {
               ),
               // Email
               Text(user.email),
+              // Phone
+              Text(user.phone ?? 'N/A'),
+              // Domain
+              Text(user.domainId ?? 'N/A'),
               // Role Badge
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
@@ -228,6 +233,18 @@ class _UserListTabState extends ConsumerState<_UserListTab> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  if (widget.role == 'student')
+                    IconButton(
+                      icon: const Icon(Icons.class_outlined, size: 20),
+                      color: AppColors.primary,
+                      tooltip: 'Assign Class',
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (ctx) => AssignClassDialog(student: user),
+                        );
+                      },
+                    ),
                   IconButton(
                     icon: const Icon(Icons.edit_outlined, size: 20),
                     color: AppColors.info,

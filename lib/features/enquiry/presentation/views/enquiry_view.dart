@@ -81,8 +81,10 @@ class _EnquiryViewState extends ConsumerState<EnquiryView> {
                 gradient: const LinearGradient(colors: [Color(0xFFE91E63), Color(0xFFFF5252)]),
                 borderRadius: BorderRadius.circular(16.r),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Wrap(
+                spacing: 24.w,
+                runSpacing: 24.h,
+                alignment: WrapAlignment.spaceBetween,
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,7 +95,8 @@ class _EnquiryViewState extends ConsumerState<EnquiryView> {
                       SizedBox(height: 8.h),
                       Text('Better enquiry pipeline view with clean updates, safe delete, and AI-style visual support.', style: TextStyle(color: Colors.white70, fontSize: 14.sp)),
                       SizedBox(height: 4.h),
-                      Row(
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Icon(Icons.auto_awesome, color: Colors.white70, size: 14.sp),
                           SizedBox(width: 4.w),
@@ -166,10 +169,14 @@ class _EnquiryViewState extends ConsumerState<EnquiryView> {
                   // Toolbar
                   Padding(
                     padding: EdgeInsets.all(24.w),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: Wrap(
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 16.w,
+                      runSpacing: 16.h,
                       children: [
                         Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(Icons.email_outlined, color: Colors.pink),
                             SizedBox(width: 8.w),
@@ -188,30 +195,57 @@ class _EnquiryViewState extends ConsumerState<EnquiryView> {
                   // Filters
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 24.w),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 3,
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: 'Search name, email, phone, course, message',
-                              prefixIcon: const Icon(Icons.search),
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 16.w),
-                        Expanded(
-                          flex: 1,
-                          child: DropdownButtonFormField<String>(
-                            decoration: InputDecoration(border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r))),
-                            value: selectedStatus,
-                            items: ['All Status', 'New', 'In Progress', 'Converted', 'Closed'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                            onChanged: (v) => setState(() => selectedStatus = v),
-                            hint: const Text('All Status'),
-                          ),
-                        ),
-                      ],
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        if (constraints.maxWidth > 500) {
+                          return Row(
+                            children: [
+                              Expanded(
+                                flex: 3,
+                                child: TextField(
+                                  decoration: InputDecoration(
+                                    hintText: 'Search name, email, phone, course, message',
+                                    prefixIcon: const Icon(Icons.search),
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 16.w),
+                              Expanded(
+                                flex: 1,
+                                child: DropdownButtonFormField<String>(
+                                  decoration: InputDecoration(border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r))),
+                                  value: selectedStatus,
+                                  items: ['All Status', 'New', 'In Progress', 'Converted', 'Closed'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                                  onChanged: (v) => setState(() => selectedStatus = v),
+                                  hint: const Text('All Status'),
+                                ),
+                              ),
+                            ],
+                          );
+                        } else {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              TextField(
+                                decoration: InputDecoration(
+                                  hintText: 'Search name, email...',
+                                  prefixIcon: const Icon(Icons.search),
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
+                                ),
+                              ),
+                              SizedBox(height: 16.h),
+                              DropdownButtonFormField<String>(
+                                decoration: InputDecoration(border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r))),
+                                value: selectedStatus,
+                                items: ['All Status', 'New', 'In Progress', 'Converted', 'Closed'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                                onChanged: (v) => setState(() => selectedStatus = v),
+                                hint: const Text('All Status'),
+                              ),
+                            ],
+                          );
+                        }
+                      }
                     ),
                   ),
                   
@@ -291,10 +325,6 @@ class _EnquiryViewState extends ConsumerState<EnquiryView> {
               ),
             ),
             
-            Padding(
-              padding: EdgeInsets.only(top: 16.h),
-              child: Text('API coverage: GET /admin/enquiries, PUT /admin/enquiries/:id, DELETE /admin/enquiries/:id', style: TextStyle(color: Colors.grey, fontSize: 10.sp)),
-            )
           ],
         ),
       ),

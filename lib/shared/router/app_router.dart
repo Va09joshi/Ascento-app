@@ -7,20 +7,31 @@ import 'package:ascento_abacus/features/dashboard/presentation/views/dashboard_v
 import 'package:ascento_abacus/features/dashboard/presentation/views/admin_dashboard_view.dart';
 import 'package:ascento_abacus/features/dashboard/presentation/views/teacher_dashboard_view.dart';
 import 'package:ascento_abacus/features/enquiry/presentation/views/enquiry_view.dart';
+import 'package:ascento_abacus/features/exams/presentation/views/student_exams_view.dart';
+import 'package:ascento_abacus/features/exams/presentation/views/exam_results_management_view.dart';
 import 'package:ascento_abacus/features/exams/presentation/views/exams_management_view.dart';
 import 'package:ascento_abacus/features/exams/presentation/views/exam_form_view.dart';
 import 'package:ascento_abacus/features/fees/presentation/views/fees_view.dart';
-import 'package:ascento_abacus/features/homework/presentation/views/homework_view.dart';
+import 'package:ascento_abacus/features/homework/presentation/views/homework_student_view.dart';
+import 'package:ascento_abacus/features/homework/presentation/views/homework_teacher_view.dart';
+import 'package:ascento_abacus/features/meetings/presentation/views/meetings_view.dart';
+import 'package:ascento_abacus/features/content/presentation/views/content_view.dart';
 import 'package:ascento_abacus/features/notifications/presentation/views/notices_management_view.dart';
 import 'package:ascento_abacus/features/notifications/presentation/views/notice_form_view.dart';
 import 'package:ascento_abacus/features/splash/presentation/views/splash_view.dart';
 import 'package:ascento_abacus/features/onboarding/presentation/views/onboarding_view.dart';
+import 'package:ascento_abacus/features/attendance/presentation/views/student_attendance_view.dart';
+import 'package:ascento_abacus/features/attendance/presentation/views/teacher_mark_attendance_view.dart';
+import 'package:ascento_abacus/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:ascento_abacus/features/auth/presentation/views/login_view.dart';
+import 'package:ascento_abacus/features/auth/presentation/views/force_change_password_view.dart';
+import 'package:ascento_abacus/features/dashboard/presentation/views/student_dashboard_view.dart';
 import 'package:ascento_abacus/features/auth/presentation/views/forgot_password_view.dart';
 import 'package:ascento_abacus/features/auth/presentation/views/otp_verification_view.dart';
 import 'package:ascento_abacus/features/auth/presentation/views/reset_password_view.dart';
 import 'package:ascento_abacus/features/profile/presentation/views/profile_view.dart';
 import 'package:ascento_abacus/features/timetable/presentation/views/timetable_management_view.dart';
+import 'package:ascento_abacus/features/timetable/presentation/views/timetable_view.dart';
 import 'package:ascento_abacus/features/courses/presentation/views/courses_management_view.dart';
 import 'package:ascento_abacus/features/lessons/presentation/views/lessons_view.dart';
 import 'package:ascento_abacus/features/users/presentation/views/users_management_view.dart';
@@ -56,13 +67,15 @@ final routerProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) => guard.handleRedirection(context, state),
 
     // Global fallback error page override
-    errorBuilder: (context, state) => Scaffold(
-      body: ErrorView(
-        message:
-            'The screen you requested does not exist or has been relocated.',
-        onRetry: () => context.go(RoutePaths.dashboard),
-      ),
-    ),
+    errorBuilder: (context, state) {
+      debugPrint('GoRouter Error: ${state.error}');
+      return Scaffold(
+        body: ErrorView(
+          message: 'The screen you requested does not exist or has been relocated.\nError: ${state.error}',
+          onRetry: () => context.go(RoutePaths.dashboard),
+        ),
+      );
+    },
 
     routes: [
       // --- Root Sequence Routes ---
@@ -89,6 +102,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: RouteNames.login,
         builder: (context, state) => const LoginView(),
       ),
+      GoRoute(
+        path: RoutePaths.forceChangePassword,
+        name: RouteNames.forceChangePassword,
+        builder: (context, state) => const ForceChangePasswordView(),
+      ),
+
       GoRoute(
         path: RoutePaths.forgotPassword,
         name: RouteNames.forgotPassword,
@@ -145,6 +164,17 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(
+            path: RoutePaths.studentDashboard,
+            name: RouteNames.studentDashboard,
+            pageBuilder: (context, state) => CustomTransitionPage(
+              key: state.pageKey,
+              child: const StudentDashboardView(),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+            ),
+          ),
+          GoRoute(
             path: RoutePaths.manageUsers,
             name: RouteNames.manageUsers,
             pageBuilder: (context, state) => CustomTransitionPage(
@@ -189,40 +219,49 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
 
-          GoRoute(
-            path: RoutePaths.studentDashboard,
-            name: RouteNames.studentDashboard,
-            pageBuilder: (context, state) => CustomTransitionPage(
-              key: state.pageKey,
-              child: const DashboardView(),
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                return FadeTransition(opacity: animation, child: child);
-              },
-            ),
-          ),
+
           GoRoute(
             path: RoutePaths.attendance,
             name: RouteNames.attendance,
-            pageBuilder: (context, state) => CustomTransitionPage(
-              key: state.pageKey,
-              child: const AttendanceManagementView(),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
-            ),
+            pageBuilder: (context, state) {
+              final authState = ref.watch(authControllerProvider);
+              final role = authState.currentUser?.role;
+              final isStudent = role == UserRole.student;
+              final isTeacher = role == UserRole.teacher;
+              
+              Widget view = const AttendanceManagementView();
+              if (isStudent) {
+                view = const StudentAttendanceView();
+              } else if (isTeacher) {
+                view = const TeacherMarkAttendanceView();
+              }
+
+              return CustomTransitionPage(
+                key: state.pageKey,
+                child: view,
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(opacity: animation, child: child);
+                    },
+              );
+            },
           ),
           GoRoute(
             path: RoutePaths.exams,
             name: RouteNames.exams,
-            pageBuilder: (context, state) => CustomTransitionPage(
-              key: state.pageKey,
-              child: const ExamsManagementView(),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
-            ),
+            pageBuilder: (context, state) {
+              final authState = ref.watch(authControllerProvider);
+              final isStudent = authState.currentUser?.role == UserRole.student;
+              
+              return CustomTransitionPage(
+                key: state.pageKey,
+                child: isStudent ? const StudentExamsView() : const ExamsManagementView(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(opacity: animation, child: child);
+                    },
+              );
+            },
           ),
           GoRoute(
             path: RoutePaths.addExam,
@@ -263,41 +302,80 @@ final routerProvider = Provider<GoRouter>((ref) {
                   },
             ),
           ),
-          GoRoute(
-            path: RoutePaths.homework,
-            name: RouteNames.homework,
-            pageBuilder: (context, state) => CustomTransitionPage(
-              key: state.pageKey,
-              child: const HomeworkView(),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
+            GoRoute(
+              path: RoutePaths.homework,
+              name: RouteNames.homework,
+              pageBuilder: (context, state) {
+                final authState = ref.watch(authControllerProvider);
+                final isStudent = authState.currentUser?.role == UserRole.student;
+                
+                return CustomTransitionPage(
+                  key: state.pageKey,
+                  child: isStudent ? const HomeworkStudentView() : const HomeworkTeacherView(),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(opacity: animation, child: child);
+                      },
+                );
+              },
             ),
-          ),
+            GoRoute(
+              path: RoutePaths.meetings,
+              name: RouteNames.meetings,
+              pageBuilder: (context, state) => CustomTransitionPage(
+                key: state.pageKey,
+                child: const MeetingsView(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(opacity: animation, child: child);
+                    },
+              ),
+            ),
+            GoRoute(
+              path: RoutePaths.content,
+              name: RouteNames.content,
+              pageBuilder: (context, state) => CustomTransitionPage(
+                key: state.pageKey,
+                child: const ContentView(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(opacity: animation, child: child);
+                    },
+              ),
+            ),
           GoRoute(
             path: RoutePaths.notifications,
             name: RouteNames.notifications,
-            pageBuilder: (context, state) => CustomTransitionPage(
-              key: state.pageKey,
-              child: const NoticesManagementView(),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
-            ),
+            pageBuilder: (context, state) {
+              final authState = ref.watch(authControllerProvider);
+              final isStudent = authState.currentUser?.role == UserRole.student;
+              
+              return CustomTransitionPage(
+                key: state.pageKey,
+                child: NoticesManagementView(isReadOnly: isStudent),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(opacity: animation, child: child);
+                    },
+              );
+            },
           ),
           GoRoute(
             path: RoutePaths.timetable,
             name: RouteNames.timetable,
-            pageBuilder: (context, state) => CustomTransitionPage(
-              key: state.pageKey,
-              child: const TimetableManagementView(),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
-            ),
+            pageBuilder: (context, state) {
+              final authState = ref.watch(authControllerProvider);
+              final isStudent = authState.currentUser?.role == UserRole.student;
+              
+              return CustomTransitionPage(
+                key: state.pageKey,
+                child: isStudent ? const TimetableView() : const TimetableManagementView(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(opacity: animation, child: child);
+                    },
+              );
+            },
           ),
           GoRoute(
             path: RoutePaths.enquiry,
@@ -329,18 +407,6 @@ final routerProvider = Provider<GoRouter>((ref) {
             pageBuilder: (context, state) => CustomTransitionPage(
               key: state.pageKey,
               child: const ProfileView(),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
-            ),
-          ),
-          GoRoute(
-            path: RoutePaths.content,
-            name: RouteNames.content,
-            pageBuilder: (context, state) => CustomTransitionPage(
-              key: state.pageKey,
-              child: const LessonsView(),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
                     return FadeTransition(opacity: animation, child: child);

@@ -34,12 +34,7 @@ class AdminDashboardView extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _HeaderCard(
-                isDark: isDark,
-                userName: userName,
-                subtitle: 'All systems operational.',
-              ),
-              SizedBox(height: 20.h),
+
 
               Text(
                 'School Overview',

@@ -3,6 +3,7 @@ import 'package:ascento_abacus/shared/models/academic_year_model.dart';
 import 'package:ascento_abacus/shared/models/class_model.dart';
 import 'package:ascento_abacus/shared/models/section_model.dart';
 import 'package:ascento_abacus/shared/models/subject_model.dart';
+import 'package:ascento_abacus/shared/models/user_model.dart';
 import 'package:ascento_abacus/core/logging/app_logger.dart';
 import 'package:ascento_abacus/core/network/dio_client.dart';
 
@@ -169,6 +170,21 @@ class AcademicsRepository {
       }
     } catch (e) {
       AppLogger.error('Failed to delete section', e);
+      rethrow;
+    }
+  }
+
+  Future<List<UserModel>> getSectionStudents(String id) async {
+    try {
+      final response = await _dioClient.get('/sections/$id/students');
+      if (response.data['success'] == true) {
+        return (response.data['data'] as List)
+            .map((json) => UserModel.fromJson(json))
+            .toList();
+      }
+      throw Exception(response.data['message'] ?? 'Failed to fetch section students');
+    } catch (e) {
+      AppLogger.error('Failed to get section students', e);
       rethrow;
     }
   }

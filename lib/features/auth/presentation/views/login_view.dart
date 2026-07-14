@@ -55,7 +55,14 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
         _rememberMe,
         () {
           final authState = ref.read(authControllerProvider);
-          final userRole = authState.currentUser?.role;
+          final user = authState.currentUser;
+          
+          if (user?.mustChangePassword == true) {
+            context.go('/force-change-password');
+            return;
+          }
+
+          final userRole = user?.role;
           
           if (userRole == UserRole.admin || userRole == UserRole.superAdmin) {
             context.go('/admin-dashboard');

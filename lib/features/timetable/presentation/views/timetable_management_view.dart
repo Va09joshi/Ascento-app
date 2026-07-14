@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ascento_abacus/core/theme/app_colors.dart';
+import 'package:ascento_abacus/core/widgets/app_shimmer.dart';
 import 'package:ascento_abacus/shared/models/feature_models.dart';
 
 import 'package:ascento_abacus/features/timetable/presentation/providers/timetable_provider.dart';
@@ -105,17 +106,15 @@ class _TimetableManagementViewState extends ConsumerState<TimetableManagementVie
                 children: [
                   // Toolbar
                   Padding(
-                    padding: EdgeInsets.all(24.w),
-                    child: Wrap(
-                      alignment: WrapAlignment.spaceBetween,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: 16.w,
-                      runSpacing: 16.h,
-                      children: [
-                        Text('Filters', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
-                        Wrap(
-                          spacing: 12.w,
-                          runSpacing: 12.h,
+                    padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final isDesktop = constraints.maxWidth > 800;
+                        
+                        final actionButtons = Wrap(
+                          spacing: 8.w,
+                          runSpacing: 8.h,
+                          alignment: isDesktop ? WrapAlignment.end : WrapAlignment.start,
                           children: [
                             OutlinedButton.icon(
                               onPressed: () {
@@ -124,18 +123,18 @@ class _TimetableManagementViewState extends ConsumerState<TimetableManagementVie
                                 ref.invalidate(academicYearsListProvider);
                                 ref.invalidate(sectionTimetableProvider);
                               },
-                              icon: const Icon(Icons.refresh, size: 18),
+                              icon: const Icon(Icons.refresh, size: 16),
                               label: const Text('Refresh'),
                             ),
                             ElevatedButton.icon(
                               onPressed: () {},
                               style: ElevatedButton.styleFrom(backgroundColor: Colors.lightBlue.shade300, foregroundColor: Colors.white),
-                              icon: const Icon(Icons.download, size: 18),
-                              label: const Text('Download PDF'),
+                              icon: const Icon(Icons.download, size: 16),
+                              label: const Text('PDF'),
                             ),
                             OutlinedButton.icon(
                               onPressed: () {},
-                              icon: const Icon(Icons.share, size: 18),
+                              icon: const Icon(Icons.share, size: 16),
                               label: const Text('Share'),
                             ),
                             ElevatedButton.icon(
@@ -153,63 +152,84 @@ class _TimetableManagementViewState extends ConsumerState<TimetableManagementVie
                                 );
                               },
                               style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent, foregroundColor: Colors.white),
-                              icon: const Icon(Icons.add, size: 18),
+                              icon: const Icon(Icons.add, size: 16),
                               label: const Text('Create Slot'),
                             ),
                           ],
-                        )
-                      ],
-                    ),
-                  ),
+                        );
 
-                  // Filters
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 24.w),
-                    child: Wrap(
-                      spacing: 16.w,
-                      runSpacing: 16.h,
-                      children: [
-                        SizedBox(
-                          width: 200.w,
-                          child: DropdownButtonFormField<String>(
-                            isExpanded: true,
-                            decoration: const InputDecoration(labelText: 'Class', border: OutlineInputBorder()),
-                            value: selectedClassId,
-                            items: classesAsync.valueOrNull?.map((c) => DropdownMenuItem(value: c.id, child: Text(c.name))).toList() ?? [],
-                            onChanged: (v) {
-                              ref.read(selectedClassIdProvider.notifier).state = v;
-                              ref.read(selectedSectionIdProvider.notifier).state = null; // Reset section
-                            },
-                            hint: classesAsync.isLoading ? const Text('Loading...') : const Text('Select Class'),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 200.w,
-                          child: DropdownButtonFormField<String>(
-                            isExpanded: true,
-                            decoration: const InputDecoration(labelText: 'Section', border: OutlineInputBorder()),
-                            value: selectedSectionId,
-                            items: sectionsAsync.valueOrNull
-                                ?.where((s) => s.classId == selectedClassId)
-                                .map((s) => DropdownMenuItem(value: s.id, child: Text(s.name)))
-                                .toList() ?? [],
-                            onChanged: (v) => ref.read(selectedSectionIdProvider.notifier).state = v,
-                            hint: sectionsAsync.isLoading ? const Text('Loading...') : const Text('All Sections'),
-                            disabledHint: const Text('Select Class First'),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 200.w,
-                          child: DropdownButtonFormField<String>(
-                            isExpanded: true,
-                            decoration: const InputDecoration(labelText: 'Academic Year', border: OutlineInputBorder()),
-                            value: selectedAcademicYearId,
-                            items: yearsAsync.valueOrNull?.map((y) => DropdownMenuItem(value: y.id, child: Text(y.name))).toList() ?? [],
-                            onChanged: (v) => setState(() => selectedAcademicYearId = v),
-                            hint: yearsAsync.isLoading ? const Text('Loading...') : const Text('Select Year'),
-                          ),
-                        ),
-                      ],
+                        final classDropdown = DropdownButtonFormField<String>(
+                          isExpanded: true,
+                          decoration: const InputDecoration(labelText: 'Class', border: OutlineInputBorder(), contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
+                          value: selectedClassId,
+                          items: classesAsync.valueOrNull?.map((c) => DropdownMenuItem(value: c.id, child: Text(c.name))).toList() ?? [],
+                          onChanged: (v) {
+                            ref.read(selectedClassIdProvider.notifier).state = v;
+                            ref.read(selectedSectionIdProvider.notifier).state = null; // Reset section
+                          },
+                          hint: classesAsync.isLoading ? const Text('Loading...') : const Text('Select Class'),
+                        );
+
+                        final sectionDropdown = DropdownButtonFormField<String>(
+                          isExpanded: true,
+                          decoration: const InputDecoration(labelText: 'Section', border: OutlineInputBorder(), contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
+                          value: selectedSectionId,
+                          items: sectionsAsync.valueOrNull
+                              ?.where((s) => s.classId == selectedClassId)
+                              .map((s) => DropdownMenuItem(value: s.id, child: Text(s.name)))
+                              .toList() ?? [],
+                          onChanged: (v) => ref.read(selectedSectionIdProvider.notifier).state = v,
+                          hint: sectionsAsync.isLoading ? const Text('Loading...') : const Text('Sections'),
+                          disabledHint: const Text('Select Class First'),
+                        );
+
+                        final yearDropdown = DropdownButtonFormField<String>(
+                          isExpanded: true,
+                          decoration: const InputDecoration(labelText: 'Academic Year', border: OutlineInputBorder(), contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
+                          value: selectedAcademicYearId,
+                          items: yearsAsync.valueOrNull?.map((y) => DropdownMenuItem(value: y.id, child: Text(y.name))).toList() ?? [],
+                          onChanged: (v) => setState(() => selectedAcademicYearId = v),
+                          hint: yearsAsync.isLoading ? const Text('Loading...') : const Text('Select Year'),
+                        );
+
+                        if (isDesktop) {
+                          final dropdownsDesktop = Row(
+                            children: [
+                              Expanded(child: classDropdown),
+                              SizedBox(width: 8.w),
+                              Expanded(child: sectionDropdown),
+                              SizedBox(width: 8.w),
+                              Expanded(child: yearDropdown),
+                            ],
+                          );
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Expanded(flex: 3, child: dropdownsDesktop),
+                              SizedBox(width: 24.w),
+                              Expanded(flex: 2, child: actionButtons),
+                            ],
+                          );
+                        } else {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(child: classDropdown),
+                                  SizedBox(width: 8.w),
+                                  Expanded(child: sectionDropdown),
+                                ],
+                              ),
+                              SizedBox(height: 12.h),
+                              yearDropdown,
+                              SizedBox(height: 16.h),
+                              actionButtons,
+                            ],
+                          );
+                        }
+                      },
                     ),
                   ),
                   
@@ -224,9 +244,18 @@ class _TimetableManagementViewState extends ConsumerState<TimetableManagementVie
                       ),
                     )
                   else if (timetableAsync.isLoading)
-                    const Padding(
-                      padding: EdgeInsets.all(48.0),
-                      child: Center(child: CircularProgressIndicator()),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
+                      child: Column(
+                        children: [
+                          AppShimmer(width: double.infinity, height: 40.h, borderRadius: 8.r),
+                          SizedBox(height: 8.h),
+                          ...List.generate(5, (_) => Padding(
+                            padding: EdgeInsets.only(bottom: 8.h),
+                            child: AppShimmer(width: double.infinity, height: 60.h, borderRadius: 8.r),
+                          )),
+                        ],
+                      ),
                     )
                   else if (timetableAsync.hasError)
                     Padding(

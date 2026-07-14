@@ -19,6 +19,8 @@ class UserModel {
   final String? status;
   final String? address;
   final String? domainId;
+  final String? tempPassword;
+  final bool mustChangePassword;
 
   const UserModel({
     required this.id,
@@ -33,6 +35,8 @@ class UserModel {
     this.status,
     this.address,
     this.domainId,
+    this.tempPassword,
+    this.mustChangePassword = false,
   });
 
   // Convert to JSON map
@@ -50,6 +54,8 @@ class UserModel {
       'status': status,
       'address': address,
       'domainId': domainId,
+      'tempPassword': tempPassword,
+      'must_change_password': mustChangePassword,
     };
   }
 
@@ -59,6 +65,7 @@ class UserModel {
       id: json['id'] as String? ?? '',
       name: (json['full_name'] ?? json['name']) as String? ?? 'Guest User',
       email: json['email'] as String? ?? '',
+      tempPassword: json['tempPassword'] as String?,
       avatarUrl: json['avatar_url'] as String? ?? json['profile_image_url'] as String?,
       role: UserRole.values.firstWhere(
         (r) {
@@ -75,6 +82,7 @@ class UserModel {
       status: json['status'] as String?,
       address: json['address'] as String?,
       domainId: json['domain_id'] as String?,
+      mustChangePassword: json['must_change_password'] as bool? ?? false,
     );
   }
 
@@ -91,6 +99,7 @@ class UserModel {
     String? status,
     String? address,
     String? domainId,
+    bool? mustChangePassword,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -105,6 +114,8 @@ class UserModel {
       status: status ?? this.status,
       address: address ?? this.address,
       domainId: domainId ?? this.domainId,
+      tempPassword: tempPassword,
+      mustChangePassword: mustChangePassword ?? this.mustChangePassword,
     );
   }
 }

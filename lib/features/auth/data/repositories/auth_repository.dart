@@ -9,6 +9,7 @@ abstract class AuthRepository {
   Future<void> forgotPassword(String email);
   Future<bool> verifyOtp(String email, String code);
   Future<void> resetPassword(String email, String code, String newPassword);
+  Future<void> changePassword(String newPassword);
   Future<String> refreshAccessToken(String refreshToken);
 }
 
@@ -113,6 +114,23 @@ class AuthRepositoryImpl implements AuthRepository {
       );
     } catch (e) {
       AppLogger.warning('API endpoints not active. Completing local password reset simulation.');
+    }
+  }
+
+  @override
+  Future<void> changePassword(String newPassword) async {
+    AppLogger.info('Submitting password change request');
+    try {
+      final response = await _dioClient.post(
+        '/auth/change-password',
+        data: {'new_password': newPassword},
+      );
+      if (!(response.data['success'] as bool)) {
+        throw Exception(response.data['message'] ?? 'Failed to change password');
+      }
+    } catch (e) {
+      AppLogger.error('Password change failed in repo', e);
+      rethrow;
     }
   }
 
