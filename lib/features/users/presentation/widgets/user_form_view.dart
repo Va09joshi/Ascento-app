@@ -12,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io';
 import 'package:flutter/services.dart';
+import 'package:ascento_abacus/features/academics/presentation/providers/academics_provider.dart';
 class UserFormView extends ConsumerStatefulWidget {
   final String initialRole;
   final UserModel? userToEdit;
@@ -56,6 +57,11 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
   final _qualificationController = TextEditingController();
   final _experienceController = TextEditingController();
 
+  final _rollNumberController = TextEditingController();
+  String? _selectedClassId;
+  String? _selectedSectionId;
+  String? _selectedAcademicYearId;
+
   String? _selectedDomain;
   String? _selectedStatus = 'Active';
   String? _selectedGender = 'Male';
@@ -75,6 +81,10 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
       if (_selectedRole == 'student') {
         _parentEmailController.text = user.email;
         if (user.phone != null) _parentPhoneController.text = user.phone!;
+        _selectedClassId = user.classId;
+        _selectedSectionId = user.sectionId;
+        _selectedAcademicYearId = user.academicYearId;
+        if (user.rollNumber != null) _rollNumberController.text = user.rollNumber!;
       } else {
         if (user.phone != null) _phoneController.text = user.phone!;
       }
@@ -115,6 +125,7 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
     _countryController.dispose();
     _qualificationController.dispose();
     _experienceController.dispose();
+    _rollNumberController.dispose();
     super.dispose();
   }
 
@@ -137,6 +148,10 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
         if (_selectedRole == 'student') 'parent_name': _parentNameController.text.trim(),
         if (_selectedRole == 'student') 'parent_email': _parentEmailController.text.trim(),
         if (_selectedRole == 'student') 'parent_phone': _parentPhoneController.text.trim(),
+        if (_selectedRole == 'student' && _selectedClassId != null) 'class_id': _selectedClassId,
+        if (_selectedRole == 'student' && _selectedSectionId != null) 'section_id': _selectedSectionId,
+        if (_selectedRole == 'student' && _selectedAcademicYearId != null) 'academic_year_id': _selectedAcademicYearId,
+        if (_selectedRole == 'student' && _rollNumberController.text.isNotEmpty) 'roll_number': _rollNumberController.text.trim(),
       };
       
       UserModel? createdUser;
@@ -356,6 +371,57 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
                 CustomTextField(controller: _passwordController, label: 'Password (Optional)', hint: 'Leave blank to auto-generate temporary'),
                 
                 _buildSectionTitle('ACADEMIC & ADDRESS'),
+                _buildResponsiveRow([
+                  ref.watch(academicYearsListProvider).when(
+                    data: (years) => DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(labelText: 'Academic Year'),
+                      value: _selectedAcademicYearId,
+                      items: [
+                        const DropdownMenuItem(value: null, child: Text('Select Year')),
+                        ...years.where((y) => y.isActive).map((e) => DropdownMenuItem(value: e.id, child: Text(e.name)))
+                      ],
+                      onChanged: (v) => setState(() => _selectedAcademicYearId = v),
+                    ),
+                    loading: () => const Center(child: CircularProgressIndicator()),
+                    error: (e, s) => const Text('Error loading years'),
+                  ),
+                  ref.watch(classesListProvider).when(
+                    data: (classes) => DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(labelText: 'Class'),
+                      value: _selectedClassId,
+                      items: [
+                        const DropdownMenuItem(value: null, child: Text('Select Class')),
+                        ...classes.where((c) => c.isActive).map((e) => DropdownMenuItem(value: e.id, child: Text(e.name)))
+                      ],
+                      onChanged: (v) => setState(() => _selectedClassId = v),
+                    ),
+                    loading: () => const Center(child: CircularProgressIndicator()),
+                    error: (e, s) => const Text('Error loading classes'),
+                  ),
+                ]),
+                SizedBox(height: 16.h),
+                _buildResponsiveRow([
+                  ref.watch(sectionsListProvider).when(
+                    data: (sections) {
+                      final filteredSections = _selectedClassId != null
+                          ? sections.where((s) => s.classId == _selectedClassId && s.isActive).toList()
+                          : sections.where((s) => s.isActive).toList();
+                      return DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(labelText: 'Section'),
+                        value: filteredSections.any((s) => s.id == _selectedSectionId) ? _selectedSectionId : null,
+                        items: [
+                          const DropdownMenuItem(value: null, child: Text('Select Section')),
+                          ...filteredSections.map((e) => DropdownMenuItem(value: e.id, child: Text(e.name)))
+                        ],
+                        onChanged: (v) => setState(() => _selectedSectionId = v),
+                      );
+                    },
+                    loading: () => const Center(child: CircularProgressIndicator()),
+                    error: (e, s) => const Text('Error loading sections'),
+                  ),
+                  CustomTextField(controller: _rollNumberController, label: 'Roll Number'),
+                ]),
+                SizedBox(height: 16.h),
                 DropdownButtonFormField<String>(
                   decoration: const InputDecoration(labelText: 'Status'),
                   value: _selectedStatus,

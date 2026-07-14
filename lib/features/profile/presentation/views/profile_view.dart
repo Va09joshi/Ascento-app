@@ -22,7 +22,7 @@ class ProfileView extends ConsumerWidget {
     final authState = ref.watch(authControllerProvider);
     final user = authState.currentUser;
 
-    if (user != null && user.role != UserRole.student && user.role != UserRole.parent) {
+    if (user != null && user.role != UserRole.student) {
       return Scaffold(
         backgroundColor: Colors.transparent,
         body: _buildStaffProfile(context, user, ref, isDark),

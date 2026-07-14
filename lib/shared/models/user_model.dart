@@ -24,6 +24,9 @@ class UserModel {
   final String? rollNumber;
   final String? className;
   final String? sectionName;
+  final String? classId;
+  final String? sectionId;
+  final String? academicYearId;
 
   const UserModel({
     required this.id,
@@ -43,6 +46,9 @@ class UserModel {
     this.rollNumber,
     this.className,
     this.sectionName,
+    this.classId,
+    this.sectionId,
+    this.academicYearId,
   });
 
   // Convert to JSON map
@@ -70,14 +76,20 @@ class UserModel {
     String? rNumber;
     String? cName;
     String? sName;
+    String? sId;
+    String? cId;
+    String? ayId;
     if (json['student_sections'] != null && (json['student_sections'] as List).isNotEmpty) {
       final sec = json['student_sections'][0];
       rNumber = sec['roll_number']?.toString();
+      sId = sec['section_id'];
+      ayId = sec['academic_year_id'];
       final secDetails = sec['sections'];
       if (secDetails != null) {
         sName = secDetails['name'];
         if (secDetails['classes'] != null) {
           cName = secDetails['classes']['name'];
+          cId = secDetails['classes']['id'];
         }
       }
     }
@@ -107,6 +119,9 @@ class UserModel {
       rollNumber: rNumber,
       className: cName,
       sectionName: sName,
+      classId: cId,
+      sectionId: sId,
+      academicYearId: ayId,
     );
   }
 

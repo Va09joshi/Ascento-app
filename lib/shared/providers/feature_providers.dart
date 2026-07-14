@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ascento_abacus/shared/models/feature_models.dart';
 import 'package:ascento_abacus/shared/repositories/feature_repository.dart';
+import 'package:ascento_abacus/shared/models/user_model.dart';
+import 'package:ascento_abacus/features/auth/presentation/controllers/auth_controller.dart';
 
 // =============================================================================
 // ATTENDANCE PROVIDERS
@@ -62,6 +64,15 @@ final notificationsProvider = FutureProvider<List<NotificationItem>>((ref) {
 // PROFILE PROVIDERS
 // =============================================================================
 
-final studentProfileProvider = FutureProvider<StudentProfile>((ref) {
+final studentProfileProvider = FutureProvider<StudentProfile>((ref) async {
+  final user = ref.read(authControllerProvider).currentUser;
+  if (user == null || user.role != UserRole.student) {
+    return StudentProfile(
+      user: user ?? const UserModel(id: '', name: '', email: '', role: UserRole.student),
+      className: '',
+      section: '',
+      rollNumber: '',
+    );
+  }
   return ref.watch(featureRepositoryProvider).getStudentProfile();
 });
