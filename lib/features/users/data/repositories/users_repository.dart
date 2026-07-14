@@ -70,13 +70,24 @@ class UsersRepository {
     }
   }
 
-  Future<void> assignStudentClass(String studentId, String classId, String sectionId, String academicYearId) async {
+  Future<void> assignStudentClass({
+    required String studentId,
+    required String classId,
+    required String sectionId,
+    required String academicYearId,
+    String? rollNumber,
+  }) async {
     try {
-      await _dioClient.patch('/students/$studentId', data: {
+      final payload = {
         'class_id': classId,
         'section_id': sectionId,
         'academic_year_id': academicYearId,
-      });
+      };
+      if (rollNumber != null) {
+        payload['roll_number'] = rollNumber;
+      }
+      
+      await _dioClient.patch('/students/$studentId', data: payload);
     } catch (e) {
       AppLogger.error('Failed to assign student class', e);
       if (e is ApiException) throw Exception(e.message);

@@ -19,7 +19,14 @@ class AssignClassDialog extends ConsumerStatefulWidget {
 class _AssignClassDialogState extends ConsumerState<AssignClassDialog> {
   String? _selectedClassId;
   String? _selectedSectionId;
+  final TextEditingController _rollNumberController = TextEditingController();
   bool _isSubmitting = false;
+
+  @override
+  void dispose() {
+    _rollNumberController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,6 +93,22 @@ class _AssignClassDialogState extends ConsumerState<AssignClassDialog> {
               )).toList() ?? [],
               onChanged: (val) => setState(() => _selectedSectionId = val),
             ),
+            SizedBox(height: 16.h),
+            
+            // Roll Number Field (Optional)
+            TextFormField(
+              controller: _rollNumberController,
+              decoration: InputDecoration(
+                labelText: 'Roll Number (Optional)',
+                hintText: 'Leave empty to auto-assign',
+                filled: true,
+                fillColor: isDark ? AppColors.darkBackground : AppColors.background,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                  borderSide: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.border),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -113,10 +136,11 @@ class _AssignClassDialogState extends ConsumerState<AssignClassDialog> {
       const defaultAcademicYearId = '1ce37a6b-c744-4861-ab7d-686beeb59d99'; 
 
       await ref.read(usersRepositoryProvider).assignStudentClass(
-        widget.student.id,
-        _selectedClassId!,
-        _selectedSectionId!,
-        defaultAcademicYearId,
+        studentId: widget.student.id,
+        classId: _selectedClassId!,
+        sectionId: _selectedSectionId!,
+        academicYearId: defaultAcademicYearId,
+        rollNumber: _rollNumberController.text.trim().isEmpty ? null : _rollNumberController.text.trim(),
       );
       
       if (!mounted) return;
