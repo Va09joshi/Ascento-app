@@ -205,7 +205,9 @@ class ProfileView extends ConsumerWidget {
                 isLoading: authState.isLoading,
                 onPressed: () {
                   ref.read(authControllerProvider.notifier).logout(() {
-                    context.go('/login');
+                    if (context.mounted) {
+                      context.go('/login');
+                    }
                   });
                 },
               ),
@@ -314,7 +316,9 @@ class ProfileView extends ConsumerWidget {
               isLoading: authState.isLoading,
               onPressed: () {
                 ref.read(authControllerProvider.notifier).logout(() {
-                  context.go('/login');
+                  if (context.mounted) {
+                    context.go('/login');
+                  }
                 });
               },
             ),

@@ -169,6 +169,26 @@ class AdminDrawer extends ConsumerWidget {
                       },
                     ),
                     _DrawerItem(
+                      icon: Icons.menu_book_rounded,
+                      title: 'Study Materials',
+                      iconColor: const Color(0xFF3498DB),
+                      isSelected: currentRoute.startsWith(RoutePaths.content),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        context.go(RoutePaths.content);
+                      },
+                    ),
+                    _DrawerItem(
+                      icon: Icons.video_camera_front_rounded,
+                      title: 'Live Meetings',
+                      iconColor: const Color(0xFFE74C3C),
+                      isSelected: currentRoute.startsWith(RoutePaths.meetings),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        context.go(RoutePaths.meetings);
+                      },
+                    ),
+                    _DrawerItem(
                       icon: Icons.campaign_rounded,
                       title: 'Notices Board',
                       iconColor: const Color(0xFFFF7A3A),
@@ -216,9 +236,10 @@ class AdminDrawer extends ConsumerWidget {
                 ),
               ),
               onTap: () {
-                Navigator.of(context).pop();
                 ref.read(authControllerProvider.notifier).logout(() {
-                  context.go('/login');
+                  if (context.mounted) {
+                    context.go('/login');
+                  }
                 });
               },
             ),

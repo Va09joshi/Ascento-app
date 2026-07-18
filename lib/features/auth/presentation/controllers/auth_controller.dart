@@ -160,7 +160,7 @@ class AuthController extends StateNotifier<AuthUIState> {
 }
 
 // Global Auth State Provider
-final authControllerProvider = StateNotifierProvider<AuthController, AuthUIState>((ref) {
+final StateNotifierProvider<AuthController, AuthUIState> authControllerProvider = StateNotifierProvider<AuthController, AuthUIState>((ref) {
   final authService = ref.watch(authServiceProvider);
   return AuthController(authService);
 });

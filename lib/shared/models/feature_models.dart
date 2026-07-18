@@ -353,11 +353,12 @@ class NotificationItem {
   final DateTime createdAt;
   final bool isRead;
   final String? actionUrl;
+  final String? imageUrl;
 
   const NotificationItem({
     required this.id, required this.title, required this.body,
     required this.type, required this.createdAt,
-    this.isRead = false, this.actionUrl,
+    this.isRead = false, this.actionUrl, this.imageUrl,
   });
 
   factory NotificationItem.fromJson(Map<String, dynamic> json) {
@@ -372,6 +373,7 @@ class NotificationItem {
       createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
       isRead: json['isRead'] as bool? ?? false,
       actionUrl: json['actionUrl'] as String?,
+      imageUrl: json['imageUrl'] as String?,
     );
   }
 }
@@ -413,6 +415,90 @@ class StudentProfile {
       bloodGroup: json['bloodGroup'] as String?,
       dateOfBirth: json['dateOfBirth'] != null ? DateTime.tryParse(json['dateOfBirth']) : null,
       avatarUrl: json['avatarUrl'] as String?,
+    );
+  }
+}
+
+// =============================================================================
+// Teacher Models
+// =============================================================================
+
+class TeacherDashboardStats {
+  final int totalStudents;
+  final int pendingHomework;
+  final int upcomingMeetings;
+  final int unreadNotices;
+  final List<TimetableSlot> upcomingClasses;
+
+  const TeacherDashboardStats({
+    required this.totalStudents,
+    required this.pendingHomework,
+    required this.upcomingMeetings,
+    required this.unreadNotices,
+    required this.upcomingClasses,
+  });
+
+  factory TeacherDashboardStats.fromJson(Map<String, dynamic> json) {
+    return TeacherDashboardStats(
+      totalStudents: json['total_students'] as int? ?? 0,
+      pendingHomework: json['pending_homework'] as int? ?? 0,
+      upcomingMeetings: json['upcoming_meetings'] as int? ?? json['today_meetings'] as int? ?? 0,
+      unreadNotices: json['unread_notices'] as int? ?? 0,
+      upcomingClasses: (json['upcoming_classes'] as List? ?? []).map((e) => TimetableSlot.fromJson(e as Map<String, dynamic>)).toList(),
+    );
+  }
+}
+
+class SectionStudent {
+  final String studentId;
+  final String? rollNumber;
+  final String fullName;
+  final String? email;
+  final String? phone;
+  final String? avatarUrl;
+
+  const SectionStudent({
+    required this.studentId,
+    this.rollNumber,
+    required this.fullName,
+    this.email,
+    this.phone,
+    this.avatarUrl,
+  });
+
+  factory SectionStudent.fromJson(Map<String, dynamic> json) {
+    return SectionStudent(
+      studentId: json['student_id'] as String? ?? '',
+      rollNumber: json['roll_number'] as String?,
+      fullName: json['full_name'] as String? ?? 'Unknown',
+      email: json['email'] as String?,
+      phone: json['phone'] as String?,
+      avatarUrl: json['avatar_url'] as String?,
+    );
+  }
+}
+
+class SectionStudentsModel {
+  final String sectionId;
+  final String sectionName;
+  final String? className;
+  final List<SectionStudent> students;
+
+  const SectionStudentsModel({
+    required this.sectionId,
+    required this.sectionName,
+    this.className,
+    required this.students,
+  });
+
+  factory SectionStudentsModel.fromJson(Map<String, dynamic> json) {
+    return SectionStudentsModel(
+      sectionId: json['section_id'] as String? ?? '',
+      sectionName: json['section_name'] as String? ?? '',
+      className: json['class_name'] as String?,
+      students: (json['students'] as List? ?? [])
+          .map((e) => SectionStudent.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }

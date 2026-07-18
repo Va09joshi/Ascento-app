@@ -40,6 +40,30 @@ class MeetingsRepository {
       rethrow;
     }
   }
+
+  Future<void> updateMeeting(String id, Map<String, dynamic> data) async {
+    try {
+      final response = await _dioClient.put('${ApiEndpoints.meetings}/$id', data: data);
+      if (response.data['success'] != true) {
+        throw Exception(response.data['message'] ?? 'Failed to update meeting');
+      }
+    } catch (e) {
+      AppLogger.error('Failed to update meeting', e);
+      rethrow;
+    }
+  }
+
+  Future<void> deleteMeeting(String id) async {
+    try {
+      final response = await _dioClient.delete('${ApiEndpoints.meetings}/$id');
+      if (response.data['success'] != true) {
+        throw Exception(response.data['message'] ?? 'Failed to delete meeting');
+      }
+    } catch (e) {
+      AppLogger.error('Failed to delete meeting', e);
+      rethrow;
+    }
+  }
 }
 
 final meetingsRepositoryProvider = Provider<MeetingsRepository>((ref) {

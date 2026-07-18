@@ -7,6 +7,8 @@ import 'package:ascento_abacus/core/widgets/app_shimmer.dart';
 import 'package:ascento_abacus/core/widgets/app_components.dart';
 import 'package:ascento_abacus/shared/models/feature_models.dart';
 import 'package:ascento_abacus/shared/providers/feature_providers.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ascento_abacus/shared/router/route_names.dart';
 
 class NotificationsView extends ConsumerWidget {
   const NotificationsView({super.key});
@@ -83,7 +85,7 @@ class NotificationsView extends ConsumerWidget {
                         ),
                         SizedBox(height: 4.h),
                         Text(
-                          'Stay updated with school alerts',
+                          'Stay updated with school notices',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: AppColors.textMuted,
                           ),
@@ -153,65 +155,73 @@ class _NotificationTile extends StatelessWidget {
     final theme = Theme.of(context);
     final color = _typeColor();
 
-    return AppCard(
-      color: item.isRead ? null : AppColors.primary.withValues(alpha: 0.04),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(_typeIcon(), color: color, size: 20),
-          ),
-          SizedBox(width: 14.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+    return Padding(
+      padding: EdgeInsets.only(bottom: 12.h),
+      child: InkWell(
+        onTap: () => context.push(RoutePaths.noticeDetails, extra: item),
+        borderRadius: BorderRadius.circular(16.r),
+        child: AppCard(
+          color: item.isRead ? null : AppColors.primary.withValues(alpha: 0.04),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(_typeIcon(), color: color, size: 20),
+              ),
+              SizedBox(width: 14.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Text(
-                        item.title,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: item.isRead
-                              ? FontWeight.w500
-                              : FontWeight.bold,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            item.title,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: item.isRead
+                                  ? FontWeight.w500
+                                  : FontWeight.bold,
+                            ),
+                          ),
                         ),
+                        if (!item.isRead)
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: color,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                      ],
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      item.body,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: item.isRead ? Colors.grey : null,
+                        height: 1.4,
                       ),
                     ),
-                    if (!item.isRead)
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: color,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
+                    SizedBox(height: 6.h),
+                    Text(
+                      _timeAgo(),
+                      style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+                    ),
                   ],
                 ),
-                SizedBox(height: 4.h),
-                Text(
-                  item.body,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: item.isRead ? Colors.grey : null,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: 6.h),
-                Text(
-                  _timeAgo(),
-                  style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

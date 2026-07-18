@@ -1,3 +1,4 @@
+import 'package:ascento_abacus/features/dashboard/presentation/views/teacher_students_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -18,6 +19,8 @@ import 'package:ascento_abacus/features/meetings/presentation/views/meetings_vie
 import 'package:ascento_abacus/features/content/presentation/views/content_view.dart';
 import 'package:ascento_abacus/features/notifications/presentation/views/notices_management_view.dart';
 import 'package:ascento_abacus/features/notifications/presentation/views/notice_form_view.dart';
+import 'package:ascento_abacus/features/notifications/presentation/views/notice_details_view.dart';
+import 'package:ascento_abacus/features/notifications/presentation/views/admin_notice_details_view.dart';
 import 'package:ascento_abacus/features/splash/presentation/views/splash_view.dart';
 import 'package:ascento_abacus/features/onboarding/presentation/views/onboarding_view.dart';
 import 'package:ascento_abacus/features/attendance/presentation/views/student_attendance_view.dart';
@@ -59,7 +62,7 @@ import '../models/section_model.dart';
 import '../models/subject_model.dart';
 
 // Decoupled, centralized GoRouter configuration driving Ascento Abacus application navigation
-final routerProvider = Provider<GoRouter>((ref) {
+final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
   final guard = ref.watch(routeGuardProvider);
 
   return GoRouter(
@@ -158,6 +161,17 @@ final routerProvider = Provider<GoRouter>((ref) {
             pageBuilder: (context, state) => CustomTransitionPage(
               key: state.pageKey,
               child: const TeacherDashboardView(),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+            ),
+          ),
+          GoRoute(
+            path: RoutePaths.teacherStudents,
+            name: RouteNames.teacherStudents,
+            pageBuilder: (context, state) => CustomTransitionPage(
+              key: state.pageKey,
+              child: const TeacherStudentsView(),
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                 return FadeTransition(opacity: animation, child: child);
               },
@@ -605,6 +619,34 @@ final routerProvider = Provider<GoRouter>((ref) {
           return CustomTransitionPage(
             key: state.pageKey,
             child: NoticeFormView(notice: notice),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          );
+        },
+      ),
+      GoRoute(
+        path: RoutePaths.noticeDetails,
+        name: RouteNames.noticeDetails,
+        pageBuilder: (context, state) {
+          final notice = state.extra as NotificationItem;
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: NoticeDetailsView(notice: notice),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          );
+        },
+      ),
+      GoRoute(
+        path: RoutePaths.adminNoticeDetails,
+        name: RouteNames.adminNoticeDetails,
+        pageBuilder: (context, state) {
+          final notice = state.extra as NoticeModel;
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: AdminNoticeDetailsView(notice: notice),
             transitionsBuilder: (context, animation, secondaryAnimation, child) {
               return FadeTransition(opacity: animation, child: child);
             },

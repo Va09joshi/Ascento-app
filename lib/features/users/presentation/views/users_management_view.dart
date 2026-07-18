@@ -19,7 +19,7 @@ class UsersManagementView extends ConsumerStatefulWidget {
 
 class _UsersManagementViewState extends ConsumerState<UsersManagementView> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final List<String> _roles = ['admin', 'teacher', 'student', 'parent'];
+  final List<String> _roles = ['admin', 'teacher', 'student'];
 
   @override
   void initState() {
@@ -72,7 +72,6 @@ class _UsersManagementViewState extends ConsumerState<UsersManagementView> with 
                   Tab(text: 'Admins'),
                   Tab(text: 'Teachers'),
                   Tab(text: 'Students'),
-                  Tab(text: 'Parents'),
                 ],
               ),
             ),

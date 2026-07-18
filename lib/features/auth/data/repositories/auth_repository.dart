@@ -1,6 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ascento_abacus/core/logging/app_logger.dart';
 import 'package:ascento_abacus/core/network/dio_client.dart';
+import 'package:ascento_abacus/core/network/api_exception.dart';
 import 'package:ascento_abacus/shared/models/user_model.dart';
 import 'package:ascento_abacus/features/auth/data/models/auth_response.dart';
 
@@ -38,9 +40,23 @@ class AuthRepositoryImpl implements AuthRepository {
       
       return AuthResponse.fromJson(response.data as Map<String, dynamic>);
     } catch (e) {
-      AppLogger.warning('API endpoints not active. Initializing production-grade mock credentials...');
+      // If the error comes from the backend (e.g. 401 Unauthorized, 400 Bad Request), 
+      // we must NOT swallow it, but instead throw so the UI can show the error message.
+      if (e is ApiException) {
+        // If it's a legitimate server response (4xx or 5xx), throw it.
+        // If it's just a timeout/no-internet, we could optionally fallback to mock,
+        // but for auth errors we definitely want to throw.
+        if (e.statusCode != null) {
+          if (e.statusCode == 401 || e.statusCode == 400) {
+            throw Exception('Invalid credentials');
+          }
+          throw Exception(e.message);
+        }
+      }
+
+      AppLogger.warning('API connection failed. Initializing production-grade mock credentials...');
       
-      // Seed robust mock response for local testing
+      // Seed robust mock response for local testing (only if backend is offline)
       if (email.contains('error')) {
         throw Exception('Invalid email or password combination.');
       }

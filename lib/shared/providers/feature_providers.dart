@@ -76,3 +76,15 @@ final studentProfileProvider = FutureProvider<StudentProfile>((ref) async {
   }
   return ref.watch(featureRepositoryProvider).getStudentProfile();
 });
+
+// =============================================================================
+// TEACHER PROVIDERS
+// =============================================================================
+
+final teacherDashboardStatsProvider = FutureProvider<TeacherDashboardStats>((ref) async {
+  return ref.watch(featureRepositoryProvider).getTeacherDashboardStats();
+});
+
+final teacherStudentsProvider = FutureProvider<List<SectionStudentsModel>>((ref) async {
+  return ref.watch(featureRepositoryProvider).getTeacherStudents();
+});

@@ -9,18 +9,7 @@ import 'package:ascento_abacus/core/widgets/app_card.dart';
 import 'package:ascento_abacus/shared/widgets/premium_data_table.dart';
 import 'package:ascento_abacus/features/attendance/presentation/widgets/attendance_form_dialog.dart';
 
-// Mock Provider for UI demonstration until API is connected
-final mockAttendanceProvider = FutureProvider.autoDispose<List<AttendanceRecord>>((ref) async {
-  await Future.delayed(const Duration(seconds: 1));
-  return [
-    AttendanceRecord(
-      id: '1', date: DateTime.now(), status: AttendanceStatus.present, remark: 'On time'
-    ),
-    AttendanceRecord(
-      id: '2', date: DateTime.now().subtract(const Duration(days: 1)), status: AttendanceStatus.absent, remark: 'Sick leave'
-    ),
-  ];
-});
+import 'package:ascento_abacus/shared/providers/feature_providers.dart';
 
 class AttendanceManagementView extends ConsumerWidget {
   const AttendanceManagementView({super.key});
@@ -29,7 +18,8 @@ class AttendanceManagementView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final attendanceAsync = ref.watch(mockAttendanceProvider);
+    final now = DateTime.now();
+    final attendanceAsync = ref.watch(monthlyAttendanceProvider((month: now.month, year: now.year)));
 
     return Scaffold(
       backgroundColor: Colors.transparent,

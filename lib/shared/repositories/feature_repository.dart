@@ -40,18 +40,9 @@ class FeatureRepository {
   // ===========================================================================
 
   Future<List<FeeRecord>> getFeeHistory() async {
-    try {
-      final response = await _client.get(ApiEndpoints.feeHistory);
-      return (response.data['data'] as List).map((e) => FeeRecord.fromJson(e)).toList();
-    } catch (_) {
-      AppLogger.warning('Using mock fee records');
-      return [
-        FeeRecord(id: 'f1', title: 'Tuition Fee - Q1', amount: 25000, paidAmount: 25000, status: PaymentStatus.paid, dueDate: DateTime(2026, 4, 15), paidDate: DateTime(2026, 4, 10), transactionId: 'TXN001'),
-        FeeRecord(id: 'f2', title: 'Tuition Fee - Q2', amount: 25000, paidAmount: 12000, status: PaymentStatus.partial, dueDate: DateTime(2026, 7, 15)),
-        FeeRecord(id: 'f3', title: 'Lab & Activity Fee', amount: 8000, status: PaymentStatus.pending, dueDate: DateTime(2026, 8, 1)),
-        FeeRecord(id: 'f4', title: 'Transport Fee', amount: 6000, status: PaymentStatus.overdue, dueDate: DateTime(2026, 3, 1)),
-      ];
-    }
+    final response = await _client.get(ApiEndpoints.feeHistory);
+    if (response.data == null || response.data['data'] == null) return [];
+    return (response.data['data'] as List).map((e) => FeeRecord.fromJson(e)).toList();
   }
 
   // ===========================================================================
@@ -76,25 +67,8 @@ class FeatureRepository {
   }
 
   Future<ReportCard> getReportCard(String examId) async {
-    try {
-      final response = await _client.get('/exams/report/$examId');
-      return ReportCard.fromJson(response.data['data']);
-    } catch (_) {
-      AppLogger.warning('Using mock report card');
-      return const ReportCard(
-        examName: 'Mid-Term Examination 2026',
-        results: [
-          SubjectResult(subject: 'Mathematics', marksObtained: 87, totalMarks: 100, grade: 'A'),
-          SubjectResult(subject: 'Science', marksObtained: 92, totalMarks: 100, grade: 'A+'),
-          SubjectResult(subject: 'English', marksObtained: 78, totalMarks: 100, grade: 'B+'),
-          SubjectResult(subject: 'Hindi', marksObtained: 71, totalMarks: 80, grade: 'A'),
-          SubjectResult(subject: 'Social Studies', marksObtained: 85, totalMarks: 100, grade: 'A'),
-        ],
-        overallPercentage: 86.0,
-        overallGrade: 'A',
-        gpa: 8.9,
-      );
-    }
+    final response = await _client.get('/exams/report/$examId');
+    return ReportCard.fromJson(response.data['data']);
   }
 
   // ===========================================================================
@@ -116,11 +90,7 @@ class FeatureRepository {
   }
 
   Future<void> markNotificationRead(String id) async {
-    try {
-      await _client.patch('${ApiEndpoints.notifications}/$id', data: {'isRead': true});
-    } catch (_) {
-      AppLogger.warning('Mock: notification $id marked as read');
-    }
+    await _client.patch('${ApiEndpoints.notifications}/$id', data: {'isRead': true});
   }
 
   // ===========================================================================
@@ -160,6 +130,19 @@ class FeatureRepository {
     } else {
       await _client.patch(ApiEndpoints.studentProfile, data: data);
     }
+  }
+
+  // Teacher specific endpoints
+  Future<TeacherDashboardStats> getTeacherDashboardStats() async {
+    final response = await _client.get(ApiEndpoints.teacherDashboard);
+    return TeacherDashboardStats.fromJson(response.data['data']);
+  }
+
+  Future<List<SectionStudentsModel>> getTeacherStudents() async {
+    final response = await _client.get(ApiEndpoints.teacherStudents);
+    return (response.data['data'] as List? ?? [])
+        .map((e) => SectionStudentsModel.fromJson(e))
+        .toList();
   }
 }
 

@@ -106,6 +106,19 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
       if (user.domainId != null) {
         _selectedDomain = user.domainId;
       }
+      if (user.city != null) _cityController.text = user.city!;
+      if (user.state != null) _stateController.text = user.state!;
+      if (user.country != null) _countryController.text = user.country!;
+      if (user.qualification != null) _qualificationController.text = user.qualification!;
+      if (user.experience != null) _experienceController.text = user.experience.toString();
+      if (user.dateOfBirth != null) {
+        _selectedDateOfBirth = user.dateOfBirth;
+        if (_selectedRole == 'student') {
+          // If you need age calculation, although not strictly saved.
+          final age = DateTime.now().year - user.dateOfBirth!.year;
+          _ageController.text = age.toString();
+        }
+      }
     }
   }
 
@@ -142,7 +155,7 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
         'phone': _phoneController.text.trim(),
         'role': _selectedRole,
         'gender': _selectedGender?.toLowerCase(),
-        'status': _selectedStatus,
+        'is_active': _selectedStatus == 'active',
         'address': _addressController.text.trim(),
         if (_selectedDomain != null) 'domain_id': _selectedDomain,
         if (_selectedRole == 'student') 'parent_name': _parentNameController.text.trim(),
@@ -152,6 +165,12 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
         if (_selectedRole == 'student' && _selectedSectionId != null) 'section_id': _selectedSectionId,
         if (_selectedRole == 'student' && _selectedAcademicYearId != null) 'academic_year_id': _selectedAcademicYearId,
         if (_selectedRole == 'student' && _rollNumberController.text.isNotEmpty) 'roll_number': _rollNumberController.text.trim(),
+        if (_selectedDateOfBirth != null) 'date_of_birth': _selectedDateOfBirth!.toIso8601String().split('T')[0],
+        if (_cityController.text.isNotEmpty) 'city': _cityController.text.trim(),
+        if (_stateController.text.isNotEmpty) 'state': _stateController.text.trim(),
+        if (_countryController.text.isNotEmpty) 'country': _countryController.text.trim(),
+        if (_qualificationController.text.isNotEmpty) 'qualification': _qualificationController.text.trim(),
+        if (_experienceController.text.isNotEmpty) 'experience': int.tryParse(_experienceController.text.trim()),
       };
       
       UserModel? createdUser;
@@ -435,6 +454,8 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
                   CustomTextField(controller: _cityController, label: 'City'),
                   CustomTextField(controller: _stateController, label: 'State'),
                 ]),
+                SizedBox(height: 16.h),
+                CustomTextField(controller: _countryController, label: 'Country'),
               ] else ...[
                 _buildResponsiveRow([
                   CustomTextField(controller: _nameController, label: 'Name'),

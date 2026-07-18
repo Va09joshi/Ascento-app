@@ -47,33 +47,26 @@ class NoticesManagementView extends ConsumerWidget {
               ),
               SizedBox(height: 24.h),
               if (noticesAsync.isLoading)
-                GridView.builder(
+                ListView.separated(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 400.w,
-                    childAspectRatio: 0.8,
-                    crossAxisSpacing: 24.w,
-                    mainAxisSpacing: 24.h,
-                  ),
                   itemCount: 4,
-                  itemBuilder: (context, index) => AppShimmer.card(),
+                  separatorBuilder: (context, index) => SizedBox(height: 24.h),
+                  itemBuilder: (context, index) => SizedBox(
+                    height: 250.h,
+                    child: AppShimmer.card(),
+                  ),
                 )
               else if (noticesAsync.hasError)
                 Center(child: Text('Error: ${noticesAsync.error}'))
               else if (noticesAsync.valueOrNull == null || noticesAsync.valueOrNull!.isEmpty)
                 Center(child: Text('No notices found', style: TextStyle(color: AppColors.textMuted)))
               else
-                GridView.builder(
+                ListView.separated(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 400.w,
-                    childAspectRatio: 0.8,
-                    crossAxisSpacing: 24.w,
-                    mainAxisSpacing: 24.h,
-                  ),
                   itemCount: noticesAsync.value!.length,
+                  separatorBuilder: (context, index) => SizedBox(height: 24.h),
                   itemBuilder: (context, index) {
                     final notice = noticesAsync.value![index];
                     return _buildNoticePosterCard(context, notice, isDark, ref);
@@ -87,7 +80,10 @@ class NoticesManagementView extends ConsumerWidget {
   }
 
   Widget _buildNoticePosterCard(BuildContext context, NoticeModel notice, bool isDark, WidgetRef ref) {
-    return Container(
+    return InkWell(
+      onTap: () => context.push(RoutePaths.adminNoticeDetails, extra: notice),
+      borderRadius: BorderRadius.circular(16.r),
+      child: Container(
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurface : AppColors.surface,
         borderRadius: BorderRadius.circular(16.r),
@@ -104,8 +100,8 @@ class NoticesManagementView extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Banner or Default Graphic
-          Expanded(
-            flex: 3,
+          SizedBox(
+            height: 180.h,
             child: Stack(
               fit: StackFit.expand,
               children: [
@@ -154,31 +150,30 @@ class NoticesManagementView extends ConsumerWidget {
                 ),
 
                 // Date & Actions (Edit/Delete) overlay
-                Positioned(
-                  top: 8.h,
-                  right: 8.w,
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.white, size: 20),
-                        onPressed: () => context.push(RoutePaths.editNotice, extra: notice),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.white, size: 20),
-                        onPressed: () => _showDeleteDialog(context, notice, ref),
-                      ),
-                    ],
+                if (!isReadOnly)
+                  Positioned(
+                    top: 8.h,
+                    right: 8.w,
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.edit, color: Colors.white, size: 20),
+                          onPressed: () => context.push(RoutePaths.editNotice, extra: notice),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.white, size: 20),
+                          onPressed: () => _showDeleteDialog(context, notice, ref),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
               ],
             ),
           ),
           
           // Content
-          Expanded(
-            flex: 2,
-            child: Padding(
-              padding: EdgeInsets.all(16.w),
+          Padding(
+            padding: EdgeInsets.all(20.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -186,26 +181,20 @@ class NoticesManagementView extends ConsumerWidget {
                     notice.title,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 16.sp,
+                      fontSize: 18.sp,
                       color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 8.h),
-                  Expanded(
-                    child: Text(
-                      notice.content,
-                      style: TextStyle(
-                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
-                        fontSize: 12.sp,
-                        height: 1.4,
-                      ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
+                  SizedBox(height: 12.h),
+                  Text(
+                    notice.content,
+                    style: TextStyle(
+                      color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                      fontSize: 14.sp,
+                      height: 1.5,
                     ),
                   ),
-                  SizedBox(height: 8.h),
+                  SizedBox(height: 16.h),
                   Row(
                     children: [
                       Icon(Icons.calendar_today, size: 14.sp, color: AppColors.textMuted),
@@ -219,11 +208,13 @@ class NoticesManagementView extends ConsumerWidget {
                 ],
               ),
             ),
-          ),
         ],
       ),
+      )
     );
   }
+
+  // Dialog implementation removed in favor of AdminNoticeDetailsView
 
   Widget _buildPlaceholderGraphic(NoticeModel notice, bool isDark) {
     return Container(

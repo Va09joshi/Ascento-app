@@ -5,9 +5,14 @@ import 'package:go_router/go_router.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ascento_abacus/core/theme/app_colors.dart';
 import 'package:ascento_abacus/shared/router/route_names.dart';
+import 'package:ascento_abacus/shared/router/app_router.dart';
 import 'package:ascento_abacus/shared/models/user_model.dart';
 import 'package:ascento_abacus/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:ascento_abacus/shared/providers/feature_providers.dart';
+import 'package:ascento_abacus/shared/widgets/drawer/admin_drawer.dart';
+import 'package:ascento_abacus/shared/widgets/drawer/teacher_drawer.dart';
+import 'package:ascento_abacus/shared/widgets/drawer/student_drawer.dart';
+import 'package:ascento_abacus/shared/widgets/drawer/drawer_item.dart';
 
 class _NavItem {
   final String label;
@@ -34,14 +39,14 @@ class NavigationShell extends ConsumerWidget {
         _NavItem('Overview', FontAwesomeIcons.chartPie, FontAwesomeIcons.chartPie, RoutePaths.adminDashboard),
         _NavItem('Users', FontAwesomeIcons.users, FontAwesomeIcons.users, RoutePaths.manageUsers),
         _NavItem('Profile', FontAwesomeIcons.user, FontAwesomeIcons.solidUser, RoutePaths.profile),
-        _NavItem('Alerts', FontAwesomeIcons.bell, FontAwesomeIcons.solidBell, RoutePaths.notifications),
+        _NavItem('Notices', FontAwesomeIcons.bullhorn, FontAwesomeIcons.bullhorn, RoutePaths.notifications),
       ];
     } else if (role == UserRole.teacher) {
       return [
         _NavItem('Dashboard', FontAwesomeIcons.house, FontAwesomeIcons.solidHouse, RoutePaths.teacherDashboard),
         _NavItem('Timetable', FontAwesomeIcons.clock, FontAwesomeIcons.solidClock, RoutePaths.timetable),
         _NavItem('Profile', FontAwesomeIcons.user, FontAwesomeIcons.solidUser, RoutePaths.profile),
-        _NavItem('Alerts', FontAwesomeIcons.bell, FontAwesomeIcons.solidBell, RoutePaths.notifications),
+        _NavItem('Notices', FontAwesomeIcons.bullhorn, FontAwesomeIcons.bullhorn, RoutePaths.notifications),
       ];
     } else {
       return [
@@ -90,277 +95,172 @@ class NavigationShell extends ConsumerWidget {
       // --- School Management Drawer Menu ---
       drawer: Drawer(
         backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
-        child: SafeArea(
-          child: Column(
-            children: [
-              Container(
-                padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 16.h),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: isDark
-                        ? [const Color(0xFF5B62E6), const Color(0xFF3D3FA8)]
-                        : [const Color(0xFF5B67F4), const Color(0xFF7B4DE6)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+        child: Column(
+          children: [
+            // Modern Header Profile Card
+            Container(
+              padding: EdgeInsets.fromLTRB(24.w, MediaQuery.of(context).padding.top + 24.h, 24.w, 24.h),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: isDark
+                      ? [const Color(0xFF5B62E6).withValues(alpha: 0.15), Colors.transparent]
+                      : [const Color(0xFF5B67F4).withValues(alpha: 0.1), Colors.transparent],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+                border: Border(
+                  bottom: BorderSide(
+                    color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.05),
+                    width: 1,
                   ),
                 ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 52,
-                      height: 52,
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.18),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        fit: BoxFit.contain,
-                        filterQuality: FilterQuality.high,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(
-                              Icons.school_rounded,
-                              size: 26,
-                              color: Colors.white,
-                            ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 56.r,
+                    height: 56.r,
+                    padding: EdgeInsets.all(10.r),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.darkSurface : Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF5B67F4).withValues(alpha: 0.15),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4),
+                        )
+                      ],
+                      border: Border.all(
+                        color: const Color(0xFF5B67F4).withValues(alpha: 0.2),
+                        width: 1.5,
                       ),
                     ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            name,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontSize: 16,
-                            ),
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      fit: BoxFit.contain,
+                      filterQuality: FilterQuality.high,
+                      errorBuilder: (context, error, stackTrace) =>
+                          Icon(
+                            Icons.school_rounded,
+                            size: 28.r,
+                            color: const Color(0xFF5B67F4),
                           ),
-                          SizedBox(height: 4.h),
-                          Text(
+                    ),
+                  ),
+                  SizedBox(width: 16.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          name,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                            fontSize: 16.sp,
+                            letterSpacing: -0.2,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 4.h),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF5B67F4).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          child: Text(
                             classLabel,
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 12,
+                            style: TextStyle(
+                              color: const Color(0xFF5B67F4),
+                              fontSize: 10.sp,
+                              fontWeight: FontWeight.w600,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    IconButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(Icons.close, color: Colors.white),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: ListView(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 12.w,
-                    vertical: 12.h,
                   ),
-                  children: [
-                    if (user?.role == UserRole.admin || user?.role == UserRole.superAdmin) ...[
-                      _DrawerSection(title: 'Admin Console'),
-                      _DrawerItem(
-                        icon: Icons.dashboard_rounded,
-                        label: 'Overview',
-                        active: currentPath == RoutePaths.adminDashboard,
-                        accent: const Color(0xFF5B67F4),
-                        onTap: () => _go(context, RoutePaths.adminDashboard),
-                      ),
-                      _DrawerItem(
-                        icon: Icons.account_tree_rounded,
-                        label: 'Manage Branches',
-                        active: currentPath == RoutePaths.manageBranches,
-                        accent: const Color(0xFFFF8A34),
-                        onTap: () => _go(context, RoutePaths.manageBranches),
-                      ),
-                      _DrawerItem(
-                        icon: Icons.manage_accounts_rounded,
-                        label: 'Users & Roles',
-                        active: currentPath == RoutePaths.manageUsers,
-                        accent: const Color(0xFF2FAE78),
-                        onTap: () => _go(context, RoutePaths.manageUsers),
-                      ),
-                      _DrawerItem(
-                        icon: Icons.category_rounded,
-                        label: 'Manage Domains',
-                        active: currentPath == RoutePaths.manageDomains,
-                        accent: const Color(0xFFD946EF),
-                        onTap: () => _go(context, RoutePaths.manageDomains),
-                      ),
-                      _DrawerItem(
-                        icon: Icons.school_rounded,
-                        label: 'Academics Config',
-                        active: currentPath == RoutePaths.academicsConfig,
-                        accent: const Color(0xFF6C4ED9),
-                        onTap: () => _go(context, RoutePaths.academicsConfig),
-                      ),
-
-                      _DrawerItem(
-                        icon: Icons.co_present_rounded,
-                        label: 'Attendance Data',
-                        active: currentPath == RoutePaths.attendance,
-                        accent: const Color(0xFFF9A826),
-                        onTap: () => _go(context, RoutePaths.attendance),
-                      ),
-                      _DrawerItem(
-                        icon: Icons.access_time_filled_rounded,
-                        label: 'Timetable Setup',
-                        active: currentPath == RoutePaths.timetable,
-                        accent: const Color(0xFF00B4D8),
-                        onTap: () => _go(context, RoutePaths.timetable),
-                      ),
-                      _DrawerItem(
-                        icon: Icons.assignment_rounded,
-                        label: 'Exams Config',
-                        active: currentPath == RoutePaths.exams,
-                        accent: const Color(0xFF9D4EDD),
-                        onTap: () => _go(context, RoutePaths.exams),
-                      ),
-                      _DrawerItem(
-                        icon: Icons.campaign_rounded,
-                        label: 'Notices Board',
-                        active: currentPath == RoutePaths.notifications,
-                        accent: const Color(0xFFFF5400),
-                        onTap: () => _go(context, RoutePaths.notifications),
-                      ),
-                    ] else if (user?.role == UserRole.teacher) ...[
-                      _DrawerSection(title: 'Teacher Portal'),
-                      _DrawerItem(
-                        icon: Icons.dashboard_rounded,
-                        label: 'My Dashboard',
-                        active: currentPath == RoutePaths.teacherDashboard,
-                        accent: const Color(0xFF5B67F4),
-                        onTap: () => _go(context, RoutePaths.teacherDashboard),
-                      ),
-                      _DrawerItem(
-                        icon: Icons.class_rounded,
-                        label: 'My Classes',
-                        active: false,
-                        accent: const Color(0xFFFF8A34),
-                        onTap: () => _showComingSoon(context),
-                      ),
-                      _DrawerItem(
-                        icon: Icons.how_to_reg_rounded,
-                        label: 'Mark Attendance',
-                        active: currentPath == RoutePaths.attendance,
-                        accent: const Color(0xFF2FAE78),
-                        onTap: () => _go(context, RoutePaths.attendance),
-                      ),
-                      _DrawerItem(
-                        icon: Icons.assignment_turned_in_rounded,
-                        label: 'Exam Results',
-                        active: false,
-                        accent: const Color(0xFF6C4ED9),
-                        onTap: () => _showComingSoon(context),
-                      ),
-                      _DrawerItem(
-                        icon: Icons.access_time_rounded,
-                        label: 'Timetable',
-                        active: currentPath == RoutePaths.timetable,
-                        accent: const Color(0xFFE85A9A),
-                        onTap: () => _go(context, RoutePaths.timetable),
-                      ),
-                    ] else ...[
-                      _DrawerSection(title: 'Student Portal'),
-                      _DrawerItem(
-                        icon: Icons.grid_view_rounded,
-                        label: 'Overview',
-                        active: currentPath == RoutePaths.studentDashboard,
-                        accent: const Color(0xFF5B67F4),
-                        onTap: () => _go(context, RoutePaths.studentDashboard),
-                      ),
-                      _DrawerItem(
-                        icon: Icons.calendar_month_rounded,
-                        label: 'My Timetable',
-                        active: currentPath == RoutePaths.timetable,
-                        accent: const Color(0xFF2FA2B9),
-                        onTap: () => _go(context, RoutePaths.timetable),
-                      ),
-                      _DrawerItem(
-                        icon: Icons.assignment_rounded,
-                        label: 'My Exams',
-                        active: currentPath == RoutePaths.exams,
-                        accent: const Color(0xFFE85A9A),
-                        onTap: () => _go(context, RoutePaths.exams),
-                      ),
-                      _DrawerItem(
-                        icon: Icons.check_circle_rounded,
-                        label: 'My Attendance',
-                        active: currentPath == RoutePaths.attendance,
-                        accent: const Color(0xFF2FAE78),
-                        onTap: () => _go(context, RoutePaths.attendance),
-                      ),
-                      _DrawerItem(
-                        icon: Icons.campaign_rounded,
-                        label: 'Notice Board',
-                        active: currentPath == RoutePaths.notifications,
-                        accent: const Color(0xFFFF7A3A),
-                        onTap: () => _go(context, RoutePaths.notifications),
-                      ),
-                      _DrawerItem(
-                        icon: Icons.assignment_turned_in_rounded,
-                        label: 'My Homework',
-                        active: currentPath == RoutePaths.homework,
-                        accent: const Color(0xFF8E44AD),
-                        onTap: () => _go(context, RoutePaths.homework),
-                      ),
-                      _DrawerItem(
-                        icon: Icons.video_camera_front_rounded,
-                        label: 'Live Meetings',
-                        active: currentPath == RoutePaths.meetings,
-                        accent: const Color(0xFFE74C3C),
-                        onTap: () => _go(context, RoutePaths.meetings),
-                      ),
-                      _DrawerItem(
-                        icon: Icons.menu_book_rounded,
-                        label: 'Study Materials',
-                        active: currentPath == RoutePaths.content,
-                        accent: const Color(0xFF3498DB),
-                        onTap: () => _go(context, RoutePaths.content),
-                      ),
-                      _DrawerItem(
-                        icon: Icons.receipt_long_rounded,
-                        label: 'Fee Details',
-                        active: currentPath == RoutePaths.fees,
-                        accent: const Color(0xFF1ABC9C),
-                        onTap: () => _go(context, RoutePaths.fees),
-                      ),
-                      SizedBox(height: 6.h),
-                      _DrawerSection(title: 'Account'),
-                      _DrawerItem(
-                        icon: Icons.person_outline_rounded,
-                        label: 'My Profile',
-                        active: currentPath == RoutePaths.profile,
-                        accent: const Color(0xFF6C5CE7),
-                        onTap: () => _go(context, RoutePaths.profile),
-                      ),
-                    ],
-                    SizedBox(height: 12.h),
-                    const Divider(),
-                    _DrawerItem(
-                      icon: Icons.logout_rounded,
-                      label: 'Sign Out',
-                      active: false,
-                      isDanger: true,
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        ref.read(authControllerProvider.notifier).logout(() {
-                          context.go(RoutePaths.login);
-                        });
-                      },
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: Icon(Icons.close_rounded, color: isDark ? Colors.white54 : Colors.black45, size: 24.r),
+                    style: IconButton.styleFrom(
+                      backgroundColor: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            
+            // Scrollable Menu Items
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16.w,
+                  vertical: 8.h,
+                ),
+                children: [
+                  if (user?.role == UserRole.admin || user?.role == UserRole.superAdmin)
+                    AdminDrawer(
+                      currentPath: currentPath,
+                      onNavigate: (route) => _go(context, route),
+                    )
+                  else if (user?.role == UserRole.teacher)
+                    TeacherDrawer(
+                      currentPath: currentPath,
+                      onNavigate: (route) => _go(context, route),
+                    )
+                  else
+                    StudentDrawer(
+                      currentPath: currentPath,
+                      onNavigate: (route) => _go(context, route),
+                    ),
+                ],
+              ),
+            ),
+            
+            // Persistent Footer for Sign Out
+            Container(
+              padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, MediaQuery.of(context).padding.bottom + 16.h),
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.darkSurface : Colors.white,
+                border: Border(
+                  top: BorderSide(
+                    color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.05),
+                    width: 1,
+                  ),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: (isDark ? Colors.black : const Color(0xFF5B67F4)).withValues(alpha: 0.04),
+                    blurRadius: 24,
+                    offset: const Offset(0, -8),
+                  )
+                ],
+              ),
+              child: Builder(
+                builder: (innerContext) {
+                  return DrawerItem(
+                    icon: Icons.logout_rounded,
+                    label: 'Sign Out',
+                    active: false,
+                    isDanger: true,
+                    onTap: () {
+                      final router = ref.read(routerProvider);
+                      Navigator.of(innerContext).pop();
+                      ref.read(authControllerProvider.notifier).logout(() {
+                        router.go(RoutePaths.login);
+                      });
+                    },
+                  );
+                }
+              ),
+            ),
+          ],
         ),
       ),
       // We wrap the nested sub-views in an app bar holding drawer triggers
@@ -528,7 +428,7 @@ class NavigationShell extends ConsumerWidget {
     if (currentPath == RoutePaths.fees) return 'Fees';
     if (currentPath == RoutePaths.profile) return 'Profile';
     if (currentPath == RoutePaths.homework) return 'Homework';
-    if (currentPath == RoutePaths.notifications) return 'Notifications';
+    if (currentPath == RoutePaths.notifications) return 'Notices';
     if (currentPath == RoutePaths.timetable) return 'Timetable';
     if (currentPath == RoutePaths.enquiry) return 'Enquiry Form';
     if (currentPath == RoutePaths.content) return 'Notes & Materials';
@@ -544,109 +444,5 @@ class NavigationShell extends ConsumerWidget {
   void _go(BuildContext context, String route) {
     Navigator.of(context).pop();
     context.go(route);
-  }
-}
-
-class _DrawerSection extends StatelessWidget {
-  final String title;
-  const _DrawerSection({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(left: 8.w, top: 8.h, bottom: 6.h),
-      child: Text(
-        title.toUpperCase(),
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          letterSpacing: 1.1,
-          fontWeight: FontWeight.bold,
-          color: AppColors.textMuted,
-        ),
-      ),
-    );
-  }
-}
-
-class _DrawerItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool active;
-  final bool isDanger;
-  final Color? accent;
-  final VoidCallback onTap;
-
-  const _DrawerItem({
-    required this.icon,
-    required this.label,
-    required this.active,
-    required this.onTap,
-    this.isDanger = false,
-    this.accent,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final Color activeColor = isDanger
-        ? AppColors.error
-        : AppColors.primary;
-    final Color iconColor = isDanger
-        ? AppColors.error
-        : (active
-              ? activeColor
-              : (isDark ? AppColors.darkTextMuted : AppColors.textMuted));
-    final Color textColor = isDanger
-        ? AppColors.error
-        : (active
-              ? activeColor
-              : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary));
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12.r),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-        margin: EdgeInsets.only(bottom: 4.h),
-        decoration: BoxDecoration(
-          color: active
-              ? activeColor.withValues(alpha: 0.1)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(12.r),
-          boxShadow: active
-              ? [
-                  BoxShadow(
-                    color: activeColor.withValues(alpha: 0.08),
-                    offset: const Offset(0, 4),
-                    blurRadius: 10,
-                  ),
-                ]
-              : null,
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 30.w,
-              height: 30.w,
-              decoration: BoxDecoration(
-                color: active 
-                    ? activeColor.withValues(alpha: 0.12)
-                    : Colors.grey.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10.r),
-              ),
-              child: Icon(icon, color: iconColor, size: 18),
-            ),
-            SizedBox(width: 12.w),
-            Text(
-              label,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: textColor,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

@@ -6,6 +6,7 @@ import 'package:ascento_abacus/core/theme/app_colors.dart';
 import 'package:ascento_abacus/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:ascento_abacus/shared/models/user_model.dart';
 import 'package:ascento_abacus/shared/router/route_names.dart';
+import 'package:ascento_abacus/shared/router/app_router.dart';
 
 class StudentDrawer extends ConsumerWidget {
   const StudentDrawer({super.key});
@@ -222,7 +223,7 @@ class StudentDrawer extends ConsumerWidget {
               onTap: () async {
                 final authController = ref.read(authControllerProvider.notifier);
                 await authController.logout(() {
-                  context.go(RoutePaths.login);
+                  ref.read(routerProvider).go(RoutePaths.login);
                 });
               },
             ),

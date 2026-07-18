@@ -9,6 +9,9 @@ import 'package:ascento_abacus/core/network/interceptors/auth_interceptor.dart';
 import 'package:ascento_abacus/core/network/interceptors/retry_interceptor.dart';
 import 'package:ascento_abacus/core/network/interceptors/logging_interceptor.dart';
 import 'package:ascento_abacus/core/network/services/token_refresh_service.dart';
+import 'package:ascento_abacus/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:ascento_abacus/shared/router/app_router.dart';
+import 'package:ascento_abacus/shared/router/route_names.dart';
 
 /// Production-grade Dio HTTP client for Ascento Abacus.
 ///
@@ -452,8 +455,11 @@ final dioClientProvider = Provider<DioClient>((ref) {
     },
     onSessionExpired: () {
       AppLogger.warning('🔒 Session expired — user must re-authenticate.');
-      // Navigation to login will be handled by the RouteGuard
-      // checking isUserLoggedIn() on the next navigation event
+      // 1. Force the auth controller to reflect the logged out state
+      ref.read(authControllerProvider.notifier).logout(() {});
+      
+      // 2. Force the global router to navigate to login immediately
+      ref.read(routerProvider).go(RoutePaths.login);
     },
   );
 

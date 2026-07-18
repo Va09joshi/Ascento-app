@@ -12,6 +12,9 @@ import 'package:ascento_abacus/core/widgets/glass_container.dart';
 import 'package:ascento_abacus/shared/models/user_model.dart';
 import 'package:ascento_abacus/shared/validators/form_validators.dart';
 import 'package:ascento_abacus/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:ascento_abacus/shared/router/route_names.dart';
+
+import '../../../../core/services/storage_service.dart';
 
 class LoginView extends ConsumerStatefulWidget {
   const LoginView({super.key});
@@ -36,6 +39,19 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
       vsync: this,
       duration: const Duration(seconds: 10),
     )..repeat(reverse: true);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final storage = ref.read(storageServiceProvider);
+      setState(() {
+        _rememberMe = storage.getRememberMe();
+        if (_rememberMe) {
+          final savedEmail = storage.getRememberMeEmail();
+          if (savedEmail != null) {
+            _usernameController.text = savedEmail;
+          }
+        }
+      });
+    });
   }
 
   @override
@@ -58,18 +74,20 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
           final user = authState.currentUser;
           
           if (user?.mustChangePassword == true) {
-            context.go('/force-change-password');
+            context.go(RoutePaths.forceChangePassword);
             return;
           }
 
           final userRole = user?.role;
           
           if (userRole == UserRole.admin || userRole == UserRole.superAdmin) {
-            context.go('/admin-dashboard');
+            context.go(RoutePaths.adminDashboard);
           } else if (userRole == UserRole.teacher) {
-            context.go('/teacher-dashboard');
+            context.go(RoutePaths.teacherDashboard);
+          } else if (userRole == UserRole.student) {
+            context.go(RoutePaths.studentDashboard);
           } else {
-            context.go('/dashboard');
+            context.go(RoutePaths.dashboard);
           }
         },
       );
@@ -90,6 +108,24 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final authState = ref.watch(authControllerProvider);
+
+    ref.listen<AuthUIState>(authControllerProvider, (previous, next) {
+      if (next.errorMessage != null && next.errorMessage != previous?.errorMessage) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(child: Text(next.errorMessage!)),
+              ],
+            ),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    });
 
     return Scaffold(
       body: Container(
@@ -160,48 +196,6 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
                           AppSpacing.h32,
 
                           // Removed Welcome Text and Subtitle
-
-                          // --- Red Error Announcement Panel ---
-                          if (authState.errorMessage != null) ...[
-                            Container(
-                              padding: EdgeInsets.all(AppSpacing.p16),
-                              decoration: BoxDecoration(
-                                color: AppColors.error.withValues(alpha: 0.1),
-                                border: Border.all(
-                                  color: AppColors.error.withValues(alpha: 0.3),
-                                  width: 1.5,
-                                ),
-                                borderRadius: BorderRadius.circular(AppRadius.r12),
-                              ),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.error.withValues(alpha: 0.2),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.warning_amber_rounded,
-                                      color: AppColors.error,
-                                      size: 20,
-                                    ),
-                                  ),
-                                  AppSpacing.w12,
-                                  Expanded(
-                                    child: Text(
-                                      authState.errorMessage!,
-                                      style: theme.textTheme.bodyMedium?.copyWith(
-                                        color: AppColors.error,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            AppSpacing.h24,
-                          ],
 
                           // --- Form Fields ---
                           CustomTextField(

@@ -45,9 +45,12 @@ class RouteNames {
   static const String homework = 'homework';
   static const String meetings = 'meetings';
   static const String notifications = 'notifications';
+  static const String noticeDetails = 'noticeDetails';
+  static const String adminNoticeDetails = 'adminNoticeDetails';
   static const String addNotice = 'addNotice';
   static const String editNotice = 'editNotice';
   static const String timetable = 'timetable';
+  static const String teacherStudents = 'teacherStudents';
   static const String enquiry = 'enquiry';
   static const String programs = 'programs';
   static const String content = 'content';
@@ -100,9 +103,12 @@ class RoutePaths {
   static const String homework = '/homework';
   static const String meetings = '/meetings';
   static const String notifications = '/notifications';
+  static const String noticeDetails = '/notifications/details';
+  static const String adminNoticeDetails = '/notifications/admin-details';
   static const String addNotice = '/notifications/add';
   static const String editNotice = '/notifications/edit';
   static const String timetable = '/timetable';
+  static const String teacherStudents = '/teacher-students';
   static const String enquiry = '/enquiry';
   static const String programs = '/programs';
   static const String content = '/content';

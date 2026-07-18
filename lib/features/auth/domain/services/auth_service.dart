@@ -96,6 +96,11 @@ class AuthService {
     await _storageService.setString('secure_jwt_refresh_token', response.refreshToken);
     await _storageService.setCurrentUser(response.user);
     await _storageService.setRememberMe(rememberMe);
+    if (rememberMe) {
+      await _storageService.setRememberMeEmail(response.user.email);
+    } else {
+      await _storageService.remove('remember_me_email');
+    }
   }
 }
 

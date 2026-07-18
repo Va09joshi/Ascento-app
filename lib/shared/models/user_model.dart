@@ -27,6 +27,12 @@ class UserModel {
   final String? classId;
   final String? sectionId;
   final String? academicYearId;
+  final String? city;
+  final String? state;
+  final String? country;
+  final String? qualification;
+  final int? experience;
+  final DateTime? dateOfBirth;
 
   const UserModel({
     required this.id,
@@ -49,6 +55,12 @@ class UserModel {
     this.classId,
     this.sectionId,
     this.academicYearId,
+    this.city,
+    this.state,
+    this.country,
+    this.qualification,
+    this.experience,
+    this.dateOfBirth,
   });
 
   // Convert to JSON map
@@ -68,6 +80,12 @@ class UserModel {
       'domainId': domainId,
       'tempPassword': tempPassword,
       'must_change_password': mustChangePassword,
+      'city': city,
+      'state': state,
+      'country': country,
+      'qualification': qualification,
+      'experience': experience,
+      'date_of_birth': dateOfBirth?.toIso8601String().split('T')[0],
     };
   }
 
@@ -122,6 +140,12 @@ class UserModel {
       classId: cId,
       sectionId: sId,
       academicYearId: ayId,
+      city: json['city'] as String?,
+      state: json['state'] as String?,
+      country: json['country'] as String?,
+      qualification: json['qualification'] as String?,
+      experience: json['experience'] != null ? int.tryParse(json['experience'].toString()) : null,
+      dateOfBirth: json['date_of_birth'] != null ? DateTime.tryParse(json['date_of_birth']) : null,
     );
   }
 
@@ -139,6 +163,12 @@ class UserModel {
     String? address,
     String? domainId,
     bool? mustChangePassword,
+    String? city,
+    String? state,
+    String? country,
+    String? qualification,
+    int? experience,
+    DateTime? dateOfBirth,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -155,6 +185,12 @@ class UserModel {
       domainId: domainId ?? this.domainId,
       tempPassword: tempPassword,
       mustChangePassword: mustChangePassword ?? this.mustChangePassword,
+      city: city ?? this.city,
+      state: state ?? this.state,
+      country: country ?? this.country,
+      qualification: qualification ?? this.qualification,
+      experience: experience ?? this.experience,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
     );
   }
 }

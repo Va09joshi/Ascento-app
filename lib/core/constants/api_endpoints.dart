@@ -35,6 +35,8 @@ class ApiEndpoints {
   static const String classes        = '/classes';
   static const String sections       = '/sections';
   static const String manageUsers    = '/admin/users';
+  static const String teacherDashboard = '/teachers/dashboard';
+  static const String teacherStudents = '/teachers/my-students';
 
   // -------------------------------------------------------------------------
   // Abacus Levels & Lessons
