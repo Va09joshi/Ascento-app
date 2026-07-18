@@ -256,11 +256,13 @@ class _TeacherStudentsViewState extends ConsumerState<TeacherStudentsView> {
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
       itemCount: 4,
       itemBuilder: (context, index) {
-        return AppShimmer(
-          width: double.infinity,
-          height: 80.h,
-          borderRadius: 16.r,
-          margin: EdgeInsets.only(bottom: 16.h),
+        return Padding(
+          padding: EdgeInsets.only(bottom: 16.h),
+          child: AppShimmer(
+            width: double.infinity,
+            height: 80.h,
+            borderRadius: 16.r,
+          ),
         );
       },
     );

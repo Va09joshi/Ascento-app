@@ -17,3 +17,9 @@ final sectionTimetableProvider = FutureProvider.autoDispose<List<TimetableSlot>>
   final repository = ref.watch(timetableRepositoryProvider);
   return await repository.getSectionTimetable(sectionId);
 });
+
+// Fetch provider for teacher timetable
+final teacherTimetableProvider = FutureProvider.autoDispose<List<TimetableSlot>>((ref) async {
+  final repository = ref.watch(timetableRepositoryProvider);
+  return await repository.getTeacherTimetable();
+});

@@ -23,9 +23,9 @@ class TimetableRepository {
     }
   }
 
-  Future<List<TimetableSlot>> getTeacherTimetable(String teacherId) async {
+  Future<List<TimetableSlot>> getTeacherTimetable() async {
     try {
-      final response = await _dioClient.get('/timetable/teacher/$teacherId');
+      final response = await _dioClient.get('/timetable/my-timetable');
       if (response.data['success'] == true) {
         return (response.data['data'] as List)
             .map((json) => TimetableSlot.fromJson(json))

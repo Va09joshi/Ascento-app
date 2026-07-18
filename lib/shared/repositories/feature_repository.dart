@@ -80,6 +80,11 @@ class FeatureRepository {
     return (response.data['data'] as List).map((e) => TimetableSlot.fromJson(e)).toList();
   }
 
+  Future<List<TimetableSlot>> getTeacherTimetable() async {
+    final response = await _client.get('${ApiEndpoints.timetable}/my-timetable');
+    return (response.data['data'] as List).map((e) => TimetableSlot.fromJson(e)).toList();
+  }
+
   // ===========================================================================
   // NOTIFICATIONS
   // ===========================================================================

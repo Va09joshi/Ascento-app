@@ -23,10 +23,19 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
   String? _selectedClassId;
   String? _selectedSectionId;
   
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
   // Local state for attendance toggles before submission
   // studentId -> isPresent
   final Map<String, bool> _attendanceState = {};
   bool _isSubmitting = false;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,6 +114,7 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
                     children: [
                       Expanded(
                         child: DropdownButtonFormField<String>(
+                          isExpanded: true,
                           decoration: InputDecoration(
                             labelText: 'Class',
                             filled: true,
@@ -117,7 +127,7 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
                           value: _selectedClassId,
                           items: classesAsync.valueOrNull?.map((c) => DropdownMenuItem(
                             value: c.id,
-                            child: Text(c.name),
+                            child: Text(c.name, overflow: TextOverflow.ellipsis),
                           )).toList() ?? [],
                           onChanged: (val) {
                             setState(() {
@@ -131,6 +141,7 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
                       SizedBox(width: 16.w),
                       Expanded(
                         child: DropdownButtonFormField<String>(
+                          isExpanded: true,
                           decoration: InputDecoration(
                             labelText: 'Section',
                             filled: true,
@@ -145,7 +156,7 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
                               ?.where((s) => s.classId == _selectedClassId)
                               .map((s) => DropdownMenuItem(
                             value: s.id,
-                            child: Text(s.name),
+                            child: Text(s.name, overflow: TextOverflow.ellipsis),
                           )).toList() ?? [],
                           onChanged: (val) {
                             setState(() {
@@ -157,6 +168,28 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
                       ),
                     ],
                   ),
+                  if (_selectedSectionId != null) ...[
+                    SizedBox(height: 16.h),
+                    TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Search student by name...',
+                        prefixIcon: const Icon(Icons.search),
+                        filled: true,
+                        fillColor: isDark ? AppColors.darkSurface : AppColors.surface,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                          borderSide: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.border),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                      ),
+                      onChanged: (val) {
+                        setState(() {
+                          _searchQuery = val.toLowerCase();
+                        });
+                      },
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -190,12 +223,25 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
                           }
                         }
 
+                        final filteredStudents = students
+                            .where((s) => s.name.toLowerCase().contains(_searchQuery))
+                            .toList();
+
+                        if (filteredStudents.isEmpty && _searchQuery.isNotEmpty) {
+                          return Center(
+                            child: Text(
+                              'No students found matching "$_searchQuery".',
+                              style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.textMuted),
+                            ),
+                          );
+                        }
+
                         return ListView.separated(
                           padding: EdgeInsets.fromLTRB(24.w, 0, 24.w, 100.h),
-                          itemCount: students.length,
+                          itemCount: filteredStudents.length,
                           separatorBuilder: (_, __) => Divider(color: isDark ? AppColors.darkBorder : AppColors.border, height: 1),
                           itemBuilder: (context, index) {
-                            final student = students[index];
+                            final student = filteredStudents[index];
                             final isPresent = _attendanceState[student.id] ?? true;
                             
                             return ListTile(

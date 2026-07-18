@@ -376,46 +376,26 @@ class _HeaderCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(22.w),
       decoration: BoxDecoration(
-        gradient: isDark 
-          ? const LinearGradient(
-              colors: [Color(0xFF2A2D3E), Color(0xFF1F212E)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            )
-          : const LinearGradient(
-              colors: [Color(0xFF5B67F4), Color(0xFF3442E5)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-        borderRadius: BorderRadius.circular(28.r),
-        boxShadow: [
-          BoxShadow(
-            color: (isDark ? Colors.black : const Color(0xFF5B67F4)).withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        color: isDark ? AppColors.darkSurface : AppColors.primary,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : Colors.transparent,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 2),
-                ),
-                child: CircleAvatar(
-                  radius: 26.r,
-                  backgroundColor: Colors.white.withValues(alpha: 0.15),
-                  child: Text(
-                    userName.isNotEmpty ? userName[0].toUpperCase() : 'T',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                      fontSize: 22.sp,
-                      color: Colors.white,
-                    ),
+              CircleAvatar(
+                radius: 24.r,
+                backgroundColor: isDark ? AppColors.darkPrimary.withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.2),
+                child: Text(
+                  userName.isNotEmpty ? userName[0].toUpperCase() : 'T',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 20.sp,
+                    color: isDark ? AppColors.darkPrimary : Colors.white,
                   ),
                 ),
               ),
@@ -425,20 +405,18 @@ class _HeaderCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Welcome back',
+                      'Welcome back,',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.7),
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.5,
+                        color: isDark ? Colors.white70 : Colors.white.withValues(alpha: 0.9),
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                     SizedBox(height: 2.h),
                     Text(
                       userName,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                        letterSpacing: -0.5,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: isDark ? Colors.white : Colors.white,
                       ),
                     ),
                   ],
@@ -450,18 +428,14 @@ class _HeaderCard extends StatelessWidget {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(16.r),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.1),
-                width: 1,
-              ),
+              color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8.r),
             ),
             child: Row(
               children: [
                 Icon(
-                  Icons.auto_awesome_rounded,
-                  color: Colors.white.withValues(alpha: 0.9),
+                  Icons.info_outline_rounded,
+                  color: isDark ? Colors.white70 : Colors.white,
                   size: 18,
                 ),
                 SizedBox(width: 10.w),
@@ -469,8 +443,8 @@ class _HeaderCard extends StatelessWidget {
                   child: Text(
                     subtitle,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: Colors.white.withValues(alpha: 0.9),
-                      fontWeight: FontWeight.w600,
+                      color: isDark ? Colors.white70 : Colors.white,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
@@ -502,58 +476,39 @@ class _StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      padding: EdgeInsets.all(18.w),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurface : AppColors.surface,
-        borderRadius: BorderRadius.circular(24.r),
+        borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color: isDark ? AppColors.darkBorder : AppColors.border,
-          width: 1.5,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: EdgeInsets.all(12.w),
+            padding: EdgeInsets.all(10.w),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  color.withValues(alpha: 0.2),
-                  color.withValues(alpha: 0.05),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(16.r),
-              border: Border.all(
-                color: color.withValues(alpha: 0.1),
-              ),
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8.r),
             ),
-            child: Icon(icon, color: color, size: 24),
+            child: Icon(icon, color: color, size: 20),
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 12.h),
           Text(
             title,
             style: theme.textTheme.bodySmall?.copyWith(
               color: AppColors.textMuted,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w500,
             ),
           ),
           SizedBox(height: 4.h),
           Text(
             value,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w900,
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w700,
               color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
-              letterSpacing: -0.5,
             ),
           ),
         ],
@@ -584,32 +539,24 @@ class _QuickAction extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            width: 64.w,
-            height: 64.w,
+            width: 56.w,
+            height: 56.w,
             decoration: BoxDecoration(
-              color: isDark ? AppColors.darkSurface : AppColors.surface,
-              borderRadius: BorderRadius.circular(20.r),
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12.r),
               border: Border.all(
-                color: color.withValues(alpha: 0.3),
-                width: 1.5,
+                color: color.withValues(alpha: 0.2),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: color.withValues(alpha: 0.15),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
             ),
             child: Center(
-              child: Icon(icon, color: color, size: 28),
+              child: Icon(icon, color: color, size: 24),
             ),
           ),
-          SizedBox(height: 10.h),
+          SizedBox(height: 8.h),
           Text(
             label,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w500,
               color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
             ),
           ),
