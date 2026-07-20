@@ -1,15 +1,26 @@
-# ascento_abacus
+# Ascento App
 
-A new Flutter project.
+Ascento App is a Flutter application for the Ascento Abacus platform. 
+It features modules for notifications, enquiries, and other abacus-related operations.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+To get started with the Ascento App:
 
-A few resources to get you started if this is your first Flutter project:
+1. Clone the repository.
+2. Ensure you have [Flutter](https://docs.flutter.dev/get-started/install) installed.
+3. Run `flutter pub get` to install dependencies.
+4. Run `flutter run` to launch the application on your connected device or emulator.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Features
+
+* **Notifications**: Stay updated with the latest alerts.
+* **Enquiries**: Manage and track enquiries efficiently.
+* **Timetable**: View schedules (integrated with backend).
+
+## Project Structure
+
+This project follows a feature-first architecture, separating presentation, domain, and data layers within each feature.
 
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
