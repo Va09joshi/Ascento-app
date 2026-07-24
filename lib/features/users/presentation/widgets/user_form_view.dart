@@ -6,6 +6,7 @@ import 'package:ascento_abacus/core/widgets/custom_button.dart';
 import 'package:ascento_abacus/core/widgets/custom_textfield.dart';
 import 'package:ascento_abacus/features/users/data/repositories/users_repository.dart';
 import 'package:ascento_abacus/features/users/presentation/providers/users_provider.dart';
+import 'package:ascento_abacus/features/users/presentation/providers/teachers_provider.dart';
 import 'package:ascento_abacus/features/domains/presentation/providers/domains_provider.dart';
 import 'package:ascento_abacus/shared/models/user_model.dart';
 import 'package:image_picker/image_picker.dart';
@@ -181,6 +182,9 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
       }
       
       ref.invalidate(usersListProvider(_selectedRole));
+      if (_selectedRole == 'teacher') {
+        ref.invalidate(teachersProvider);
+      }
       if (mounted) {
         if (createdUser?.tempPassword != null) {
           await showDialog(
