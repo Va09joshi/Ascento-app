@@ -178,7 +178,7 @@ class _SectionFormViewState extends ConsumerState<SectionFormView> {
                       ),
                       SizedBox(height: 20.h),
                       ref.watch(usersListProvider('teacher')).when(
-                        data: (teachers) => DropdownButtonFormField<String>(
+                        data: (teachers) => DropdownButtonFormField<String?>(
                           decoration: InputDecoration(
                             labelText: 'Assign Teacher',
                             prefixIcon: const Icon(Icons.person_rounded),
