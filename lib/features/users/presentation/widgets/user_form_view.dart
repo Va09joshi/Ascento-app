@@ -156,7 +156,7 @@ class _UserFormViewState extends ConsumerState<UserFormView> {
         'phone': _phoneController.text.trim(),
         'role': _selectedRole,
         'gender': _selectedGender?.toLowerCase(),
-        'is_active': _selectedStatus == 'active',
+        'is_active': _selectedStatus?.toLowerCase() == 'active',
         'address': _addressController.text.trim(),
         if (_selectedDomain != null) 'domain_id': _selectedDomain,
         if (_selectedRole == 'student') 'parent_name': _parentNameController.text.trim(),
