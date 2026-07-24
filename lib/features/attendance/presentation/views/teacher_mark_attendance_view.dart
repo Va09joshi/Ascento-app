@@ -226,54 +226,70 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
                         final filteredStudents = students
                             .where((s) => s.name.toLowerCase().contains(_searchQuery))
                             .toList();
-
-                        if (filteredStudents.isEmpty && _searchQuery.isNotEmpty) {
-                          return Center(
-                            child: Text(
-                              'No students found matching "$_searchQuery".',
-                              style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.textMuted),
-                            ),
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 8.h),
+                                child: Text(
+                                  'Total Students: ${students.length}',
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark ? Colors.white : AppColors.textPrimary,
+                                  ),
+                                ),
+                              ),
+                              if (filteredStudents.isEmpty && _searchQuery.isNotEmpty)
+                                Expanded(
+                                  child: Center(
+                                    child: Text(
+                                      'No students found matching "$_searchQuery".',
+                                      style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.textMuted),
+                                    ),
+                                  ),
+                                )
+                              else
+                                Expanded(
+                                  child: ListView.separated(
+                                    padding: EdgeInsets.fromLTRB(24.w, 0, 24.w, 100.h),
+                                    itemCount: filteredStudents.length,
+                                    separatorBuilder: (_, __) => Divider(color: isDark ? AppColors.darkBorder : AppColors.border, height: 1),
+                                    itemBuilder: (context, index) {
+                                      final student = filteredStudents[index];
+                                      final isPresent = _attendanceState[student.id] ?? true;
+                                      
+                                      return ListTile(
+                                        contentPadding: EdgeInsets.symmetric(vertical: 8.h),
+                                        leading: CircleAvatar(
+                                          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                                          backgroundImage: student.avatarUrl != null ? NetworkImage(student.avatarUrl!) : null,
+                                          child: student.avatarUrl == null
+                                              ? Text(student.name.isNotEmpty ? student.name[0] : 'S', style: const TextStyle(color: AppColors.primary))
+                                              : null,
+                                        ),
+                                        title: Text(student.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+                                        subtitle: Text(student.email, style: TextStyle(fontSize: 12.sp, color: AppColors.textMuted)),
+                                        trailing: Switch(
+                                          value: isPresent,
+                                          activeColor: AppColors.success,
+                                          inactiveThumbColor: AppColors.error,
+                                          inactiveTrackColor: AppColors.error.withValues(alpha: 0.3),
+                                          onChanged: (val) {
+                                            setState(() {
+                                              _attendanceState[student.id] = val;
+                                            });
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                            ],
                           );
-                        }
-
-                        return ListView.separated(
-                          padding: EdgeInsets.fromLTRB(24.w, 0, 24.w, 100.h),
-                          itemCount: filteredStudents.length,
-                          separatorBuilder: (_, __) => Divider(color: isDark ? AppColors.darkBorder : AppColors.border, height: 1),
-                          itemBuilder: (context, index) {
-                            final student = filteredStudents[index];
-                            final isPresent = _attendanceState[student.id] ?? true;
-                            
-                            return ListTile(
-                              contentPadding: EdgeInsets.symmetric(vertical: 8.h),
-                              leading: CircleAvatar(
-                                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                                backgroundImage: student.avatarUrl != null ? NetworkImage(student.avatarUrl!) : null,
-                                child: student.avatarUrl == null
-                                    ? Text(student.name.isNotEmpty ? student.name[0] : 'S', style: const TextStyle(color: AppColors.primary))
-                                    : null,
-                              ),
-                              title: Text(student.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                              subtitle: Text(student.email, style: TextStyle(fontSize: 12.sp, color: AppColors.textMuted)),
-                              trailing: Switch(
-                                value: isPresent,
-                                activeColor: AppColors.success,
-                                inactiveThumbColor: AppColors.error,
-                                inactiveTrackColor: AppColors.error.withValues(alpha: 0.3),
-                                onChanged: (val) {
-                                  setState(() {
-                                    _attendanceState[student.id] = val;
-                                  });
-                                },
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    ),
-            ),
-          ],
-        ),
+                        },
+                      ),
+              ),
+            ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: _selectedSectionId != null 

@@ -8,6 +8,7 @@ import 'package:ascento_abacus/core/widgets/custom_textfield.dart';
 import 'package:ascento_abacus/shared/models/section_model.dart';
 import 'package:ascento_abacus/features/academics/data/repositories/academics_repository.dart';
 import 'package:ascento_abacus/features/academics/presentation/providers/academics_provider.dart';
+import 'package:ascento_abacus/features/users/presentation/providers/users_provider.dart';
 import 'package:go_router/go_router.dart';
 
 class SectionFormView extends ConsumerStatefulWidget {
@@ -24,6 +25,7 @@ class _SectionFormViewState extends ConsumerState<SectionFormView> {
   late TextEditingController _nameController;
   late TextEditingController _maxStudentsController;
   String? _selectedClassId;
+  String? _selectedTeacherId;
   bool _isLoading = false;
 
   @override
@@ -32,6 +34,7 @@ class _SectionFormViewState extends ConsumerState<SectionFormView> {
     _nameController = TextEditingController(text: widget.section?.name ?? '');
     _maxStudentsController = TextEditingController(text: widget.section?.maxStudents.toString() ?? '');
     _selectedClassId = widget.section?.classId;
+    _selectedTeacherId = widget.section?.teacherId;
   }
 
   @override
@@ -55,6 +58,7 @@ class _SectionFormViewState extends ConsumerState<SectionFormView> {
         'name': _nameController.text.trim(),
         'class_id': _selectedClassId,
         'max_students': int.tryParse(_maxStudentsController.text.trim()) ?? 40,
+        if (_selectedTeacherId != null) 'teacher_id': _selectedTeacherId,
       };
 
       if (widget.section == null) {
@@ -171,6 +175,31 @@ class _SectionFormViewState extends ConsumerState<SectionFormView> {
                         keyboardType: TextInputType.number,
                         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                         validator: (value) => value == null || value.isEmpty ? 'Required' : null,
+                      ),
+                      SizedBox(height: 20.h),
+                      ref.watch(usersListProvider('teacher')).when(
+                        data: (teachers) => DropdownButtonFormField<String>(
+                          decoration: InputDecoration(
+                            labelText: 'Assign Teacher',
+                            prefixIcon: const Icon(Icons.person_rounded),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                              borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                              borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12),
+                            ),
+                          ),
+                          value: _selectedTeacherId,
+                          items: [
+                            const DropdownMenuItem(value: null, child: Text('No Teacher assigned')),
+                            ...teachers.map((t) => DropdownMenuItem(value: t.id, child: Text(t.name))),
+                          ],
+                          onChanged: (val) => setState(() => _selectedTeacherId = val),
+                        ),
+                        loading: () => const Center(child: CircularProgressIndicator()),
+                        error: (e, s) => Text('Error loading teachers: $e'),
                       ),
                     ],
                   ),

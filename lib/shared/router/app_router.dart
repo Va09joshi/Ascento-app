@@ -38,6 +38,7 @@ import 'package:ascento_abacus/features/profile/presentation/views/profile_view.
 import 'package:ascento_abacus/features/timetable/presentation/views/timetable_management_view.dart';
 import 'package:ascento_abacus/features/timetable/presentation/views/timetable_view.dart';
 import 'package:ascento_abacus/features/courses/presentation/views/courses_management_view.dart';
+import 'package:ascento_abacus/features/users/presentation/views/teacher_students_view.dart';
 import 'package:ascento_abacus/features/users/presentation/views/users_management_view.dart';
 import 'package:ascento_abacus/features/users/presentation/views/teachers_management_view.dart';
 import 'package:ascento_abacus/features/users/presentation/widgets/user_form_view.dart';
@@ -438,17 +439,29 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
             name: RouteNames.timetable,
             pageBuilder: (context, state) {
               final authState = ref.watch(authControllerProvider);
-              final isStudent = authState.currentUser?.role == UserRole.student;
+              final isStudentOrTeacher = authState.currentUser?.role == UserRole.student || authState.currentUser?.role == UserRole.teacher;
               
               return CustomTransitionPage(
                 key: state.pageKey,
-                child: isStudent ? const TimetableView() : const TimetableManagementView(),
+                child: isStudentOrTeacher ? const TimetableView() : const TimetableManagementView(),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
                       return FadeTransition(opacity: animation, child: child);
                     },
               );
             },
+          ),
+          GoRoute(
+            path: RoutePaths.teacherStudents,
+            name: RouteNames.teacherStudents,
+            pageBuilder: (context, state) => CustomTransitionPage(
+              key: state.pageKey,
+              child: const TeacherStudentsView(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+            ),
           ),
           GoRoute(
             path: RoutePaths.enquiry,

@@ -9,7 +9,11 @@ import 'package:ascento_abacus/shared/models/feature_models.dart';
 import 'package:ascento_abacus/features/homework/presentation/providers/homework_provider.dart';
 import 'package:ascento_abacus/features/homework/data/repositories/homework_repository.dart';
 import 'package:ascento_abacus/features/academics/presentation/providers/academics_provider.dart';
+import 'package:ascento_abacus/features/users/presentation/providers/teachers_provider.dart';
+import 'package:ascento_abacus/core/network/dio_client.dart';
 import 'package:intl/intl.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:dio/dio.dart';
 
 class HomeworkTeacherView extends ConsumerStatefulWidget {
   const HomeworkTeacherView({super.key});
@@ -124,7 +128,9 @@ class _CreateHomeworkDialogState extends ConsumerState<_CreateHomeworkDialog> {
   String? _selectedClassId;
   String? _selectedSectionId;
   String? _selectedSubjectId;
-
+  
+  String? _uploadedPdfUrl;
+  bool _isUploadingPdf = false;
   bool _isSubmitting = false;
 
   @override
@@ -139,9 +145,28 @@ class _CreateHomeworkDialogState extends ConsumerState<_CreateHomeworkDialog> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     
-    final classesAsync = ref.watch(classesListProvider);
-    final sectionsAsync = ref.watch(sectionsListProvider);
+    // Use myStudentsProvider for assigned classes/sections
+    final myStudentsAsync = ref.watch(myStudentsProvider);
     final subjectsAsync = ref.watch(subjectsListProvider);
+
+    // Extract unique classes from the assigned sections
+    final uniqueClasses = <String, Map<String, dynamic>>{};
+    if (myStudentsAsync.value != null) {
+      for (var section in myStudentsAsync.value!) {
+        if (section['class_id'] != null && section['class_name'] != null) {
+          uniqueClasses[section['class_id']] = {
+            'id': section['class_id'],
+            'name': section['class_name']
+          };
+        }
+      }
+    }
+    final classItems = uniqueClasses.values.toList();
+
+    // Extract sections for the selected class
+    final sectionItems = (myStudentsAsync.value ?? [])
+        .where((s) => s['class_id'] == _selectedClassId)
+        .toList();
 
     return AlertDialog(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
@@ -150,6 +175,7 @@ class _CreateHomeworkDialogState extends ConsumerState<_CreateHomeworkDialog> {
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextField(
               controller: _titleController,
@@ -171,10 +197,10 @@ class _CreateHomeworkDialogState extends ConsumerState<_CreateHomeworkDialog> {
                     isExpanded: true,
                     decoration: _inputDecoration('Class', isDark),
                     value: _selectedClassId,
-                    items: classesAsync.valueOrNull?.map((c) => DropdownMenuItem(
-                      value: c.id,
-                      child: Text(c.name, overflow: TextOverflow.ellipsis),
-                    )).toList() ?? [],
+                    items: classItems.map((c) => DropdownMenuItem(
+                      value: c['id'] as String,
+                      child: Text(c['name'] as String, overflow: TextOverflow.ellipsis),
+                    )).toList(),
                     onChanged: (val) {
                       setState(() {
                         _selectedClassId = val;
@@ -189,12 +215,10 @@ class _CreateHomeworkDialogState extends ConsumerState<_CreateHomeworkDialog> {
                     isExpanded: true,
                     decoration: _inputDecoration('Section', isDark),
                     value: _selectedSectionId,
-                    items: sectionsAsync.valueOrNull
-                        ?.where((s) => s.classId == _selectedClassId)
-                        .map((s) => DropdownMenuItem(
-                      value: s.id,
-                      child: Text(s.name, overflow: TextOverflow.ellipsis),
-                    )).toList() ?? [],
+                    items: sectionItems.map((s) => DropdownMenuItem(
+                      value: s['section_id'] as String,
+                      child: Text(s['section_name'] as String, overflow: TextOverflow.ellipsis),
+                    )).toList(),
                     onChanged: (val) => setState(() => _selectedSectionId = val),
                   ),
                 ),
@@ -243,6 +267,47 @@ class _CreateHomeworkDialogState extends ConsumerState<_CreateHomeworkDialog> {
                 ),
               ),
             ),
+            SizedBox(height: 16.h),
+            
+            // PDF Upload Button
+            OutlinedButton.icon(
+              onPressed: _isUploadingPdf ? null : () async {
+                final result = await FilePicker.platform.pickFiles(
+                  type: FileType.custom,
+                  allowedExtensions: ['pdf'],
+                );
+                if (result != null && result.files.single.path != null) {
+                  setState(() => _isUploadingPdf = true);
+                  try {
+                    final dioClient = ref.read(dioClientProvider);
+                    final formData = FormData.fromMap({
+                      'file': await MultipartFile.fromFile(result.files.single.path!),
+                    });
+                    final response = await dioClient.post('/uploads/document', data: formData);
+                    if (response.data['success'] == true) {
+                      setState(() {
+                        _uploadedPdfUrl = response.data['data']['url'];
+                      });
+                      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('PDF Uploaded successfully!')));
+                    } else {
+                      throw Exception('Failed to upload PDF');
+                    }
+                  } catch (e) {
+                    if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                  } finally {
+                    if (mounted) setState(() => _isUploadingPdf = false);
+                  }
+                }
+              },
+              icon: _isUploadingPdf 
+                ? SizedBox(width: 16.w, height: 16.w, child: CircularProgressIndicator(strokeWidth: 2))
+                : Icon(_uploadedPdfUrl != null ? Icons.check_circle : Icons.picture_as_pdf, color: _uploadedPdfUrl != null ? AppColors.success : null),
+              label: Text(_uploadedPdfUrl != null ? 'PDF Uploaded' : 'Upload PDF Document'),
+              style: OutlinedButton.styleFrom(
+                padding: EdgeInsets.symmetric(vertical: 16.h),
+                side: BorderSide(color: _uploadedPdfUrl != null ? AppColors.success : (isDark ? AppColors.darkBorder : AppColors.border)),
+              ),
+            ),
           ],
         ),
       ),
@@ -253,7 +318,7 @@ class _CreateHomeworkDialogState extends ConsumerState<_CreateHomeworkDialog> {
         ),
         CustomButton(
           text: 'Publish',
-          isLoading: _isSubmitting,
+          isLoading: _isSubmitting || _isUploadingPdf,
           onPressed: () async {
             if (_titleController.text.isEmpty || _selectedSectionId == null || _selectedSubjectId == null) {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please fill all required fields.')));
@@ -266,8 +331,10 @@ class _CreateHomeworkDialogState extends ConsumerState<_CreateHomeworkDialog> {
                 'title': _titleController.text,
                 'description': _descriptionController.text,
                 'due_date': _selectedDate.toIso8601String(),
+                'class_id': _selectedClassId,
                 'section_id': _selectedSectionId,
                 'subject_id': _selectedSubjectId,
+                if (_uploadedPdfUrl != null) 'file_url': _uploadedPdfUrl,
               });
               
               ref.invalidate(homeworkListProvider); // Refresh list

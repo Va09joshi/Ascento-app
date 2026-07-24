@@ -28,4 +28,9 @@ class TeachersRepository {
   Future<void> deactivateTeacher(String id) async {
     await _dioClient.delete('/teachers/$id');
   }
+
+  Future<List<dynamic>> getMyStudentsBySection() async {
+    final response = await _dioClient.get('/teachers/my-students');
+    return response.data['data'] as List;
+  }
 }

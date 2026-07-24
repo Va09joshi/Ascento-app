@@ -13,6 +13,11 @@ final teachersProvider = FutureProvider.autoDispose<List<UserModel>>((ref) async
   return repo.getTeachers();
 });
 
+final myStudentsProvider = FutureProvider.autoDispose<List<dynamic>>((ref) async {
+  final repo = ref.watch(teachersRepositoryProvider);
+  return repo.getMyStudentsBySection();
+});
+
 class TeachersNotifier extends StateNotifier<AsyncValue<void>> {
   final TeachersRepository _repository;
   final Ref _ref;

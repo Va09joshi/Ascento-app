@@ -41,6 +41,13 @@ class TeacherDrawer extends StatelessWidget {
           onTap: () => onNavigate(RoutePaths.timetable),
         ),
         DrawerItem(
+          icon: Icons.people_alt_rounded,
+          label: 'My Students',
+          active: currentPath == RoutePaths.teacherStudents,
+          accent: const Color(0xFF2E86C1),
+          onTap: () => onNavigate(RoutePaths.teacherStudents),
+        ),
+        DrawerItem(
           icon: Icons.assignment_turned_in_rounded,
           label: 'Homework & Grades',
           active: currentPath == RoutePaths.homework,
