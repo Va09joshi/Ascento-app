@@ -12,7 +12,20 @@ class TimetableRepository {
     try {
       final response = await _dioClient.get('/timetable/section/$sectionId');
       if (response.data['success'] == true) {
-        return (response.data['data'] as List)
+        final data = response.data['data'];
+        List jsonList = [];
+        if (data is List) {
+          jsonList = data;
+        } else if (data is Map) {
+          if (data.containsKey('timetable') && data['timetable'] is List) {
+            jsonList = data['timetable'] as List;
+          } else if (data.containsKey('slots') && data['slots'] is List) {
+            jsonList = data['slots'] as List;
+          } else if (data.containsKey('data') && data['data'] is List) {
+            jsonList = data['data'] as List;
+          }
+        }
+        return jsonList
             .map((json) => TimetableSlot.fromJson(json))
             .toList();
       }
@@ -27,7 +40,20 @@ class TimetableRepository {
     try {
       final response = await _dioClient.get('/timetable/my-timetable');
       if (response.data['success'] == true) {
-        return (response.data['data'] as List)
+        final data = response.data['data'];
+        List jsonList = [];
+        if (data is List) {
+          jsonList = data;
+        } else if (data is Map) {
+          if (data.containsKey('timetable') && data['timetable'] is List) {
+            jsonList = data['timetable'] as List;
+          } else if (data.containsKey('slots') && data['slots'] is List) {
+            jsonList = data['slots'] as List;
+          } else if (data.containsKey('data') && data['data'] is List) {
+            jsonList = data['data'] as List;
+          }
+        }
+        return jsonList
             .map((json) => TimetableSlot.fromJson(json))
             .toList();
       }

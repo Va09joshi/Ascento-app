@@ -127,7 +127,6 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-/// Empty state placeholder with illustration, message, and optional CTA.
 class EmptyStateWidget extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -148,36 +147,107 @@ class EmptyStateWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final baseColor = isDark ? AppColors.darkPrimary : AppColors.primary;
 
     return Center(
       child: Padding(
-        padding: EdgeInsets.all(32.w),
+        padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 48.h),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              padding: EdgeInsets.all(24.w),
-              decoration: BoxDecoration(
-                color: (isDark ? AppColors.darkPrimary : AppColors.primary).withValues(alpha: 0.08),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, size: 56.r,
-                  color: isDark ? AppColors.darkPrimary : AppColors.primary),
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                // Outer subtle ring
+                Container(
+                  width: 140.r,
+                  height: 140.r,
+                  decoration: BoxDecoration(
+                    color: baseColor.withValues(alpha: 0.03),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                // Inner subtle ring
+                Container(
+                  width: 105.r,
+                  height: 105.r,
+                  decoration: BoxDecoration(
+                    color: baseColor.withValues(alpha: 0.06),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                // Main icon container with gradient and shadow
+                Container(
+                  padding: EdgeInsets.all(24.r),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        baseColor.withValues(alpha: 0.15),
+                        baseColor.withValues(alpha: 0.05),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: baseColor.withValues(alpha: 0.15),
+                        blurRadius: 24,
+                        offset: const Offset(0, 8),
+                      )
+                    ],
+                    border: Border.all(
+                      color: baseColor.withValues(alpha: 0.2),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Icon(
+                    icon, 
+                    size: 48.r,
+                    color: baseColor,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 24.h),
-            Text(title, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center),
-            SizedBox(height: 8.h),
-            Text(subtitle, style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey),
-                textAlign: TextAlign.center),
+            SizedBox(height: 32.h),
+            Text(
+              title, 
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.5,
+                color: isDark ? Colors.white : AppColors.textPrimary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 12.h),
+            Text(
+              subtitle, 
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
             if (actionText != null && onAction != null) ...[
-              SizedBox(height: 24.h),
-              TextButton(
+              SizedBox(height: 32.h),
+              ElevatedButton(
                 onPressed: onAction,
-                child: Text(actionText!, style: TextStyle(
-                  color: isDark ? AppColors.darkPrimary : AppColors.primary,
-                  fontWeight: FontWeight.bold,
-                )),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: baseColor,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                ),
+                child: Text(
+                  actionText!, 
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14.sp,
+                  ),
+                ),
               ),
             ],
           ],

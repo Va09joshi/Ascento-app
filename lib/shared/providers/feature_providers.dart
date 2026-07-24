@@ -49,8 +49,8 @@ final reportCardProvider = FutureProvider.family<ReportCard, String>((ref, examI
 // =============================================================================
 
 final weeklyTimetableProvider = FutureProvider<List<TimetableSlot>>((ref) async {
-  final user = ref.watch(authStateProvider).value;
-  if (user?.role == 'teacher') {
+  final user = ref.read(authControllerProvider).currentUser;
+  if (user?.role == UserRole.teacher) {
     return ref.watch(featureRepositoryProvider).getTeacherTimetable();
   }
   return ref.watch(featureRepositoryProvider).getWeeklyTimetable();

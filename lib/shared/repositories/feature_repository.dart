@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ascento_abacus/core/logging/app_logger.dart';
 import 'package:ascento_abacus/core/network/dio_client.dart';
 import 'package:ascento_abacus/core/constants/api_endpoints.dart';
 import 'package:dio/dio.dart';
@@ -18,7 +17,8 @@ class FeatureRepository {
 
   Future<AttendanceSummary> getAttendanceSummary() async {
     final response = await _client.get(ApiEndpoints.attendanceReport);
-    return AttendanceSummary.fromJson(response.data);
+    final data = response.data['data'] ?? response.data;
+    return AttendanceSummary.fromJson(data);
   }
 
   Future<List<AttendanceRecord>> getMonthlyAttendance(int month, int year) async {
@@ -113,7 +113,9 @@ class FeatureRepository {
     return StudentProfile(
       user: UserModel.fromJson(data),
       className: sectionData?['sections']?['classes']?['name'] ?? '',
+      classId: sectionData?['sections']?['class_id'],
       section: sectionData?['sections']?['name'] ?? '',
+      sectionId: sectionData?['section_id'],
       rollNumber: sectionData?['roll_number'] ?? '',
       fatherName: data['parent_name'], 
       motherName: null,
@@ -121,6 +123,7 @@ class FeatureRepository {
       address: data['address'],
       bloodGroup: null, 
       dateOfBirth: data['date_of_birth'] != null ? DateTime.tryParse(data['date_of_birth']) : null,
+      timetablePdfUrl: sectionData?['sections']?['timetable_pdf_url'],
     );
   }
 

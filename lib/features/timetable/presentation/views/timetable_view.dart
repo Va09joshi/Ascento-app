@@ -8,6 +8,9 @@ import 'package:ascento_abacus/core/widgets/app_shimmer.dart';
 import 'package:ascento_abacus/core/widgets/responsive_builder.dart';
 import 'package:ascento_abacus/shared/models/feature_models.dart';
 import 'package:ascento_abacus/shared/providers/feature_providers.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:ascento_abacus/features/timetable/utils/timetable_pdf_generator.dart';
+import 'package:ascento_abacus/features/timetable/presentation/views/timetable_pdf_preview_screen.dart';
 
 import '../../../../core/widgets/app_page_widgets.dart';
 
@@ -99,143 +102,161 @@ class _TimetableViewState extends ConsumerState<TimetableView> {
                 children: [
                   // The top descriptions are removed for a cleaner look.
 
-                  // View Toggle Switcher (Daily Grid vs Weekly Matrix)
-                  Container(
-                    height: 46.h,
-                    padding: EdgeInsets.all(4.w),
-                    decoration: BoxDecoration(
-                      color: isDark ? AppColors.darkSurface : AppColors.surface,
-                      borderRadius: BorderRadius.circular(14.r),
-                      border: Border.all(
-                        color: isDark ? AppColors.darkBorder : AppColors.border,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Class Schedule',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : AppColors.textPrimary,
+                        ),
                       ),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () => setState(() => _viewMode = TimetableViewMode.daily),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              decoration: BoxDecoration(
-                                color: _viewMode == TimetableViewMode.daily
-                                    ? (isDark ? AppColors.darkPrimary : AppColors.primary)
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(10.r),
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                'Daily Grid',
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                  color: _viewMode == TimetableViewMode.daily
-                                      ? Colors.white
-                                      : AppColors.textMuted,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () => setState(() => _viewMode = TimetableViewMode.weekly),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              decoration: BoxDecoration(
-                                color: _viewMode == TimetableViewMode.weekly
-                                    ? (isDark ? AppColors.darkPrimary : AppColors.primary)
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(10.r),
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                'Weekly Matrix',
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                  color: _viewMode == TimetableViewMode.weekly
-                                      ? Colors.white
-                                      : AppColors.textMuted,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 18.h),
+                      Consumer(
+                        builder: (context, ref, child) {
+                          final profile = ref.watch(studentProfileProvider).valueOrNull;
+                          // Show for everyone; if student has PDF, launch it, else generate it
+                          return Tooltip(
+                            message: 'Download/View PDF Timetable',
+                            child: InkWell(
+                              onTap: () async {
+                                if (profile != null && profile.timetablePdfUrl != null && profile.timetablePdfUrl!.isNotEmpty) {
+                                  final url = Uri.tryParse(profile.timetablePdfUrl!);
+                                  if (url != null && await canLaunchUrl(url)) {
+                                    await launchUrl(url, mode: LaunchMode.externalApplication);
+                                    return;
+                                  }
+                                }
+                                
+                                // Fallback: Generate PDF from slots
+                                if (slots.isEmpty) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No timetable slots available to generate PDF')));
+                                  }
+                                  return;
+                                }
 
-                  // Show horizontal days selector only in Daily View
-                  if (_viewMode == TimetableViewMode.daily) ...[
-                    SizedBox(
-                      height: 72.h,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: _dayShortNames.length,
-                        separatorBuilder: (_, _) => SizedBox(width: 10.w),
-                        itemBuilder: (context, index) {
-                          final day = index + 1;
-                          final isSelected = _selectedDay == day;
-                          final count = slots.where((slot) => slot.dayOfWeek == day).length;
-
-                          return GestureDetector(
-                            onTap: () => setState(() => _selectedDay = day),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 180),
-                              width: 90.w,
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 10.w,
-                                vertical: 10.h,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? (isDark
-                                          ? AppColors.darkPrimary
-                                          : AppColors.primary)
-                                    : (isDark
-                                          ? AppColors.darkSurface
-                                          : AppColors.surface),
-                                borderRadius: BorderRadius.circular(16.r),
-                                border: Border.all(
-                                  color: isSelected
-                                      ? Colors.transparent
-                                      : (isDark
-                                            ? AppColors.darkBorder
-                                            : AppColors.border),
+                                try {
+                                  final className = profile?.className.isNotEmpty == true ? profile!.className : 'General';
+                                  final section = profile?.section.isNotEmpty == true ? profile!.section : '';
+                                  final pdfBytes = await TimetablePdfGenerator.generatePdfBytes(
+                                    slots,
+                                    className,
+                                    section,
+                                  );
+                                  if (context.mounted) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => TimetablePdfPreviewScreen(
+                                          pdfBytes: pdfBytes,
+                                          title: 'Timetable $className $section',
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to generate PDF: $e')));
+                                  }
+                                }
+                              },
+                              borderRadius: BorderRadius.circular(14.r),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(14.r),
+                                  border: Border.all(
+                                    color: const Color(0xFFEF4444).withValues(alpha: 0.3),
+                                  ),
                                 ),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    _dayShortNames[index],
-                                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.w800,
-                                      color: isSelected
-                                          ? Colors.white
-                                          : (isDark
-                                                ? AppColors.darkTextPrimary
-                                                : AppColors.textPrimary),
-                                    ),
-                                  ),
-                                  SizedBox(height: 6.h),
-                                  Text(
-                                    '$count class',
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: isSelected
-                                          ? Colors.white.withValues(alpha: 0.85)
-                                          : AppColors.textMuted,
-                                    ),
-                                  ),
-                                ],
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.picture_as_pdf_rounded, color: const Color(0xFFEF4444), size: 20.r),
+                                    SizedBox(width: 8.w),
+                                    Text('View PDF', style: TextStyle(color: const Color(0xFFEF4444), fontWeight: FontWeight.bold, fontSize: 12.sp)),
+                                  ],
+                                ),
                               ),
                             ),
                           );
                         },
                       ),
+                    ],
+                  ),
+                  SizedBox(height: 18.h),
+
+                  SizedBox(
+                    height: 44.h,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _dayShortNames.length,
+                      separatorBuilder: (_, _) => SizedBox(width: 8.w),
+                      itemBuilder: (context, index) {
+                        final day = index + 1;
+                        final isSelected = _selectedDay == day;
+                        final count = slots.where((slot) => slot.dayOfWeek == day).length;
+
+                        return GestureDetector(
+                          onTap: () => setState(() => _selectedDay = day),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: EdgeInsets.symmetric(horizontal: 20.w),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? (isDark ? Colors.white : Colors.black)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(24.r),
+                              border: Border.all(
+                                color: isSelected
+                                    ? Colors.transparent
+                                    : (isDark ? AppColors.darkBorder : AppColors.border),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  _dayShortNames[index],
+                                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                                    color: isSelected
+                                        ? (isDark ? Colors.black : Colors.white)
+                                        : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
+                                  ),
+                                ),
+                                if (count > 0) ...[
+                                  SizedBox(width: 6.w),
+                                  Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? (isDark ? Colors.black.withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.2))
+                                          : (isDark ? AppColors.darkSurface : AppColors.surface),
+                                      borderRadius: BorderRadius.circular(10.r),
+                                    ),
+                                    child: Text(
+                                      '$count',
+                                      style: TextStyle(
+                                        fontSize: 10.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: isSelected
+                                            ? (isDark ? Colors.black : Colors.white)
+                                            : AppColors.textMuted,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                    SizedBox(height: 18.h),
-                  ],
+                  ),
+                  SizedBox(height: 18.h),
 
                   // Quick actions removed for a cleaner look
 
@@ -339,7 +360,7 @@ class _TimetableViewState extends ConsumerState<TimetableView> {
                                   crossAxisCount: columns,
                                   crossAxisSpacing: 12.w,
                                   mainAxisSpacing: 12.h,
-                                  mainAxisExtent: columns == 1 ? 168.h : 176.h,
+                                  mainAxisExtent: 82.h,
                                 ),
                                 itemBuilder: (context, index) {
                                   final slot = daySlots[index];
@@ -347,14 +368,6 @@ class _TimetableViewState extends ConsumerState<TimetableView> {
                                     slot: slot,
                                     accent: _subjectColor(slot.subject, slot.subjectColor),
                                     durationMinutes: _slotDuration(slot),
-                                    onUpload: () => _showActionMessage(
-                                      context,
-                                      'Upload for ${slot.subject}',
-                                    ),
-                                    onPayment: () => _showActionMessage(
-                                      context,
-                                      'Payment for ${slot.subject}',
-                                    ),
                                   );
                                 },
                               );
@@ -501,62 +514,6 @@ class _TimetableViewState extends ConsumerState<TimetableView> {
                 value: '${_slotDuration(slot)} minutes',
                 icon: Icons.timer_outlined,
                 accent: accent,
-              ),
-              SizedBox(height: 24.h),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      style: OutlinedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 12.h),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
-                        side: BorderSide(color: accent.withValues(alpha: 0.5)),
-                      ),
-                      icon: Icon(Icons.upload_file_rounded, color: accent, size: 18.r),
-                      label: Text(
-                        'Upload Work',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: accent,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        _showActionMessage(
-                          context,
-                          'Upload practice for ${slot.subject}',
-                        );
-                      },
-                    ),
-                  ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: accent,
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 12.h),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
-                      ),
-                      icon: const Icon(Icons.payment_rounded, size: 18),
-                      label: const Text(
-                        'Pay Fees',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        _showActionMessage(
-                          context,
-                          'Payment flow for ${slot.subject}',
-                        );
-                      },
-                    ),
-                  ),
-                ],
               ),
             ],
           ),
@@ -775,15 +732,11 @@ class _TimetableListTile extends StatelessWidget {
   final TimetableSlot slot;
   final Color accent;
   final int durationMinutes;
-  final VoidCallback onUpload;
-  final VoidCallback onPayment;
 
   const _TimetableListTile({
     required this.slot,
     required this.accent,
     required this.durationMinutes,
-    required this.onUpload,
-    required this.onPayment,
   });
 
   @override
@@ -792,9 +745,10 @@ class _TimetableListTile extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurface : AppColors.surface,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color: isDark ? AppColors.darkBorder : AppColors.border,
         ),
@@ -808,106 +762,63 @@ class _TimetableListTile extends StatelessWidget {
           ),
         ],
       ),
-      clipBehavior: Clip.antiAlias,
-      child: Stack(
+      child: Row(
         children: [
-          // Thicker solid left colored accent bar
-          Positioned(
-            left: 0,
-            top: 0,
-            bottom: 0,
-            width: 6.w,
-            child: Container(
+          Container(
+            width: 4.w,
+            height: 40.h,
+            decoration: BoxDecoration(
               color: accent,
+              borderRadius: BorderRadius.circular(2.r),
             ),
           ),
-          // Content
-          Padding(
-            padding: EdgeInsets.fromLTRB(18.w, 14.w, 14.w, 14.w),
+          SizedBox(width: 16.w),
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 44.w,
-                      height: 44.w,
-                      decoration: BoxDecoration(
-                        color: accent.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: Icon(
-                        _subjectIcon(slot.subject),
-                        color: accent,
-                        size: 20.r,
-                      ),
-                    ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            slot.subject,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                          SizedBox(height: 2.h),
-                          Text(
-                            '${slot.startTime} - ${slot.endTime} ($durationMinutes mins)',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: AppColors.textMuted,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                Text(
+                  slot.subject,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16.sp,
+                  ),
                 ),
-                SizedBox(height: 10.h),
-                Row(
-                  children: [
-                    AppInfoChip(
-                      label: slot.teacherName,
-                      icon: Icons.person_outline_rounded,
-                      color: accent,
-                    ),
-                    SizedBox(width: 8.w),
-                    AppInfoChip(
-                      label: slot.room,
-                      icon: Icons.room_outlined,
-                      color: accent,
-                    ),
-                  ],
-                ),
-                const Spacer(),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _SmallActionButton(
-                        label: 'Upload',
-                        icon: Icons.upload_file_rounded,
-                        color: accent,
-                        onTap: onUpload,
-                      ),
-                    ),
-                    SizedBox(width: 8.w),
-                    Expanded(
-                      child: _SmallActionButton(
-                        label: 'Payment',
-                        icon: Icons.payment_rounded,
-                        color: accent,
-                        onTap: onPayment,
-                      ),
-                    ),
-                  ],
+                SizedBox(height: 4.h),
+                Text(
+                  '${slot.teacherName} • Room ${slot.room}',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.textMuted,
+                    fontSize: 12.sp,
+                  ),
                 ),
               ],
             ),
+          ),
+          SizedBox(width: 12.w),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '${slot.startTime} - ${slot.endTime}',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : AppColors.textPrimary,
+                ),
+              ),
+              SizedBox(height: 2.h),
+              Text(
+                '$durationMinutes mins',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppColors.textMuted,
+                  fontSize: 11.sp,
+                ),
+              ),
+            ],
           ),
         ],
       ),

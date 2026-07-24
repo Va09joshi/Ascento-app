@@ -376,10 +376,10 @@ class _HeaderCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(22.w),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : AppColors.primary,
+        color: isDark ? AppColors.darkSurface : Colors.white,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: isDark ? AppColors.darkBorder : Colors.transparent,
+          color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
         ),
       ),
       child: Column(
@@ -389,13 +389,13 @@ class _HeaderCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 24.r,
-                backgroundColor: isDark ? AppColors.darkPrimary.withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.2),
+                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                 child: Text(
                   userName.isNotEmpty ? userName[0].toUpperCase() : 'T',
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 20.sp,
-                    color: isDark ? AppColors.darkPrimary : Colors.white,
+                    color: AppColors.primary,
                   ),
                 ),
               ),
@@ -407,7 +407,7 @@ class _HeaderCard extends StatelessWidget {
                     Text(
                       'Welcome back,',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: isDark ? Colors.white70 : Colors.white.withValues(alpha: 0.9),
+                        color: AppColors.textMuted,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -416,7 +416,7 @@ class _HeaderCard extends StatelessWidget {
                       userName,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: isDark ? Colors.white : Colors.white,
+                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                       ),
                     ),
                   ],
@@ -428,14 +428,17 @@ class _HeaderCard extends StatelessWidget {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             decoration: BoxDecoration(
-              color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.1),
+              color: isDark ? AppColors.darkBackground : AppColors.background,
               borderRadius: BorderRadius.circular(8.r),
+              border: Border.all(
+                color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+              ),
             ),
             child: Row(
               children: [
                 Icon(
                   Icons.info_outline_rounded,
-                  color: isDark ? Colors.white70 : Colors.white,
+                  color: AppColors.primary,
                   size: 18,
                 ),
                 SizedBox(width: 10.w),
@@ -443,7 +446,7 @@ class _HeaderCard extends StatelessWidget {
                   child: Text(
                     subtitle,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: isDark ? Colors.white70 : Colors.white,
+                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -478,10 +481,10 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : AppColors.surface,
-        borderRadius: BorderRadius.circular(12.r),
+        color: isDark ? AppColors.darkSurface : Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.border,
+          color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
         ),
       ),
       child: Column(
@@ -491,9 +494,9 @@ class _StatCard extends StatelessWidget {
             padding: EdgeInsets.all(10.w),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8.r),
+              borderRadius: BorderRadius.circular(12.r),
             ),
-            child: Icon(icon, color: color, size: 20),
+            child: Icon(icon, color: color, size: 20.r),
           ),
           SizedBox(height: 12.h),
           Text(

@@ -138,38 +138,7 @@ class _UserListTabState extends ConsumerState<_UserListTab> {
             subtitle: 'Manage all ${widget.role} accounts in the system.',
             isLoading: usersAsync.isLoading,
             onRowTap: (user) {
-              showDialog(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  title: Text('User Details'),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('ID: ${user.id}'),
-                      SizedBox(height: 8.h),
-                      Text('Name: ${user.name}'),
-                      SizedBox(height: 8.h),
-                      Text('Email: ${user.email}'),
-                      if (user.role == UserRole.student) ...[
-                        SizedBox(height: 8.h),
-                        if (user.className != null) Text('Class: ${user.className}'),
-                        if (user.sectionName != null) ...[
-                          SizedBox(height: 8.h),
-                          Text('Section: ${user.sectionName}'),
-                        ],
-                        if (user.rollNumber != null) ...[
-                          SizedBox(height: 8.h),
-                          Text('Roll No: ${user.rollNumber}'),
-                        ],
-                      ],
-                    ],
-                  ),
-                  actions: [
-                    TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close'))
-                  ],
-                ),
-              );
+              context.pushNamed(RouteNames.userDetails, extra: user);
             },
             data: filteredUsers,
             columns: const ['User', 'Email', 'Phone', 'Domain', 'Role', 'Status', 'Actions'],
@@ -179,15 +148,37 @@ class _UserListTabState extends ConsumerState<_UserListTab> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (user.avatarUrl != null && user.avatarUrl!.isNotEmpty)
-                    CircleAvatar(
-                      radius: 16.w,
-                      backgroundImage: NetworkImage(user.avatarUrl!),
-                      onBackgroundImageError: (_, __) {},
+                    ClipOval(
+                      child: Image.network(
+                        user.avatarUrl!,
+                        width: 36.r,
+                        height: 36.r,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: 36.r,
+                            height: 36.r,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Text(
+                              user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16.sp,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     )
                   else
                     Container(
-                      width: 32.w,
-                      height: 32.h,
+                      width: 36.r,
+                      height: 36.r,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: AppColors.primary.withValues(alpha: 0.1),
@@ -198,7 +189,7 @@ class _UserListTabState extends ConsumerState<_UserListTab> {
                         style: TextStyle(
                           color: AppColors.primary,
                           fontWeight: FontWeight.bold,
-                          fontSize: 14.sp,
+                          fontSize: 16.sp,
                         ),
                       ),
                     ),
@@ -264,18 +255,20 @@ class _UserListTabState extends ConsumerState<_UserListTab> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (widget.role == 'student')
+                  // Assign to Class
+                  if (user.role == UserRole.student)
                     IconButton(
-                      icon: const Icon(Icons.class_outlined, size: 20),
-                      color: AppColors.primary,
-                      tooltip: 'Assign Class',
+                      icon: const Icon(Icons.school_rounded, color: AppColors.primary),
+                      tooltip: 'Assign to Class',
                       onPressed: () {
                         showDialog(
                           context: context,
                           builder: (ctx) => AssignClassDialog(student: user),
                         );
                       },
-                    ),
+                    )
+                  else
+                    const SizedBox.shrink(),
                   IconButton(
                     icon: const Icon(Icons.edit_outlined, size: 20),
                     color: AppColors.info,

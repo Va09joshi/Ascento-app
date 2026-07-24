@@ -36,7 +36,7 @@ class _DrawerItemState extends State<DrawerItem> {
     
     final unselectedTextColor = isDark ? Colors.white60 : Colors.black54;
     final hoverTextColor = isDark ? Colors.white : Colors.black;
-    final activeTextColor = Colors.white; // Pure white for solid background
+    final activeTextColor = baseColor; 
     
     final isActive = widget.active;
     final isHovered = _isHovered;
@@ -46,14 +46,13 @@ class _DrawerItemState extends State<DrawerItem> {
         : (isHovered ? hoverTextColor : unselectedTextColor);
 
     final iconColor = isActive 
-        ? Colors.white 
+        ? baseColor 
         : (isHovered ? baseColor : unselectedTextColor);
 
     final hoverBgColor = isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.03);
-    final activeBgColor = baseColor; // Solid color for active state
 
     return Container(
-      margin: EdgeInsets.only(bottom: 6.h, left: 16.w, right: 16.w),
+      margin: EdgeInsets.only(bottom: 4.h, left: 12.w, right: 12.w),
       child: MouseRegion(
         onEnter: (_) => setState(() => _isHovered = true),
         onExit: (_) => setState(() => _isHovered = false),
@@ -61,25 +60,18 @@ class _DrawerItemState extends State<DrawerItem> {
           color: Colors.transparent,
           child: InkWell(
             onTap: widget.onTap,
-            borderRadius: BorderRadius.circular(14.r), // slightly rounder
-            highlightColor: activeBgColor.withValues(alpha: 0.1),
-            splashColor: activeBgColor.withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(12.r),
+            highlightColor: Colors.transparent,
+            splashColor: hoverBgColor,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeOutCubic,
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+              padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14.r),
+                borderRadius: BorderRadius.circular(12.r),
                 color: isActive 
-                    ? activeBgColor 
+                    ? baseColor.withValues(alpha: 0.1) 
                     : (isHovered ? hoverBgColor : Colors.transparent),
-                boxShadow: isActive ? [
-                  BoxShadow(
-                    color: baseColor.withValues(alpha: 0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  )
-                ] : [],
               ),
               child: Row(
                 children: [
@@ -101,12 +93,6 @@ class _DrawerItemState extends State<DrawerItem> {
                       child: Text(widget.label),
                     ),
                   ),
-                  if (isActive)
-                    Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      color: Colors.white.withValues(alpha: 0.8),
-                      size: 14.r,
-                    ),
                 ],
               ),
             ),

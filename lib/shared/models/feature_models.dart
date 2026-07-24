@@ -141,11 +141,13 @@ class MeetingItem {
   final String endTime;
   final String? className;
   final String? sectionName;
+  final String? classId;
+  final String? sectionId;
 
   const MeetingItem({
     required this.id, required this.title, required this.meetLink,
     required this.meetDate, required this.startTime, required this.endTime,
-    this.className, this.sectionName,
+    this.className, this.sectionName, this.classId, this.sectionId,
   });
 
   factory MeetingItem.fromJson(Map<String, dynamic> json) {
@@ -158,6 +160,8 @@ class MeetingItem {
       endTime: json['end_time'] as String? ?? '',
       className: json['classes']?['name'] as String?,
       sectionName: json['sections']?['name'] as String?,
+      classId: json['class_id'] as String?,
+      sectionId: json['section_id'] as String?,
     );
   }
 }
@@ -385,7 +389,9 @@ class NotificationItem {
 class StudentProfile {
   final UserModel user;
   final String className;
+  final String? classId;
   final String section;
+  final String? sectionId;
   final String rollNumber;
   final String? fatherName;
   final String? motherName;
@@ -394,19 +400,24 @@ class StudentProfile {
   final String? bloodGroup;
   final DateTime? dateOfBirth;
   final String? avatarUrl;
+  final String? timetablePdfUrl;
 
   const StudentProfile({
     required this.user, required this.className,
-    required this.section, required this.rollNumber,
+    this.classId,
+    required this.section, this.sectionId, required this.rollNumber,
     this.fatherName, this.motherName, this.phone,
     this.address, this.bloodGroup, this.dateOfBirth, this.avatarUrl,
+    this.timetablePdfUrl,
   });
 
   factory StudentProfile.fromJson(Map<String, dynamic> json) {
     return StudentProfile(
       user: UserModel.fromJson(json['user'] as Map<String, dynamic>? ?? json),
       className: json['className'] as String? ?? '',
+      classId: json['classId'] as String?,
       section: json['section'] as String? ?? '',
+      sectionId: json['sectionId'] as String?,
       rollNumber: json['rollNumber'] as String? ?? '',
       fatherName: json['fatherName'] as String?,
       motherName: json['motherName'] as String?,
@@ -415,6 +426,7 @@ class StudentProfile {
       bloodGroup: json['bloodGroup'] as String?,
       dateOfBirth: json['dateOfBirth'] != null ? DateTime.tryParse(json['dateOfBirth']) : null,
       avatarUrl: json['avatarUrl'] as String?,
+      timetablePdfUrl: json['timetablePdfUrl'] as String?,
     );
   }
 }

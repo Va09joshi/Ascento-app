@@ -7,6 +7,9 @@ import 'package:ascento_abacus/features/auth/presentation/controllers/auth_contr
 import 'package:ascento_abacus/shared/providers/feature_providers.dart';
 import 'package:ascento_abacus/shared/router/route_names.dart';
 import 'package:ascento_abacus/shared/models/feature_models.dart';
+import 'package:ascento_abacus/features/meetings/presentation/providers/meetings_provider.dart';
+import 'package:ascento_abacus/features/content/presentation/providers/content_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class StudentDashboardView extends ConsumerWidget {
   const StudentDashboardView({super.key});
@@ -154,9 +157,215 @@ class StudentDashboardView extends ConsumerWidget {
                   ),
                 ],
               ),
+              SizedBox(height: 32.h),
+
+              // Learning Hub Section
+              Text(
+                'Learning Hub',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : AppColors.textPrimary,
+                ),
+              ),
+              SizedBox(height: 16.h),
+              
+              // Up Next (Live Meetings)
+              _buildSectionHeader(context, 'Up Next', 'Live sessions starting soon', isDark),
+              SizedBox(height: 12.h),
+              Builder(builder: (context) {
+                final allMeetings = ref.watch(meetingsListProvider).valueOrNull ?? [];
+                // Only show meetings for all students or specifically for this class/section
+                final myMeetings = allMeetings.where((m) {
+                  if (m.classId == null) return true; // All students
+                  if (m.classId != profile?.classId) return false;
+                  // If class matches, check section if specified
+                  if (m.sectionId != null && m.sectionId != profile?.sectionId) return false;
+                  return true;
+                }).toList();
+                
+                if (myMeetings.isEmpty) {
+                  return Container(
+                    padding: EdgeInsets.all(24.w),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.darkSurface : Colors.white,
+                      borderRadius: BorderRadius.circular(16.r),
+                      border: Border.all(color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05)),
+                    ),
+                    child: Center(
+                      child: Text('No upcoming meetings scheduled.', style: TextStyle(color: AppColors.textMuted)),
+                    ),
+                  );
+                }
+                return _buildMeetingCard(context, myMeetings.first, isDark);
+              }),
+              
+              SizedBox(height: 24.h),
+              
+              // In Progress (Study Materials)
+              _buildSectionHeader(context, 'Recent Study Material', 'Pick up where you left off', isDark),
+              SizedBox(height: 12.h),
+              Builder(builder: (context) {
+                final allContent = ref.watch(contentListProvider).valueOrNull ?? [];
+                
+                if (allContent.isEmpty) {
+                  return Container(
+                    padding: EdgeInsets.all(24.w),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.darkSurface : Colors.white,
+                      borderRadius: BorderRadius.circular(16.r),
+                      border: Border.all(color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05)),
+                    ),
+                    child: Center(
+                      child: Text('No recent study material available.', style: TextStyle(color: AppColors.textMuted)),
+                    ),
+                  );
+                }
+                return _buildStudyMaterialCard(context, allContent.first, isDark);
+              }),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(BuildContext context, String title, String subtitle, bool isDark) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : AppColors.textPrimary,
+              ),
+            ),
+            SizedBox(height: 2.h),
+            Text(
+              subtitle,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
+              ),
+            ),
+          ],
+        ),
+        TextButton(
+          onPressed: () {},
+          style: TextButton.styleFrom(
+            padding: EdgeInsets.zero,
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          child: Text('View All', style: TextStyle(color: AppColors.primary, fontSize: 12.sp, fontWeight: FontWeight.bold)),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMeetingCard(BuildContext context, MeetingItem item, bool isDark) {
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: AppColors.error.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: Icon(Icons.video_camera_front_rounded, color: AppColors.error, size: 24.r),
+          ),
+          SizedBox(width: 16.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp)),
+                SizedBox(height: 4.h),
+                Text('${item.meetDate.day}/${item.meetDate.month}/${item.meetDate.year} • ${item.startTime} - ${item.endTime}', style: TextStyle(color: AppColors.textMuted, fontSize: 12.sp)),
+              ],
+            ),
+          ),
+          SizedBox(width: 8.w),
+          ElevatedButton(
+            onPressed: () {
+              final uri = Uri.tryParse(item.meetLink);
+              if (uri != null) {
+                launchUrl(uri, mode: LaunchMode.externalApplication);
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+            ),
+            child: const Text('Join'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStudyMaterialCard(BuildContext context, ContentItem item, bool isDark) {
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48.w,
+            height: 48.w,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: Icon(
+              item.type.toLowerCase() == 'pdf' ? Icons.picture_as_pdf_rounded :
+              item.type.toLowerCase() == 'video' ? Icons.play_arrow_rounded : Icons.image_rounded,
+              color: AppColors.primary, size: 24.r
+            ),
+          ),
+          SizedBox(width: 16.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp)),
+                SizedBox(height: 4.h),
+                Text('${item.type.toUpperCase()} • Added recently', style: TextStyle(color: AppColors.textMuted, fontSize: 12.sp)),
+              ],
+            ),
+          ),
+          SizedBox(width: 16.w),
+          IconButton(
+            onPressed: () => context.go(RoutePaths.content),
+            icon: Icon(Icons.arrow_forward_rounded, color: AppColors.primary, size: 20.r),
+            style: IconButton.styleFrom(
+              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -169,16 +378,9 @@ class StudentDashboardView extends ConsumerWidget {
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurface : Colors.white,
         borderRadius: BorderRadius.circular(24.r),
-        boxShadow: isDark ? [] : [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
         border: Border.all(
-          color: isDark ? AppColors.darkBorder : const Color(0xFFF1F5F9),
-          width: 1.5,
+          color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+          width: 1,
         ),
       ),
       child: Column(
@@ -281,15 +483,8 @@ class StudentDashboardView extends ConsumerWidget {
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurface : Colors.white,
         borderRadius: BorderRadius.circular(20.r),
-        boxShadow: isDark ? [] : [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
         border: Border.all(
-          color: isDark ? AppColors.darkBorder : const Color(0xFFF1F5F9),
+          color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
         ),
       ),
       child: Column(

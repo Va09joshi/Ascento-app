@@ -23,7 +23,7 @@ class _HomeworkTeacherViewState extends ConsumerState<HomeworkTeacherView> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final hwAsync = ref.watch(homeworkListProvider(null));
+    final hwAsync = ref.watch(homeworkListProvider);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -254,7 +254,6 @@ class _CreateHomeworkDialogState extends ConsumerState<_CreateHomeworkDialog> {
         CustomButton(
           text: 'Publish',
           isLoading: _isSubmitting,
-          width: 100.w,
           onPressed: () async {
             if (_titleController.text.isEmpty || _selectedSectionId == null || _selectedSubjectId == null) {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please fill all required fields.')));

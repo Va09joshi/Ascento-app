@@ -340,32 +340,34 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return AppCard(
-      margin: EdgeInsets.zero,
-      padding: EdgeInsets.all(14.w),
+    final isDark = theme.brightness == Brightness.dark;
+    
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             padding: EdgeInsets.all(10.w),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  color.withValues(alpha: 0.18),
-                  color.withValues(alpha: 0.04),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(14.r),
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12.r),
             ),
-            child: Icon(icon, color: color, size: 20),
+            child: Icon(icon, color: color, size: 20.r),
           ),
           SizedBox(height: 12.h),
           Text(
             title,
             style: theme.textTheme.bodySmall?.copyWith(
               color: AppColors.textMuted,
+              fontWeight: FontWeight.w500,
             ),
           ),
           SizedBox(height: 4.h),
@@ -373,6 +375,7 @@ class _StatCard extends StatelessWidget {
             value,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
+              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
             ),
           ),
         ],
@@ -396,6 +399,7 @@ class _QuickAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -404,28 +408,21 @@ class _QuickAction extends StatelessWidget {
             width: 58.w,
             height: 58.w,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [color, color.withValues(alpha: 0.75)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20.r),
-              boxShadow: [
-                BoxShadow(
-                  color: color.withValues(alpha: 0.2),
-                  blurRadius: 12,
-                  offset: const Offset(0, 8),
-                ),
-              ],
+              border: Border.all(
+                color: color.withValues(alpha: 0.2),
+              ),
             ),
-            child: Icon(icon, color: Colors.white, size: 26),
+            child: Icon(icon, color: color, size: 26.r),
           ),
           SizedBox(height: 8.h),
           Text(
             label,
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+            ),
           ),
         ],
       ),
@@ -478,11 +475,11 @@ Widget _buildRecentNoticePosterCard(NoticeModel notice, ThemeData theme, bool is
 
   return Container(
     decoration: BoxDecoration(
-      color: isDark ? AppColors.darkSurface : AppColors.surface,
+      color: isDark ? AppColors.darkSurface : Colors.white,
       borderRadius: BorderRadius.circular(16.r),
-      boxShadow: [
-        BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
-      ],
+      border: Border.all(
+        color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+      ),
     ),
     clipBehavior: Clip.antiAlias,
     child: Column(

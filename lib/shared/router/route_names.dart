@@ -18,11 +18,13 @@ class RouteNames {
   static const String teacherDashboard = 'teacherDashboard';
   static const String studentDashboard = 'studentDashboard';
   static const String manageUsers = 'manageUsers';
+  static const String manageTeachers = 'manageTeachers';
   static const String manageBranches = 'manageBranches';
   static const String manageDomains = 'manageDomains';
   static const String academicsConfig = 'academicsConfig';
   static const String addUser = 'addUser';
   static const String editUser = 'editUser';
+  static const String userDetails = 'userDetails';
   static const String addBranch = 'addBranch';
   static const String editBranch = 'editBranch';
   
@@ -54,6 +56,9 @@ class RouteNames {
   static const String enquiry = 'enquiry';
   static const String programs = 'programs';
   static const String content = 'content';
+  static const String uploadContent = 'uploadContent';
+  static const String studyMode = 'studyMode';
+  static const String liveSession = 'liveSession';
 
   // Nested Child / Leaf screens
   static const String error = 'error';
@@ -76,11 +81,13 @@ class RoutePaths {
   static const String teacherDashboard = '/teacher-dashboard';
   static const String studentDashboard = '/student-dashboard';
   static const String manageUsers = '/manage-users';
+  static const String manageTeachers = '/manage-teachers';
   static const String manageBranches = '/manage-branches';
   static const String manageDomains = '/manage-domains';
   static const String academicsConfig = '/academics-config';
   static const String addUser = '/manage-users/add';
   static const String editUser = '/manage-users/edit';
+  static const String userDetails = '/manage-users/details';
   static const String addBranch = '/manage-branches/add';
   static const String editBranch = '/manage-branches/edit';
   
@@ -112,6 +119,9 @@ class RoutePaths {
   static const String enquiry = '/enquiry';
   static const String programs = '/programs';
   static const String content = '/content';
+  static const String uploadContent = '/content/upload';
+  static const String studyMode = '/content/study';
+  static const String liveSession = '/meetings/session';
 
   static const String error = '/error';
 }

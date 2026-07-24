@@ -101,13 +101,6 @@ class NavigationShell extends ConsumerWidget {
             Container(
               padding: EdgeInsets.fromLTRB(24.w, MediaQuery.of(context).padding.top + 24.h, 24.w, 24.h),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: isDark
-                      ? [const Color(0xFF5B62E6).withValues(alpha: 0.15), Colors.transparent]
-                      : [const Color(0xFF5B67F4).withValues(alpha: 0.1), Colors.transparent],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
                 border: Border(
                   bottom: BorderSide(
                     color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.05),
@@ -118,22 +111,15 @@ class NavigationShell extends ConsumerWidget {
               child: Row(
                 children: [
                   Container(
-                    width: 56.r,
-                    height: 56.r,
-                    padding: EdgeInsets.all(10.r),
+                    width: 48.r,
+                    height: 48.r,
+                    padding: EdgeInsets.all(8.r),
                     decoration: BoxDecoration(
                       color: isDark ? AppColors.darkSurface : Colors.white,
                       shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF5B67F4).withValues(alpha: 0.15),
-                          blurRadius: 16,
-                          offset: const Offset(0, 4),
-                        )
-                      ],
                       border: Border.all(
-                        color: const Color(0xFF5B67F4).withValues(alpha: 0.2),
-                        width: 1.5,
+                        color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.1),
+                        width: 1,
                       ),
                     ),
                     child: Image.asset(
@@ -433,12 +419,6 @@ class NavigationShell extends ConsumerWidget {
     if (currentPath == RoutePaths.enquiry) return 'Enquiry Form';
     if (currentPath == RoutePaths.content) return 'Notes & Materials';
     return 'Ascento Abacus';
-  }
-
-  void _showComingSoon(BuildContext context) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Feature coming soon')));
   }
 
   void _go(BuildContext context, String route) {

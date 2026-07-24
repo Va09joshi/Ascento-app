@@ -9,7 +9,6 @@ import 'package:ascento_abacus/features/dashboard/presentation/views/admin_dashb
 import 'package:ascento_abacus/features/dashboard/presentation/views/teacher_dashboard_view.dart';
 import 'package:ascento_abacus/features/enquiry/presentation/views/enquiry_view.dart';
 import 'package:ascento_abacus/features/exams/presentation/views/student_exams_view.dart';
-import 'package:ascento_abacus/features/exams/presentation/views/exam_results_management_view.dart';
 import 'package:ascento_abacus/features/exams/presentation/views/exams_management_view.dart';
 import 'package:ascento_abacus/features/exams/presentation/views/exam_form_view.dart';
 import 'package:ascento_abacus/features/fees/presentation/views/fees_view.dart';
@@ -17,6 +16,9 @@ import 'package:ascento_abacus/features/homework/presentation/views/homework_stu
 import 'package:ascento_abacus/features/homework/presentation/views/homework_teacher_view.dart';
 import 'package:ascento_abacus/features/meetings/presentation/views/meetings_view.dart';
 import 'package:ascento_abacus/features/content/presentation/views/content_view.dart';
+import 'package:ascento_abacus/features/content/presentation/views/upload_content_view.dart';
+import 'package:ascento_abacus/features/content/presentation/views/study_mode_view.dart';
+import 'package:ascento_abacus/features/meetings/presentation/views/live_session_view.dart';
 import 'package:ascento_abacus/features/notifications/presentation/views/notices_management_view.dart';
 import 'package:ascento_abacus/features/notifications/presentation/views/notice_form_view.dart';
 import 'package:ascento_abacus/features/notifications/presentation/views/notice_details_view.dart';
@@ -36,10 +38,11 @@ import 'package:ascento_abacus/features/profile/presentation/views/profile_view.
 import 'package:ascento_abacus/features/timetable/presentation/views/timetable_management_view.dart';
 import 'package:ascento_abacus/features/timetable/presentation/views/timetable_view.dart';
 import 'package:ascento_abacus/features/courses/presentation/views/courses_management_view.dart';
-import 'package:ascento_abacus/features/lessons/presentation/views/lessons_view.dart';
 import 'package:ascento_abacus/features/users/presentation/views/users_management_view.dart';
+import 'package:ascento_abacus/features/users/presentation/views/teachers_management_view.dart';
 import 'package:ascento_abacus/features/users/presentation/widgets/user_form_view.dart';
 import 'package:ascento_abacus/features/domains/presentation/views/domains_management_view.dart';
+import 'package:ascento_abacus/features/users/presentation/views/user_details_view.dart';
 
 import 'package:ascento_abacus/shared/models/feature_models.dart';
 import 'package:ascento_abacus/shared/router/route_names.dart';
@@ -200,6 +203,17 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(
+            path: RoutePaths.manageTeachers,
+            name: RouteNames.manageTeachers,
+            pageBuilder: (context, state) => CustomTransitionPage(
+              key: state.pageKey,
+              child: const TeachersManagementView(),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+            ),
+          ),
+          GoRoute(
             path: RoutePaths.manageBranches,
             name: RouteNames.manageBranches,
             pageBuilder: (context, state) => CustomTransitionPage(
@@ -345,6 +359,21 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
                     },
               ),
             ),
+              GoRoute(
+                path: RoutePaths.uploadContent,
+                name: RouteNames.uploadContent,
+                pageBuilder: (context, state) {
+                  final content = state.extra as ContentItem?;
+                  return CustomTransitionPage(
+                    key: state.pageKey,
+                    child: UploadContentView(content: content),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                          return FadeTransition(opacity: animation, child: child);
+                        },
+                  );
+                },
+              ),
             GoRoute(
               path: RoutePaths.content,
               name: RouteNames.content,
@@ -356,6 +385,36 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
                       return FadeTransition(opacity: animation, child: child);
                     },
               ),
+            ),
+            GoRoute(
+              path: RoutePaths.studyMode,
+              name: RouteNames.studyMode,
+              pageBuilder: (context, state) {
+                final content = state.extra as ContentItem;
+                return CustomTransitionPage(
+                  key: state.pageKey,
+                  child: StudyModeView(item: content),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(opacity: animation, child: child);
+                      },
+                );
+              },
+            ),
+            GoRoute(
+              path: RoutePaths.liveSession,
+              name: RouteNames.liveSession,
+              pageBuilder: (context, state) {
+                final meeting = state.extra as MeetingItem;
+                return CustomTransitionPage(
+                  key: state.pageKey,
+                  child: LiveSessionView(item: meeting),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(opacity: animation, child: child);
+                      },
+                );
+              },
             ),
           GoRoute(
             path: RoutePaths.notifications,
@@ -438,6 +497,20 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
           return CustomTransitionPage(
             key: state.pageKey,
             child: UserFormView(initialRole: role),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          );
+        },
+      ),
+      GoRoute(
+        path: RoutePaths.userDetails,
+        name: RouteNames.userDetails,
+        pageBuilder: (context, state) {
+          final user = state.extra as UserModel;
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: UserDetailsView(user: user),
             transitionsBuilder: (context, animation, secondaryAnimation, child) {
               return FadeTransition(opacity: animation, child: child);
             },

@@ -9,6 +9,13 @@ import 'package:ascento_abacus/features/timetable/presentation/providers/timetab
 import 'package:ascento_abacus/features/academics/presentation/providers/academics_provider.dart';
 import 'package:ascento_abacus/features/timetable/presentation/widgets/timetable_slot_form_dialog.dart';
 import 'package:ascento_abacus/features/timetable/data/repositories/timetable_repository.dart';
+import 'package:ascento_abacus/features/academics/data/repositories/academics_repository.dart';
+import 'package:ascento_abacus/features/timetable/utils/timetable_pdf_generator.dart';
+import 'package:ascento_abacus/features/timetable/presentation/views/timetable_pdf_preview_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:dio/dio.dart';
+import 'package:ascento_abacus/core/network/dio_client.dart';
 
 class TimetableManagementView extends ConsumerStatefulWidget {
   const TimetableManagementView({super.key});
@@ -111,50 +118,161 @@ class _TimetableManagementViewState extends ConsumerState<TimetableManagementVie
                       builder: (context, constraints) {
                         final isDesktop = constraints.maxWidth > 800;
                         
-                        final actionButtons = Wrap(
+                        final refreshButton = OutlinedButton.icon(
+                          onPressed: () {
+                            ref.invalidate(classesListProvider);
+                            ref.invalidate(sectionsListProvider);
+                            ref.invalidate(academicYearsListProvider);
+                            ref.invalidate(sectionTimetableProvider);
+                          },
+                          icon: const Icon(Icons.refresh, size: 16),
+                          label: const Text('Refresh'),
+                        );
+
+                        final pdfButton = ElevatedButton.icon(
+                          onPressed: () async {
+                            if (selectedSectionId == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select a Section first')));
+                              return;
+                            }
+                            final currentSection = sectionsAsync.valueOrNull?.firstWhere((s) => s.id == selectedSectionId);
+                            final currentClass = classesAsync.valueOrNull?.firstWhere((c) => c.id == selectedClassId);
+                            
+                            final slots = timetableAsync.valueOrNull;
+                            if (slots == null || slots.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No timetable slots available to generate PDF')));
+                              return;
+                            }
+                            
+                            try {
+                              final pdfBytes = await TimetablePdfGenerator.generatePdfBytes(
+                                slots, 
+                                currentClass?.name ?? 'Class', 
+                                currentSection?.name ?? 'Section'
+                              );
+                              if (mounted) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => TimetablePdfPreviewScreen(
+                                      pdfBytes: pdfBytes,
+                                      title: 'Timetable ${currentClass?.name ?? ''} ${currentSection?.name ?? ''}',
+                                    ),
+                                  ),
+                                );
+                              }
+                            } catch (e) {
+                              if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to generate PDF: $e')));
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.lightBlue.shade300, foregroundColor: Colors.white),
+                          icon: const Icon(Icons.print, size: 16),
+                          label: const Text('View PDF'),
+                        );
+
+                        final uploadPdfButton = OutlinedButton.icon(
+                          onPressed: () async {
+                            if (selectedSectionId == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select a Section first')));
+                              return;
+                            }
+                            
+                            try {
+                              final result = await FilePicker.platform.pickFiles(
+                                type: FileType.custom,
+                                allowedExtensions: ['pdf'],
+                              );
+
+                              if (result != null && result.files.single.path != null) {
+                                if (!mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Uploading PDF...')));
+                                
+                                final dioClient = ref.read(dioClientProvider);
+                                final formData = FormData.fromMap({
+                                  'file': await MultipartFile.fromFile(result.files.single.path!),
+                                });
+                                
+                                final response = await dioClient.post(
+                                  '/uploads/document', 
+                                  data: formData,
+                                );
+                                
+                                if (response.data['success'] == true) {
+                                  final pdfUrl = response.data['data']['url'];
+                                  await ref.read(academicsRepositoryProvider).updateSection(selectedSectionId!, {
+                                    'timetable_pdf_url': pdfUrl,
+                                  });
+                                  
+                                  ref.invalidate(sectionsListProvider);
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Timetable PDF uploaded successfully!')));
+                                  }
+                                } else {
+                                  throw Exception(response.data['message'] ?? 'Failed to upload PDF');
+                                }
+                              }
+                            } catch (e) {
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                              }
+                            }
+                          },
+                          icon: const Icon(Icons.picture_as_pdf, size: 16),
+                          label: const Text('Upload PDF'),
+                        );
+
+                        final shareButton = OutlinedButton.icon(
+                          onPressed: () {},
+                          icon: const Icon(Icons.share, size: 16),
+                          label: const Text('Share'),
+                        );
+
+                        final createSlotButton = ElevatedButton.icon(
+                          onPressed: () {
+                            if (selectedSectionId == null || selectedAcademicYearId == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select an Academic Year and Section first')));
+                              return;
+                            }
+                            showDialog(
+                              context: context, 
+                              builder: (_) => TimetableSlotFormDialog(
+                                sectionId: selectedSectionId!,
+                                academicYearId: selectedAcademicYearId!,
+                              )
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent, foregroundColor: Colors.white),
+                          icon: const Icon(Icons.add, size: 16),
+                          label: const Text('Create Slot'),
+                        );
+
+                        final desktopActionButtons = Wrap(
                           spacing: 8.w,
                           runSpacing: 8.h,
-                          alignment: isDesktop ? WrapAlignment.end : WrapAlignment.start,
+                          alignment: WrapAlignment.end,
+                          children: [refreshButton, shareButton, pdfButton, uploadPdfButton, createSlotButton],
+                        );
+
+                        final mobileActionButtons = Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            OutlinedButton.icon(
-                              onPressed: () {
-                                ref.invalidate(classesListProvider);
-                                ref.invalidate(sectionsListProvider);
-                                ref.invalidate(academicYearsListProvider);
-                                ref.invalidate(sectionTimetableProvider);
-                              },
-                              icon: const Icon(Icons.refresh, size: 16),
-                              label: const Text('Refresh'),
+                            Row(
+                              children: [
+                                Expanded(child: refreshButton),
+                                SizedBox(width: 8.w),
+                                Expanded(child: shareButton),
+                              ],
                             ),
-                            ElevatedButton.icon(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(backgroundColor: Colors.lightBlue.shade300, foregroundColor: Colors.white),
-                              icon: const Icon(Icons.download, size: 16),
-                              label: const Text('PDF'),
+                            SizedBox(height: 8.h),
+                            Row(
+                              children: [
+                                Expanded(child: pdfButton),
+                                SizedBox(width: 8.w),
+                                Expanded(child: uploadPdfButton),
+                              ],
                             ),
-                            OutlinedButton.icon(
-                              onPressed: () {},
-                              icon: const Icon(Icons.share, size: 16),
-                              label: const Text('Share'),
-                            ),
-                            ElevatedButton.icon(
-                              onPressed: () {
-                                if (selectedSectionId == null || selectedAcademicYearId == null) {
-                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select an Academic Year and Section first')));
-                                  return;
-                                }
-                                showDialog(
-                                  context: context, 
-                                  builder: (_) => TimetableSlotFormDialog(
-                                    sectionId: selectedSectionId!,
-                                    academicYearId: selectedAcademicYearId!,
-                                  )
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent, foregroundColor: Colors.white),
-                              icon: const Icon(Icons.add, size: 16),
-                              label: const Text('Create Slot'),
-                            ),
+                            SizedBox(height: 8.h),
+                            createSlotButton,
                           ],
                         );
 
@@ -208,7 +326,7 @@ class _TimetableManagementViewState extends ConsumerState<TimetableManagementVie
                             children: [
                               Expanded(flex: 3, child: dropdownsDesktop),
                               SizedBox(width: 24.w),
-                              Expanded(flex: 2, child: actionButtons),
+                              Expanded(flex: 2, child: desktopActionButtons),
                             ],
                           );
                         } else {
@@ -225,7 +343,7 @@ class _TimetableManagementViewState extends ConsumerState<TimetableManagementVie
                               SizedBox(height: 12.h),
                               yearDropdown,
                               SizedBox(height: 16.h),
-                              actionButtons,
+                              mobileActionButtons,
                             ],
                           );
                         }
