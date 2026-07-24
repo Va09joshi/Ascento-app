@@ -44,6 +44,12 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
 
     final classesAsync = ref.watch(classesListProvider);
     final sectionsAsync = ref.watch(sectionsListProvider);
+    final authState = ref.watch(authControllerProvider);
+    final user = authState.currentUser;
+
+    final teacherSections = sectionsAsync.valueOrNull?.where((s) => s.teacherId == user?.id).toList() ?? [];
+    final teacherClassIds = teacherSections.map((s) => s.classId).toSet();
+    final teacherClasses = classesAsync.valueOrNull?.where((c) => teacherClassIds.contains(c.id)).toList() ?? [];
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -125,10 +131,10 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
                             ),
                           ),
                           value: _selectedClassId,
-                          items: classesAsync.valueOrNull?.map((c) => DropdownMenuItem(
+                          items: teacherClasses.map((c) => DropdownMenuItem(
                             value: c.id,
                             child: Text(c.name, overflow: TextOverflow.ellipsis),
-                          )).toList() ?? [],
+                          )).toList(),
                           onChanged: (val) {
                             setState(() {
                               _selectedClassId = val;
@@ -152,12 +158,12 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
                             ),
                           ),
                           value: _selectedSectionId,
-                          items: sectionsAsync.valueOrNull
-                              ?.where((s) => s.classId == _selectedClassId)
+                          items: teacherSections
+                              .where((s) => s.classId == _selectedClassId)
                               .map((s) => DropdownMenuItem(
                             value: s.id,
                             child: Text(s.name, overflow: TextOverflow.ellipsis),
-                          )).toList() ?? [],
+                          )).toList(),
                           onChanged: (val) {
                             setState(() {
                               _selectedSectionId = val;
@@ -316,7 +322,7 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
     try {
       final records = _attendanceState.entries.map((e) => {
         'student_id': e.key,
-        'status': e.value ? 'present' : 'absent',
+        'present': e.value,
       }).toList();
       
       await ref.read(attendanceRepositoryProvider).markBulkAttendance(
