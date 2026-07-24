@@ -450,18 +450,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
               );
             },
           ),
-          GoRoute(
-            path: RoutePaths.teacherStudents,
-            name: RouteNames.teacherStudents,
-            pageBuilder: (context, state) => CustomTransitionPage(
-              key: state.pageKey,
-              child: const TeacherStudentsView(),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
-            ),
-          ),
+
           GoRoute(
             path: RoutePaths.enquiry,
             name: RouteNames.enquiry,

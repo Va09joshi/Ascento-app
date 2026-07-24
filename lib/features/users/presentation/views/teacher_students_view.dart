@@ -84,7 +84,7 @@ class TeacherStudentsView extends ConsumerWidget {
                           border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
                           boxShadow: [
                             BoxShadow(
-                              color: isDark ? Colors.black.withOpacity(0.2) : AppColors.shadow.withOpacity(0.05),
+                              color: isDark ? Colors.black.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.05),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -96,7 +96,7 @@ class TeacherStudentsView extends ConsumerWidget {
                             Container(
                               padding: EdgeInsets.all(16.w),
                               decoration: BoxDecoration(
-                                color: (isDark ? AppColors.darkPrimary : AppColors.primary).withOpacity(0.1),
+                                color: (isDark ? AppColors.darkPrimary : AppColors.primary).withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
                                 border: Border(bottom: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.border)),
                               ),

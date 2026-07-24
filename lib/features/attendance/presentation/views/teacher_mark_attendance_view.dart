@@ -290,17 +290,21 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
                       ),
               ),
             ],
+      )
+
+
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: _selectedSectionId != null 
+      floatingActionButton: _selectedSectionId != null
           ? Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: CustomButton(
-                text: 'Submit Attendance',
-                isLoading: _isSubmitting,
-                onPressed: _submitAttendance,
-              ),
-            ) 
+        padding: EdgeInsets.symmetric(horizontal: 24.w),
+        child: CustomButton(
+          text: 'Submit Attendance',
+          isLoading: _isSubmitting,
+          onPressed: _submitAttendance,
+        ),
+      )
+
           : null,
     );
   }
