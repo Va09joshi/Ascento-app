@@ -11,8 +11,13 @@ import 'package:ascento_abacus/features/users/presentation/providers/teachers_pr
 import 'package:ascento_abacus/features/academics/presentation/providers/academics_provider.dart';
 import 'package:ascento_abacus/features/attendance/data/repositories/attendance_repository.dart';
 import 'package:ascento_abacus/core/widgets/custom_button.dart';
+import 'package:ascento_abacus/core/widgets/app_card.dart';
 
 import '../../../auth/presentation/controllers/auth_controller.dart';
+
+final dailyAttendanceProvider = FutureProvider.autoDispose.family<List<AttendanceRecord>, ({String sectionId, DateTime date})>((ref, arg) async {
+  return ref.watch(attendanceRepositoryProvider).getAttendanceSheet(arg.sectionId, arg.date, arg.date);
+});
 
 class TeacherMarkAttendanceView extends ConsumerStatefulWidget {
   const TeacherMarkAttendanceView({super.key});
@@ -99,8 +104,12 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
                         firstDate: DateTime(2020),
                         lastDate: DateTime.now(),
                       );
-                      if (date != null) {
-                        setState(() => _selectedDate = date);
+                      if (date != null && date != _selectedDate) {
+                        setState(() {
+                          _selectedDate = date;
+                          _attendanceState.clear(); // Clear local state for new date
+                          ref.invalidate(dailyAttendanceProvider);
+                        });
                       }
                     },
                     child: Container(
@@ -153,6 +162,7 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
                               _selectedClassId = val;
                               _selectedSectionId = null;
                               _attendanceState.clear();
+                              ref.invalidate(dailyAttendanceProvider);
                             });
                           },
                         ),
@@ -181,6 +191,7 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
                             setState(() {
                               _selectedSectionId = val;
                               _attendanceState.clear();
+                              ref.invalidate(dailyAttendanceProvider);
                             });
                           },
                         ),
@@ -235,10 +246,25 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
                           );
                         }
                         
-                        // Initialize attendance state if empty (default to present)
-                        if (_attendanceState.isEmpty) {
+                        // Fetch existing attendance for the selected date
+                        final existingRecordsAsync = ref.watch(dailyAttendanceProvider((sectionId: _selectedSectionId!, date: _selectedDate)));
+                        
+                        // Map of studentId -> AttendanceRecord
+                        final existingMap = <String, AttendanceRecord>{};
+                        if (existingRecordsAsync.hasValue && existingRecordsAsync.value != null) {
+                          for (var r in existingRecordsAsync.value!) {
+                            existingMap[r.userId] = r;
+                          }
+                        }
+
+                        // Initialize attendance state if empty
+                        if (_attendanceState.isEmpty || _attendanceState.keys.length != students.length) {
                           for (final student in students) {
-                            _attendanceState[student.id] = true;
+                            if (existingMap.containsKey(student.id)) {
+                              _attendanceState[student.id] = existingMap[student.id]!.status == AttendanceStatus.present;
+                            } else {
+                              _attendanceState[student.id] = true;
+                            }
                           }
                         }
 
@@ -277,27 +303,61 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
                                       final student = filteredStudents[index];
                                       final isPresent = _attendanceState[student.id] ?? true;
                                       
-                                      return ListTile(
-                                        contentPadding: EdgeInsets.symmetric(vertical: 8.h),
-                                        leading: CircleAvatar(
-                                          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                                          backgroundImage: student.avatarUrl != null ? NetworkImage(student.avatarUrl!) : null,
-                                          child: student.avatarUrl == null
-                                              ? Text(student.name.isNotEmpty ? student.name[0] : 'S', style: const TextStyle(color: AppColors.primary))
-                                              : null,
-                                        ),
-                                        title: Text(student.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                                        subtitle: Text(student.email, style: TextStyle(fontSize: 12.sp, color: AppColors.textMuted)),
-                                        trailing: Switch(
-                                          value: isPresent,
-                                          activeColor: AppColors.success,
-                                          inactiveThumbColor: AppColors.error,
-                                          inactiveTrackColor: AppColors.error.withValues(alpha: 0.3),
-                                          onChanged: (val) {
-                                            setState(() {
-                                              _attendanceState[student.id] = val;
-                                            });
-                                          },
+                                      return Padding(
+                                        padding: EdgeInsets.symmetric(vertical: 6.h),
+                                        child: AppCard(
+                                          padding: EdgeInsets.all(12.r),
+                                          child: Row(
+                                            children: [
+                                              CircleAvatar(
+                                                radius: 22.r,
+                                                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                                                backgroundImage: student.avatarUrl != null ? NetworkImage(student.avatarUrl!) : null,
+                                                child: student.avatarUrl == null
+                                                    ? Text(student.name.isNotEmpty ? student.name[0] : 'S', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 16.sp))
+                                                    : null,
+                                              ),
+                                              SizedBox(width: 12.w),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(student.name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp)),
+                                                    if (existingMap.containsKey(student.id)) ...[
+                                                      SizedBox(height: 4.h),
+                                                      Container(
+                                                        padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                                                        decoration: BoxDecoration(
+                                                          color: (existingMap[student.id]!.status == AttendanceStatus.present ? AppColors.success : AppColors.error).withValues(alpha: 0.1),
+                                                          borderRadius: BorderRadius.circular(4.r),
+                                                        ),
+                                                        child: Text(
+                                                          'Saved: ${existingMap[student.id]!.status == AttendanceStatus.present ? "Present" : "Absent"}',
+                                                          style: TextStyle(
+                                                            fontSize: 10.sp, 
+                                                            fontWeight: FontWeight.w600,
+                                                            color: existingMap[student.id]!.status == AttendanceStatus.present ? AppColors.success : AppColors.error,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ] else
+                                                      Text(student.email, style: TextStyle(fontSize: 12.sp, color: AppColors.textMuted)),
+                                                  ],
+                                                ),
+                                              ),
+                                              Switch(
+                                                value: isPresent,
+                                                activeColor: AppColors.success,
+                                                inactiveThumbColor: AppColors.error,
+                                                inactiveTrackColor: AppColors.error.withValues(alpha: 0.3),
+                                                onChanged: (val) {
+                                                  setState(() {
+                                                    _attendanceState[student.id] = val;
+                                                  });
+                                                },
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       );
                                     },
@@ -352,6 +412,9 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
         _selectedDate,
         records,
       );
+      
+      // Refresh the existing records so the UI updates with the 'Saved' badges
+      ref.invalidate(dailyAttendanceProvider);
       
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
