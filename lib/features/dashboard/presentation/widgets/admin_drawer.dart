@@ -236,6 +236,9 @@ class AdminDrawer extends ConsumerWidget {
                 ),
               ),
               onTap: () {
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                }
                 ref.read(authControllerProvider.notifier).logout(() {
                   if (context.mounted) {
                     context.go('/login');

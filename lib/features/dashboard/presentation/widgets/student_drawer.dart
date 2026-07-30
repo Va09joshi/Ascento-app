@@ -256,6 +256,10 @@ class StudentDrawer extends ConsumerWidget {
               isSelected: false,
               isDestructive: true,
               onTap: () async {
+                // Close the drawer first
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                }
                 final authController = ref.read(authControllerProvider.notifier);
                 await authController.logout(() {
                   ref.read(routerProvider).go(RoutePaths.login);
