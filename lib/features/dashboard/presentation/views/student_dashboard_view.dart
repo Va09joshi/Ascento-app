@@ -611,131 +611,180 @@ void _showNoticePopup(BuildContext context, NotificationItem notice, bool isDark
       return Dialog(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        child: Container(
-          padding: EdgeInsets.all(24.w),
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.darkSurface : Colors.white,
-            borderRadius: BorderRadius.circular(24.r),
-            border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 20,
-                spreadRadius: 5,
-              )
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Header with close button
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(10.r),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(Icons.campaign_rounded, color: AppColors.primary, size: 24.r),
-                      ),
-                      SizedBox(width: 12.w),
-                      Text(
-                        'Latest Notice',
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.black87,
-                        ),
-                      ),
-                    ],
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: Icon(Icons.close_rounded, size: 24.r, color: Colors.grey),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20.h),
-              
-              // Notice Content
-              Container(
+        insetPadding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.topCenter,
+          children: [
+            // The Paper Card (Slightly rotated for realism)
+            Transform.rotate(
+              angle: 0.02, // slight tilt
+              child: Container(
                 width: double.infinity,
-                padding: EdgeInsets.all(16.r),
+                margin: EdgeInsets.only(top: 16.h),
+                padding: EdgeInsets.all(24.w),
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.black12 : Colors.grey.shade50,
-                  borderRadius: BorderRadius.circular(16.r),
-                  border: Border.all(color: isDark ? AppColors.darkBorder : Colors.grey.shade200),
+                  color: isDark ? const Color(0xFF2C2C2C) : const Color(0xFFFDFBF7), // Warm paper color
+                  borderRadius: BorderRadius.circular(2.r), // Sharp paper edges
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.3),
+                      blurRadius: 15,
+                      spreadRadius: 2,
+                      offset: const Offset(4, 8),
+                    ),
+                  ],
                 ),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'LATEST NOTICE',
+                          style: TextStyle(
+                            color: Colors.redAccent.shade700,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12.sp,
+                            letterSpacing: 1.2,
+                            fontFamily: 'Courier',
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => Navigator.of(context).pop(),
+                          child: Icon(Icons.close_rounded, size: 24.r, color: isDark ? Colors.white54 : Colors.black54),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16.h),
+                    
                     if (notice.imageUrl != null && notice.imageUrl!.isNotEmpty) ...[
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(12.r),
-                        child: Image.network(
-                          notice.imageUrl!,
-                          width: double.infinity,
-                          height: 140.h,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                        borderRadius: BorderRadius.circular(4.r),
+                        child: GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => Dialog(
+                                backgroundColor: Colors.transparent,
+                                insetPadding: EdgeInsets.zero,
+                                child: Stack(
+                                  children: [
+                                    InteractiveViewer(
+                                      child: Center(
+                                        child: Image.network(
+                                          notice.imageUrl!,
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 40.h,
+                                      right: 20.w,
+                                      child: IconButton(
+                                        icon: const Icon(Icons.close_rounded, color: Colors.white, size: 32),
+                                        onPressed: () => Navigator.of(context).pop(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                          child: Image.network(
+                            notice.imageUrl!,
+                            width: double.infinity,
+                            height: 140.h,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                          ),
                         ),
                       ),
-                      SizedBox(height: 12.h),
+                      SizedBox(height: 16.h),
                     ],
+                    
                     Text(
                       notice.title,
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w900,
                         color: isDark ? Colors.white : Colors.black87,
+                        height: 1.3,
+                        fontFamily: 'Georgia',
                       ),
                     ),
-                    SizedBox(height: 8.h),
+                    SizedBox(height: 12.h),
+                    Divider(color: isDark ? Colors.white24 : Colors.black12, thickness: 2),
+                    SizedBox(height: 12.h),
+                    
                     Text(
                       notice.body,
                       maxLines: notice.imageUrl != null && notice.imageUrl!.isNotEmpty ? 3 : 5,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 14.sp,
-                        color: isDark ? Colors.white70 : Colors.black54,
-                        height: 1.5,
+                        color: isDark ? Colors.white70 : const Color(0xFF2C3E50),
+                        height: 1.6,
+                        fontFamily: 'Georgia',
+                      ),
+                    ),
+                    
+                    SizedBox(height: 24.h),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          context.push(RoutePaths.noticeDetails, extra: notice);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          foregroundColor: isDark ? Colors.white : Colors.black87,
+                          elevation: 0,
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4.r),
+                            side: BorderSide(color: isDark ? Colors.white54 : Colors.black54, width: 1.5),
+                          ),
+                        ),
+                        child: Text(
+                          'READ FULL NOTICE',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.0,
+                            fontFamily: 'Courier',
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              
-              SizedBox(height: 24.h),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    context.push(RoutePaths.noticeDetails, extra: notice);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: EdgeInsets.symmetric(vertical: 14.h),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                  ),
-                  child: Text(
-                    'Read Full Notice',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+            ),
+            // The Pushpin
+            Positioned(
+              top: 0,
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.4),
+                      blurRadius: 4,
+                      offset: const Offset(1, 3),
+                    )
+                  ],
+                ),
+                child: Icon(
+                  Icons.push_pin_rounded,
+                  color: Colors.redAccent.shade700,
+                  size: 36.r,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       );
     },

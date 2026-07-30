@@ -77,7 +77,36 @@ class NoticeDetailsView extends StatelessWidget {
                             padding: EdgeInsets.all(16.w),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(4.r),
-                              child: InteractiveViewer(
+                              child: GestureDetector(
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => Dialog(
+                                      backgroundColor: Colors.transparent,
+                                      insetPadding: EdgeInsets.zero,
+                                      child: Stack(
+                                        children: [
+                                          InteractiveViewer(
+                                            child: Center(
+                                              child: Image.network(
+                                                notice.imageUrl!,
+                                                fit: BoxFit.contain,
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 40.h,
+                                            right: 20.w,
+                                            child: IconButton(
+                                              icon: const Icon(Icons.close_rounded, color: Colors.white, size: 32),
+                                              onPressed: () => Navigator.of(context).pop(),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
                                 child: Image.network(
                                   notice.imageUrl!,
                                   fit: BoxFit.contain,
