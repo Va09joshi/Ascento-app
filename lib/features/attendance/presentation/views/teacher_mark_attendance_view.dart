@@ -253,7 +253,9 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
                         final existingMap = <String, AttendanceRecord>{};
                         if (existingRecordsAsync.hasValue && existingRecordsAsync.value != null) {
                           for (var r in existingRecordsAsync.value!) {
-                            existingMap[r.userId] = r;
+                            if (r.studentId != null) {
+                              existingMap[r.studentId!] = r;
+                            }
                           }
                         }
 

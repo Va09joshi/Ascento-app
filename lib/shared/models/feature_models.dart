@@ -9,15 +9,17 @@ enum AttendanceStatus { present, absent, late, holiday, halfDay }
 
 class AttendanceRecord {
   final String id;
+  final String? studentId;
   final DateTime date;
   final AttendanceStatus status;
   final String? remark;
 
-  const AttendanceRecord({required this.id, required this.date, required this.status, this.remark});
+  const AttendanceRecord({required this.id, this.studentId, required this.date, required this.status, this.remark});
 
   factory AttendanceRecord.fromJson(Map<String, dynamic> json) {
     return AttendanceRecord(
       id: json['id'] as String? ?? '',
+      studentId: json['student_id'] as String?,
       date: DateTime.tryParse(json['date'] as String? ?? '') ?? DateTime.now(),
       status: AttendanceStatus.values.firstWhere(
         (s) => s.name == (json['status'] as String?),
