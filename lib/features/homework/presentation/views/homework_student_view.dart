@@ -193,7 +193,7 @@ class _HomeworkStudentTileState extends ConsumerState<_HomeworkStudentTile> {
             ),
             
           SizedBox(height: 16.h),
-          if (widget.item.status == HomeworkStatus.pending)
+          if (widget.item.status == HomeworkStatus.pending && widget.item.submissionUrl == null)
             SizedBox(
               width: double.infinity,
               child: CustomButton(
@@ -201,7 +201,7 @@ class _HomeworkStudentTileState extends ConsumerState<_HomeworkStudentTile> {
                 onPressed: _isUploading ? null : _submitHomework,
               ),
             ),
-          if (widget.item.status != HomeworkStatus.pending && widget.item.submissionUrl != null)
+          if (widget.item.submissionUrl != null)
             Container(
               padding: EdgeInsets.all(12.r),
               decoration: BoxDecoration(
