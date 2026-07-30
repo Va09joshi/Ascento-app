@@ -415,18 +415,26 @@ class NotificationItem {
   });
 
   factory NotificationItem.fromJson(Map<String, dynamic> json) {
+    // Map backend type to frontend type if needed
+    NotificationType mappedType;
+    final typeStr = (json['type'] as String?)?.toLowerCase();
+    switch (typeStr) {
+      case 'event': mappedType = NotificationType.event; break;
+      case 'news':
+      case 'update':
+      case 'alert':
+      default: mappedType = NotificationType.general; break;
+    }
+
     return NotificationItem(
       id: json['id'] as String? ?? '',
       title: json['title'] as String? ?? '',
-      body: json['body'] as String? ?? '',
-      type: NotificationType.values.firstWhere(
-        (t) => t.name == (json['type'] as String?),
-        orElse: () => NotificationType.general,
-      ),
-      createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
+      body: json['content'] as String? ?? json['body'] as String? ?? '',
+      type: mappedType,
+      createdAt: DateTime.tryParse(json['created_at'] as String? ?? json['createdAt'] as String? ?? '') ?? DateTime.now(),
       isRead: json['isRead'] as bool? ?? false,
       actionUrl: json['actionUrl'] as String?,
-      imageUrl: json['imageUrl'] as String?,
+      imageUrl: json['banner_url'] as String? ?? json['imageUrl'] as String?,
     );
   }
 }
