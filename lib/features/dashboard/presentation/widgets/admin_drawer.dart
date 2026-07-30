@@ -213,40 +213,6 @@ class AdminDrawer extends ConsumerWidget {
               ),
             ),
           ),
-          
-          Divider(color: isDark ? AppColors.darkBorder : AppColors.border, height: 1),
-          
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.h),
-            child: ListTile(
-              contentPadding: EdgeInsets.symmetric(horizontal: 24.w),
-              leading: Container(
-                padding: EdgeInsets.all(8.r),
-                decoration: BoxDecoration(
-                  color: AppColors.error.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(10.r),
-                ),
-                child: const Icon(Icons.logout_rounded, color: AppColors.error, size: 20),
-              ),
-              title: Text(
-                'Sign Out',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: AppColors.error,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              onTap: () {
-                if (context.mounted) {
-                  Navigator.of(context).pop();
-                }
-                ref.read(authControllerProvider.notifier).logout(() {
-                  if (context.mounted) {
-                    context.go('/login');
-                  }
-                });
-              },
-            ),
-          ),
           SizedBox(height: MediaQuery.of(context).padding.bottom + 12.h),
         ],
       ),

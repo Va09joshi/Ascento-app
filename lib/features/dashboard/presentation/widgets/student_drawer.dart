@@ -242,31 +242,7 @@ class StudentDrawer extends ConsumerWidget {
             ),
           ),
 
-          // ── Sign Out ──
-          Divider(
-            color: isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0),
-            height: 1,
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
-            child: _DrawerTile(
-              icon: Icons.logout_rounded,
-              title: 'Sign Out',
-              iconColor: AppColors.error,
-              isSelected: false,
-              isDestructive: true,
-              onTap: () async {
-                // Close the drawer first
-                if (context.mounted) {
-                  Navigator.of(context).pop();
-                }
-                final authController = ref.read(authControllerProvider.notifier);
-                await authController.logout(() {
-                  ref.read(routerProvider).go(RoutePaths.login);
-                });
-              },
-            ),
-          ),
+          // Sign out button removed to rely on global persistent footer
         ],
       ),
     );
