@@ -236,9 +236,10 @@ class NavigationShell extends ConsumerWidget {
                     active: false,
                     isDanger: true,
                     onTap: () {
+                      final router = ref.read(routerProvider);
                       Navigator.of(innerContext).pop();
                       ref.read(authControllerProvider.notifier).logout(() {
-                        ref.read(routerProvider).go(RoutePaths.login);
+                        router.go(RoutePaths.login);
                       });
                     },
                   );

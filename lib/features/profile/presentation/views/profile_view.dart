@@ -228,8 +228,9 @@ class ProfileView extends ConsumerWidget {
                 isSecondary: true,
                 isLoading: authState.isLoading,
                 onPressed: () {
+                  final router = ref.read(routerProvider);
                   ref.read(authControllerProvider.notifier).logout(() {
-                    ref.read(routerProvider).go(RoutePaths.login);
+                    router.go(RoutePaths.login);
                   });
                 },
               ),
@@ -358,8 +359,9 @@ class ProfileView extends ConsumerWidget {
               isSecondary: true,
               isLoading: authState.isLoading,
               onPressed: () {
+                final router = ref.read(routerProvider);
                 ref.read(authControllerProvider.notifier).logout(() {
-                  ref.read(routerProvider).go(RoutePaths.login);
+                  router.go(RoutePaths.login);
                 });
               },
             ),
