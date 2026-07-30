@@ -190,22 +190,169 @@ class _StudentAttendanceViewState extends ConsumerState<StudentAttendanceView> {
               ),
               SizedBox(height: 16.h),
 
-              PremiumDataTable<AttendanceRecord>(
-                title: 'Recent Records',
-                subtitle: 'Your recent attendance history.',
-                isLoading: attendanceAsync.isLoading,
-                columns: const ['Date', 'Status', 'Remarks'],
-                data: attendanceAsync.valueOrNull ?? [],
-                rowBuilder: (record) => [
-                  Text(_formatDate(record.date), style: theme.textTheme.bodyMedium),
-                  _buildStatusBadge(record.status, theme),
-                  Text(record.remark ?? '-', style: theme.textTheme.bodyMedium),
-                ],
-              ),
+              if (attendanceAsync.isLoading)
+                const Center(child: CircularProgressIndicator())
+              else
+                _buildCalendarView(context, attendanceAsync.valueOrNull ?? [], isDark),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildCalendarView(BuildContext context, List<AttendanceRecord> records, bool isDark) {
+    final daysInMonth = DateTime(_currentDate.year, _currentDate.month + 1, 0).day;
+    final firstDayOfMonth = DateTime(_currentDate.year, _currentDate.month, 1);
+    final firstWeekday = firstDayOfMonth.weekday; // 1 = Monday, 7 = Sunday
+    
+    // Map records by day for easy lookup
+    final Map<int, AttendanceRecord> recordMap = {};
+    for (var record in records) {
+      recordMap[record.date.day] = record;
+    }
+
+    return Container(
+      padding: EdgeInsets.all(20.r),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : AppColors.surface,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Monthly Overview',
+                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
+              ),
+              _buildLegendRow(isDark),
+            ],
+          ),
+          SizedBox(height: 24.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                .map((day) => Expanded(
+                      child: Center(
+                        child: Text(
+                          day,
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white54 : Colors.black54,
+                          ),
+                        ),
+                      ),
+                    ))
+                .toList(),
+          ),
+          SizedBox(height: 12.h),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 7,
+              childAspectRatio: 1.0,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+            ),
+            itemCount: daysInMonth + firstWeekday - 1,
+            itemBuilder: (context, index) {
+              if (index < firstWeekday - 1) {
+                return const SizedBox.shrink(); // Empty slot before the 1st
+              }
+              final day = index - firstWeekday + 2;
+              final record = recordMap[day];
+              
+              Color bgColor = isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey.shade100;
+              Color textColor = isDark ? Colors.white70 : Colors.black87;
+              
+              if (record != null) {
+                switch (record.status) {
+                  case AttendanceStatus.present:
+                    bgColor = AppColors.success.withValues(alpha: 0.2);
+                    textColor = AppColors.success;
+                    break;
+                  case AttendanceStatus.absent:
+                    bgColor = AppColors.error.withValues(alpha: 0.2);
+                    textColor = AppColors.error;
+                    break;
+                  case AttendanceStatus.late:
+                    bgColor = AppColors.warning.withValues(alpha: 0.2);
+                    textColor = AppColors.warning;
+                    break;
+                  case AttendanceStatus.halfDay:
+                    bgColor = Colors.orange.withValues(alpha: 0.2);
+                    textColor = Colors.orange;
+                    break;
+                  case AttendanceStatus.holiday:
+                    bgColor = Colors.blue.withValues(alpha: 0.2);
+                    textColor = Colors.blue;
+                    break;
+                }
+              }
+
+              // Highlight today if in current month
+              final now = DateTime.now();
+              final isToday = now.year == _currentDate.year && now.month == _currentDate.month && now.day == day;
+              
+              if (isToday && record == null) {
+                bgColor = AppColors.primary.withValues(alpha: 0.2);
+                textColor = AppColors.primary;
+              }
+
+              return Container(
+                decoration: BoxDecoration(
+                  color: bgColor,
+                  shape: BoxShape.circle,
+                  border: isToday ? Border.all(color: AppColors.primary, width: 2) : null,
+                ),
+                child: Center(
+                  child: Text(
+                    day.toString(),
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: isToday || record != null ? FontWeight.bold : FontWeight.normal,
+                      color: textColor,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLegendRow(bool isDark) {
+    return Row(
+      children: [
+        _buildLegendDot(AppColors.success, 'P', isDark),
+        SizedBox(width: 8.w),
+        _buildLegendDot(AppColors.error, 'A', isDark),
+      ],
+    );
+  }
+  
+  Widget _buildLegendDot(Color color, String label, bool isDark) {
+    return Row(
+      children: [
+        Container(
+          width: 10.r,
+          height: 10.r,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        SizedBox(width: 4.w),
+        Text(
+          label,
+          style: TextStyle(fontSize: 12.sp, color: isDark ? Colors.white70 : Colors.black54),
+        ),
+      ],
     );
   }
 
