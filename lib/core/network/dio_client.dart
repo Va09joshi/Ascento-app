@@ -456,7 +456,7 @@ final dioClientProvider = Provider<DioClient>((ref) {
     onSessionExpired: () {
       AppLogger.warning('🔒 Session expired — user must re-authenticate.');
       // 1. Force the auth controller to reflect the logged out state
-      ref.read(authControllerProvider.notifier).logout(() {});
+      ref.read(authControllerProvider.notifier).logout();
       
       // 2. Force the global router to navigate to login immediately
       ref.read(routerProvider).go(RoutePaths.login);
