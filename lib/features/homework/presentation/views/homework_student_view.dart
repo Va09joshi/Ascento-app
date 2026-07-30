@@ -70,7 +70,7 @@ class _HomeworkStudentViewState extends ConsumerState<HomeworkStudentView> {
         },
       ),
     );
-    );
+
   }
 }
 

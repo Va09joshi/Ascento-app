@@ -90,6 +90,7 @@ class StudentDashboardView extends ConsumerWidget {
                       iconBgColor: const Color(0xFFE8F6EF),
                       title: 'Attendance',
                       value: '${attendancePct.toStringAsFixed(0)}%',
+                      onTap: () => context.go(RoutePaths.attendance),
                     ),
                   ),
                   SizedBox(width: 16.w),
@@ -497,6 +498,7 @@ class StudentDashboardView extends ConsumerWidget {
   }
 
   Widget _buildOverviewCard({
+  Widget _buildOverviewCard({
     required BuildContext context,
     required bool isDark,
     required IconData icon,
@@ -504,18 +506,21 @@ class StudentDashboardView extends ConsumerWidget {
     required Color iconBgColor,
     required String title,
     required String value,
+    VoidCallback? onTap,
   }) {
     final theme = Theme.of(context);
     
-    return Container(
-      padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : Colors.white,
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(
-          color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(20.w),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkSurface : Colors.white,
+          borderRadius: BorderRadius.circular(20.r),
+          border: Border.all(
+            color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+          ),
         ),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -545,6 +550,7 @@ class StudentDashboardView extends ConsumerWidget {
           ),
         ],
       ),
+    ),
     );
   }
 

@@ -17,15 +17,23 @@ class AttendanceRecord {
   const AttendanceRecord({required this.id, this.studentId, required this.date, required this.status, this.remark});
 
   factory AttendanceRecord.fromJson(Map<String, dynamic> json) {
+    // Derive status from boolean fields
+    AttendanceStatus derivedStatus = AttendanceStatus.absent;
+    if (json['present'] == true) {
+      derivedStatus = json['late'] == true ? AttendanceStatus.late : AttendanceStatus.present;
+    }
+    
     return AttendanceRecord(
       id: json['id'] as String? ?? '',
       studentId: json['student_id'] as String?,
       date: DateTime.tryParse(json['date'] as String? ?? '') ?? DateTime.now(),
-      status: AttendanceStatus.values.firstWhere(
-        (s) => s.name == (json['status'] as String?),
-        orElse: () => AttendanceStatus.absent,
-      ),
-      remark: json['remark'] as String?,
+      status: json['status'] != null 
+          ? AttendanceStatus.values.firstWhere(
+              (s) => s.name == (json['status'] as String?),
+              orElse: () => derivedStatus,
+            )
+          : derivedStatus,
+      remark: json['remarks'] as String? ?? json['remark'] as String?,
     );
   }
 }
@@ -46,10 +54,10 @@ class AttendanceSummary {
 
   factory AttendanceSummary.fromJson(Map<String, dynamic> json) {
     return AttendanceSummary(
-      totalDays: json['totalDays'] as int? ?? 0,
-      presentDays: json['presentDays'] as int? ?? 0,
-      absentDays: json['absentDays'] as int? ?? 0,
-      lateDays: json['lateDays'] as int? ?? 0,
+      totalDays: json['totalDays'] as int? ?? json['total_days'] as int? ?? 0,
+      presentDays: json['presentDays'] as int? ?? json['present_days'] as int? ?? 0,
+      absentDays: json['absentDays'] as int? ?? json['absent_days'] as int? ?? ((json['total_days'] as int? ?? 0) - (json['present_days'] as int? ?? 0)),
+      lateDays: json['lateDays'] as int? ?? json['late_days'] as int? ?? 0,
       holidays: json['holidays'] as int? ?? 0,
       percentage: (json['percentage'] as num?)?.toDouble() ?? 0.0,
     );
