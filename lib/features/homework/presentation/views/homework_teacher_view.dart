@@ -594,8 +594,15 @@ class _SubmissionsBottomSheetState extends ConsumerState<_SubmissionsBottomSheet
                                 margin: EdgeInsets.only(bottom: 12.h),
                                 padding: EdgeInsets.all(16.w),
                                 decoration: BoxDecoration(
-                                  color: isDark ? Colors.black12 : Colors.grey.shade50,
+                                  color: isDark ? AppColors.darkSurface : Colors.white,
                                   borderRadius: BorderRadius.circular(16.r),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.03),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
                                   border: Border.all(color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05)),
                                 ),
                                 child: Row(
@@ -659,20 +666,34 @@ class _SubmissionsBottomSheetState extends ConsumerState<_SubmissionsBottomSheet
                                       ),
                                     ),
                                     SizedBox(width: 12.w),
-                                    ElevatedButton.icon(
-                                      onPressed: () async {
+                                    GestureDetector(
+                                      onTap: () async {
                                         final url = Uri.tryParse(sub.fileUrl);
                                         if (url != null && await canLaunchUrl(url)) {
                                           await launchUrl(url, mode: LaunchMode.externalApplication);
                                         }
                                       },
-                                      icon: Icon(Icons.download_rounded, size: 16.sp, color: Colors.white),
-                                      label: const Text('View', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: AppColors.primary,
-                                        elevation: 0,
+                                      child: Container(
                                         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.primary.withValues(alpha: 0.1),
+                                          borderRadius: BorderRadius.circular(20.r),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(Icons.remove_red_eye_rounded, size: 16.sp, color: AppColors.primary),
+                                            SizedBox(width: 6.w),
+                                            Text(
+                                              'View',
+                                              style: TextStyle(
+                                                color: AppColors.primary,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 13.sp,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ],
