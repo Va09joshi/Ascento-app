@@ -608,14 +608,23 @@ class _SubmissionsBottomSheetState extends ConsumerState<_SubmissionsBottomSheet
                                         shape: BoxShape.circle,
                                       ),
                                       alignment: Alignment.center,
-                                      child: Text(
-                                        sub.studentName?.substring(0, 1).toUpperCase() ?? 'S',
-                                        style: TextStyle(
-                                          color: AppColors.primary,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18.sp,
-                                        ),
-                                      ),
+                                      child: sub.avatarUrl != null
+                                          ? ClipOval(
+                                              child: Image.network(
+                                                sub.avatarUrl!,
+                                                fit: BoxFit.cover,
+                                                width: 48.w,
+                                                height: 48.h,
+                                              ),
+                                            )
+                                          : Text(
+                                              sub.studentName?.substring(0, 1).toUpperCase() ?? 'S',
+                                              style: TextStyle(
+                                                color: AppColors.primary,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18.sp,
+                                              ),
+                                            ),
                                     ),
                                     SizedBox(width: 16.w),
                                     Expanded(
@@ -635,11 +644,14 @@ class _SubmissionsBottomSheetState extends ConsumerState<_SubmissionsBottomSheet
                                             children: [
                                               Icon(Icons.access_time_rounded, size: 14.sp, color: isDark ? Colors.white54 : Colors.black54),
                                               SizedBox(width: 4.w),
-                                              Text(
-                                                'Submitted ${sub.submittedAt.toIso8601String().split('T')[0]}',
-                                                style: TextStyle(
-                                                  color: isDark ? Colors.white54 : Colors.black54,
-                                                  fontSize: 12.sp,
+                                              Expanded(
+                                                child: Text(
+                                                  'Submitted ${sub.submittedAt.toIso8601String().split('T')[0]}',
+                                                  style: TextStyle(
+                                                    color: isDark ? Colors.white54 : Colors.black54,
+                                                    fontSize: 12.sp,
+                                                  ),
+                                                  overflow: TextOverflow.ellipsis,
                                                 ),
                                               ),
                                             ],

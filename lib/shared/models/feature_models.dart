@@ -117,6 +117,7 @@ class HomeworkSubmission {
   final String studentId;
   final String? studentName;
   final String? studentEmail;
+  final String? avatarUrl;
   final String fileUrl;
   final String status;
   final DateTime submittedAt;
@@ -125,7 +126,7 @@ class HomeworkSubmission {
 
   const HomeworkSubmission({
     required this.id, required this.homeworkId, required this.studentId,
-    this.studentName, this.studentEmail, required this.fileUrl, required this.status,
+    this.studentName, this.studentEmail, this.avatarUrl, required this.fileUrl, required this.status,
     required this.submittedAt, this.grade, this.remarks,
   });
 
@@ -136,6 +137,7 @@ class HomeworkSubmission {
       studentId: json['student_id'] as String? ?? '',
       studentName: json['users']?['full_name'] as String?,
       studentEmail: json['users']?['email'] as String?,
+      avatarUrl: json['users']?['avatar_url'] as String?,
       fileUrl: json['file_url'] as String? ?? '',
       status: json['status'] as String? ?? 'pending',
       submittedAt: DateTime.tryParse(json['submitted_at'] as String? ?? '') ?? DateTime.now(),
