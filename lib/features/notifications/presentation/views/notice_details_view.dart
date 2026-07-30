@@ -25,169 +25,154 @@ class NoticeDetailsView extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final color = _typeColor();
 
+    // Corkboard/Wood background colors
+    final bgColor = isDark ? const Color(0xFF2D1A11) : const Color(0xFFE3C9A6);
+
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: bgColor,
       appBar: AppBar(
         title: Text(
-          'Notice Details',
-          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          'Notice Board',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white70 : Colors.brown.shade800,
+          ),
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
+        iconTheme: IconThemeData(color: isDark ? Colors.white70 : Colors.brown.shade800),
       ),
       body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (notice.imageUrl != null && notice.imageUrl!.isNotEmpty)
-              Container(
-                width: double.infinity,
-                margin: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20.r),
-                  color: isDark ? AppColors.darkSurface : AppColors.surface,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    )
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20.r),
-                  child: InteractiveViewer(
-                    child: Image.network(
-                      notice.imageUrl!,
-                      fit: BoxFit.contain, // Ensures the whole image is visible without cropping
-                      width: double.infinity,
-                      // Let height be determined by image aspect ratio if possible, 
-                      // but limit max height so it doesn't overflow screen
-                      height: 300.h, 
-                    ),
-                  ),
-                ),
-              ),
-            
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: notice.imageUrl != null ? 8.h : 24.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                        decoration: BoxDecoration(
-                          color: color.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(30.r),
-                        ),
-                        child: Text(
-                          notice.type.name.toUpperCase(),
-                          style: TextStyle(
-                            color: color,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 10.sp,
-                            letterSpacing: 1.0,
-                          ),
-                        ),
-                      ),
-                      const Spacer(),
-                      Text(
-                        DateFormat('MMM dd, yyyy • hh:mm a').format(notice.createdAt),
-                        style: TextStyle(
-                          color: AppColors.textMuted,
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    notice.title,
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : Colors.black87,
-                      height: 1.3,
-                    ),
-                  ),
-                  SizedBox(height: 24.h),
-                  Container(
+            Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.topCenter,
+              children: [
+                // The Paper Card (Slightly rotated for realism)
+                Transform.rotate(
+                  angle: 0.02, // slight tilt
+                  child: Container(
                     width: double.infinity,
+                    margin: EdgeInsets.only(top: 16.h),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFFAFAFA), // Paper-like color
-                      borderRadius: BorderRadius.circular(12.r),
-                      border: Border.all(
-                        color: isDark ? Colors.white10 : const Color(0xFFE0E0E0),
-                        width: 1,
-                      ),
+                      color: isDark ? const Color(0xFF2C2C2C) : const Color(0xFFFDFBF7), // Warm paper color
+                      borderRadius: BorderRadius.circular(2.r), // Sharp paper edges
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.03),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
+                          color: Colors.black.withValues(alpha: 0.3),
+                          blurRadius: 15,
+                          spreadRadius: 2,
+                          offset: const Offset(4, 8),
                         ),
                       ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Accent top bar (Letterhead style)
-                        Container(
-                          height: 6.h,
-                          decoration: BoxDecoration(
-                            color: color,
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
+                        if (notice.imageUrl != null && notice.imageUrl!.isNotEmpty)
+                          Padding(
+                            padding: EdgeInsets.all(16.w),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(4.r),
+                              child: InteractiveViewer(
+                                child: Image.network(
+                                  notice.imageUrl!,
+                                  fit: BoxFit.contain,
+                                  width: double.infinity,
+                                  height: 250.h,
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
+                        
                         Padding(
-                          padding: EdgeInsets.all(24.w),
+                          padding: EdgeInsets.fromLTRB(24.w, notice.imageUrl != null ? 8.h : 32.h, 24.w, 32.h),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+                                    decoration: BoxDecoration(
+                                      color: color.withValues(alpha: 0.1),
+                                      border: Border.all(color: color.withValues(alpha: 0.5)),
+                                      borderRadius: BorderRadius.circular(4.r),
+                                    ),
+                                    child: Text(
+                                      notice.type.name.toUpperCase(),
+                                      style: TextStyle(
+                                        color: color,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 10.sp,
+                                        letterSpacing: 1.2,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    DateFormat('dd MMM, yyyy').format(notice.createdAt),
+                                    style: TextStyle(
+                                      color: isDark ? Colors.white54 : Colors.black54,
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w600,
+                                      fontFamily: 'Courier', // Typewriter feel
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 24.h),
                               Text(
-                                'OFFICIAL NOTICE',
-                                style: TextStyle(
-                                  color: color,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 2.0,
-                                  fontSize: 11.sp,
+                                notice.title,
+                                style: theme.textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.w900,
+                                  color: isDark ? Colors.white : Colors.black87,
+                                  height: 1.3,
+                                  fontFamily: 'Georgia',
                                 ),
                               ),
                               SizedBox(height: 16.h),
-                              Text(
-                                'From: Administration',
-                                style: TextStyle(
-                                  color: isDark ? Colors.white70 : Colors.black54,
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              SizedBox(height: 8.h),
-                              Divider(color: isDark ? Colors.white24 : Colors.black12),
+                              Divider(color: isDark ? Colors.white24 : Colors.black12, thickness: 2),
                               SizedBox(height: 16.h),
                               Text(
                                 notice.body,
                                 style: theme.textTheme.bodyLarge?.copyWith(
-                                  height: 1.8, // More readable line height
+                                  height: 1.8,
                                   color: isDark ? Colors.white70 : const Color(0xFF2C3E50),
                                   fontSize: 15.sp,
-                                  fontFamily: 'Georgia', // Serif font for realistic letter feel (if available)
+                                  fontFamily: 'Georgia', 
                                 ),
                               ),
-                              SizedBox(height: 32.h),
+                              SizedBox(height: 40.h),
                               Align(
                                 alignment: Alignment.centerRight,
-                                child: Text(
-                                  'Ascento Abacus\nManagement Team',
-                                  textAlign: TextAlign.right,
-                                  style: TextStyle(
-                                    color: isDark ? Colors.white54 : Colors.black54,
-                                    fontSize: 13.sp,
-                                    fontStyle: FontStyle.italic,
-                                  ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      'Regards,',
+                                      style: TextStyle(
+                                        color: isDark ? Colors.white54 : Colors.black54,
+                                        fontSize: 14.sp,
+                                        fontStyle: FontStyle.italic,
+                                        fontFamily: 'Georgia',
+                                      ),
+                                    ),
+                                    SizedBox(height: 4.h),
+                                    Text(
+                                      'Ascento Abacus\nAdministration',
+                                      textAlign: TextAlign.right,
+                                      style: TextStyle(
+                                        color: isDark ? Colors.white70 : Colors.black87,
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Georgia',
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               )
                             ],
@@ -196,10 +181,31 @@ class NoticeDetailsView extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(height: 40.h),
-                ],
-              ),
+                ),
+                // The Pushpin
+                Positioned(
+                  top: 0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.4),
+                          blurRadius: 4,
+                          offset: const Offset(1, 3),
+                        )
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.push_pin_rounded,
+                      color: Colors.redAccent.shade700,
+                      size: 36.r,
+                    ),
+                  ),
+                ),
+              ],
             ),
+            SizedBox(height: 40.h),
           ],
         ),
       ),
