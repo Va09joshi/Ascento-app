@@ -498,7 +498,6 @@ class StudentDashboardView extends ConsumerWidget {
   }
 
   Widget _buildOverviewCard({
-  Widget _buildOverviewCard({
     required BuildContext context,
     required bool isDark,
     required IconData icon,
