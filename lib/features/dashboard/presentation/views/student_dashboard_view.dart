@@ -11,6 +11,8 @@ import 'package:ascento_abacus/features/meetings/presentation/providers/meetings
 import 'package:ascento_abacus/features/content/presentation/providers/content_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+final hasShownNoticePopupProvider = StateProvider<bool>((ref) => false);
+
 class StudentDashboardView extends ConsumerWidget {
   const StudentDashboardView({super.key});
 
@@ -21,6 +23,7 @@ class StudentDashboardView extends ConsumerWidget {
     final user = ref.watch(authControllerProvider).currentUser;
 
     // Fetch live stats
+    final notifAsync = ref.watch(notificationsProvider);
     final attendanceAsync = ref.watch(attendanceSummaryProvider);
     final examsAsync = ref.watch(examScheduleProvider);
     final feesAsync = ref.watch(feeHistoryProvider);
@@ -40,6 +43,19 @@ class StudentDashboardView extends ConsumerWidget {
     final pendingHomeworkCount = homeworkAsync.valueOrNull?.where((h) => h.status == HomeworkStatus.pending).length ?? 0;
     final profileAsync = ref.watch(studentProfileProvider);
     final profile = profileAsync.valueOrNull;
+
+    ref.listen(notificationsProvider, (previous, next) {
+      if (next.hasValue && next.value != null && next.value!.isNotEmpty) {
+        if (!ref.read(hasShownNoticePopupProvider)) {
+          Future.microtask(() {
+            if (context.mounted && !ref.read(hasShownNoticePopupProvider)) {
+              ref.read(hasShownNoticePopupProvider.notifier).state = true;
+              _showNoticePopup(context, next.value!.first, isDark);
+            }
+          });
+        }
+      }
+    });
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -586,4 +602,129 @@ class StudentDashboardView extends ConsumerWidget {
       ),
     );
   }
+}
+
+void _showNoticePopup(BuildContext context, NotificationItem notice, bool isDark) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Container(
+          padding: EdgeInsets.all(24.w),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkSurface : Colors.white,
+            borderRadius: BorderRadius.circular(24.r),
+            border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 20,
+                spreadRadius: 5,
+              )
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header with close button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(10.r),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.campaign_rounded, color: AppColors.primary, size: 24.r),
+                      ),
+                      SizedBox(width: 12.w),
+                      Text(
+                        'Latest Notice',
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: Icon(Icons.close_rounded, size: 24.r, color: Colors.grey),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20.h),
+              
+              // Notice Content
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(16.r),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.black12 : Colors.grey.shade50,
+                  borderRadius: BorderRadius.circular(16.r),
+                  border: Border.all(color: isDark ? AppColors.darkBorder : Colors.grey.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      notice.title,
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      notice.body,
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: isDark ? Colors.white70 : Colors.black54,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              SizedBox(height: 24.h),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    context.push(RoutePaths.noticeDetails, extra: notice);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    padding: EdgeInsets.symmetric(vertical: 14.h),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                  ),
+                  child: Text(
+                    'Read Full Notice',
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }

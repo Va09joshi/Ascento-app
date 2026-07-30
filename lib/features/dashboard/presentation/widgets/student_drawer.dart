@@ -26,73 +26,79 @@ class StudentDrawer extends ConsumerWidget {
       child: Column(
         children: [
           // ── Gradient Header ──
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 16.h,
-              bottom: 20.h,
-              left: 20.w,
-              right: 12.w,
-            ),
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF4A5568), Color(0xFF5B67F4)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+          InkWell(
+            onTap: () {
+              Navigator.of(context).pop();
+              context.go(RoutePaths.profile);
+            },
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top + 16.h,
+                bottom: 20.h,
+                left: 20.w,
+                right: 12.w,
               ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 48.r,
-                  height: 48.r,
-                  padding: EdgeInsets.all(6.r),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF4A5568), Color(0xFF5B67F4)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 48.r,
+                    height: 48.r,
+                    padding: EdgeInsets.all(6.r),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: user?.avatarUrl != null && user!.avatarUrl!.isNotEmpty
+                        ? ClipOval(
+                            child: Image.network(
+                              user.avatarUrl!,
+                              fit: BoxFit.cover,
+                              width: 36.r,
+                              height: 36.r,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(Icons.person, color: Colors.white),
+                            ),
+                          )
+                        : const Icon(Icons.person, color: Colors.white),
                   ),
-                  child: user?.avatarUrl != null && user!.avatarUrl!.isNotEmpty
-                      ? ClipOval(
-                          child: Image.network(
-                            user.avatarUrl!,
-                            fit: BoxFit.cover,
-                            width: 36.r,
-                            height: 36.r,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.person, color: Colors.white),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          userName,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
                           ),
-                        )
-                      : const Icon(Icons.person, color: Colors.white),
-                ),
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        userName,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
                         ),
-                      ),
-                      SizedBox(height: 2.h),
-                      Text(
-                        '- | Roll No.',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12.sp,
+                        SizedBox(height: 2.h),
+                        Text(
+                          '- | Roll No.',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12.sp,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ],
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
             ),
           ),
 

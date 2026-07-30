@@ -69,16 +69,25 @@ class ProfileView extends ConsumerWidget {
                         color: Colors.white.withValues(alpha: 0.18),
                         shape: BoxShape.circle,
                       ),
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        fit: BoxFit.contain,
-                        filterQuality: FilterQuality.high,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(
-                              Icons.school_rounded,
-                              size: 26,
-                              color: Colors.white,
-                            ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(28.r),
+                        child: profile.user.avatarUrl != null && profile.user.avatarUrl!.isNotEmpty
+                            ? Image.network(
+                                profile.user.avatarUrl!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => const Icon(Icons.person, color: Colors.white, size: 26),
+                              )
+                            : Image.asset(
+                                'assets/images/logo.png',
+                                fit: BoxFit.contain,
+                                filterQuality: FilterQuality.high,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    const Icon(
+                                      Icons.person,
+                                      size: 26,
+                                      color: Colors.white,
+                                    ),
+                              ),
                       ),
                     ),
                     SizedBox(width: 14.w),
@@ -250,16 +259,25 @@ class ProfileView extends ConsumerWidget {
                       color: Colors.white.withValues(alpha: 0.18),
                       shape: BoxShape.circle,
                     ),
-                    child: Image.asset(
-                      'assets/images/logo.png',
-                      fit: BoxFit.contain,
-                      filterQuality: FilterQuality.high,
-                      errorBuilder: (context, error, stackTrace) =>
-                          const Icon(
-                            Icons.person,
-                            size: 26,
-                            color: Colors.white,
-                          ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(28.r),
+                      child: user.avatarUrl != null && user.avatarUrl!.isNotEmpty
+                          ? Image.network(
+                              user.avatarUrl!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const Icon(Icons.person, color: Colors.white, size: 26),
+                            )
+                          : Image.asset(
+                              'assets/images/logo.png',
+                              fit: BoxFit.contain,
+                              filterQuality: FilterQuality.high,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(
+                                    Icons.person,
+                                    size: 26,
+                                    color: Colors.white,
+                                  ),
+                            ),
                     ),
                   ),
                   SizedBox(width: 14.w),
