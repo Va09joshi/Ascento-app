@@ -56,6 +56,21 @@ class HomeworkRepository {
     }
   }
 
+  Future<List<HomeworkSubmission>> getSubmissions(String homeworkId) async {
+    try {
+      final response = await _dioClient.get('${ApiEndpoints.homework}/$homeworkId/submissions');
+      if (response.data['success'] == true) {
+        return (response.data['data'] as List)
+            .map((json) => HomeworkSubmission.fromJson(json))
+            .toList();
+      }
+      throw Exception(response.data['message'] ?? 'Failed to fetch submissions');
+    } catch (e) {
+      AppLogger.error('Failed to get submissions', e);
+      rethrow;
+    }
+  }
+
   Future<void> gradeHomework(String submissionId, int grade, String? remarks) async {
     try {
       final response = await _dioClient.patch(

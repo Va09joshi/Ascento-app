@@ -12,8 +12,9 @@ class AttendanceRepository {
 
   AttendanceRepository(this._dioClient);
 
-  Future<void> markBulkAttendance(String sectionId, DateTime date, List<Map<String, dynamic>> records) async {
+  Future<void> markBulkAttendance(String classId, String sectionId, DateTime date, List<Map<String, dynamic>> records) async {
     await _dioClient.post(ApiEndpoints.attendanceBulk, data: {
+      'class_id': classId,
       'section_id': sectionId,
       'date': date.toIso8601String().split('T')[0],
       'records': records,

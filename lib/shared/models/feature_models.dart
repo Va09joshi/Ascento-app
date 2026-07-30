@@ -68,6 +68,7 @@ class HomeworkItem {
   final DateTime dueDate;
   final HomeworkStatus status;
   final String? attachmentUrl;
+  final String? submissionUrl;
   final String? teacherName;
   final int? marks;
   final int? totalMarks;
@@ -75,7 +76,7 @@ class HomeworkItem {
   const HomeworkItem({
     required this.id, required this.title, required this.subject,
     required this.description, required this.dueDate, required this.status,
-    this.attachmentUrl, this.teacherName, this.marks, this.totalMarks,
+    this.attachmentUrl, this.submissionUrl, this.teacherName, this.marks, this.totalMarks,
   });
 
   factory HomeworkItem.fromJson(Map<String, dynamic> json) {
@@ -89,7 +90,8 @@ class HomeworkItem {
         (s) => s.name == (json['status'] as String?),
         orElse: () => HomeworkStatus.pending,
       ),
-      attachmentUrl: json['attachmentUrl'] as String?,
+      attachmentUrl: json['file_url'] as String? ?? json['attachmentUrl'] as String?,
+      submissionUrl: json['submissionUrl'] as String?,
       teacherName: json['teacherName'] as String?,
       marks: json['marks'] as int?,
       totalMarks: json['totalMarks'] as int?,
@@ -97,6 +99,40 @@ class HomeworkItem {
   }
 
   bool get isOverdue => status == HomeworkStatus.pending && DateTime.now().isAfter(dueDate);
+}
+
+class HomeworkSubmission {
+  final String id;
+  final String homeworkId;
+  final String studentId;
+  final String? studentName;
+  final String? studentEmail;
+  final String fileUrl;
+  final String status;
+  final DateTime submittedAt;
+  final int? grade;
+  final String? remarks;
+
+  const HomeworkSubmission({
+    required this.id, required this.homeworkId, required this.studentId,
+    this.studentName, this.studentEmail, required this.fileUrl, required this.status,
+    required this.submittedAt, this.grade, this.remarks,
+  });
+
+  factory HomeworkSubmission.fromJson(Map<String, dynamic> json) {
+    return HomeworkSubmission(
+      id: json['id'] as String? ?? '',
+      homeworkId: json['homework_id'] as String? ?? '',
+      studentId: json['student_id'] as String? ?? '',
+      studentName: json['users']?['full_name'] as String?,
+      studentEmail: json['users']?['email'] as String?,
+      fileUrl: json['file_url'] as String? ?? '',
+      status: json['status'] as String? ?? 'pending',
+      submittedAt: DateTime.tryParse(json['submitted_at'] as String? ?? '') ?? DateTime.now(),
+      grade: json['grade'] as int?,
+      remarks: json['remarks'] as String?,
+    );
+  }
 }
 
 // =============================================================================
@@ -110,10 +146,16 @@ class ContentItem {
   final String type; // 'pdf', 'image', 'video'
   final String publicUrl;
   final DateTime createdAt;
+  final String? classId;
+  final String? sectionId;
+  final String? className;
+  final String? sectionName;
+  final String? creatorRole;
 
   const ContentItem({
     required this.id, required this.title, required this.description,
     required this.type, required this.publicUrl, required this.createdAt,
+    this.classId, this.sectionId, this.className, this.sectionName, this.creatorRole,
   });
 
   factory ContentItem.fromJson(Map<String, dynamic> json) {
@@ -124,6 +166,11 @@ class ContentItem {
       type: json['type'] as String? ?? 'document',
       publicUrl: json['public_url'] as String? ?? '',
       createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ?? DateTime.now(),
+      classId: json['class_id'] as String?,
+      sectionId: json['section_id'] as String?,
+      className: json['class_name'] as String?,
+      sectionName: json['section_name'] as String?,
+      creatorRole: json['creator_role'] as String?,
     );
   }
 }

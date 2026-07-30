@@ -51,13 +51,18 @@ class StudentDrawer extends ConsumerWidget {
                     color: Colors.white.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
-                  child: Image.asset(
-                    'assets/images/logo.png',
-                    fit: BoxFit.contain,
-                    filterQuality: FilterQuality.high,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.person, color: Colors.white),
-                  ),
+                  child: user?.avatarUrl != null && user!.avatarUrl!.isNotEmpty
+                      ? ClipOval(
+                          child: Image.network(
+                            user.avatarUrl!,
+                            fit: BoxFit.cover,
+                            width: 36.r,
+                            height: 36.r,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(Icons.person, color: Colors.white),
+                          ),
+                        )
+                      : const Icon(Icons.person, color: Colors.white),
                 ),
                 SizedBox(width: 12.w),
                 Expanded(
@@ -170,6 +175,17 @@ class StudentDrawer extends ConsumerWidget {
                       context.go(RoutePaths.meetings);
                     },
                   ),
+                  _DrawerTile(
+                    icon: Icons.person_rounded,
+                    title: 'Profile',
+                    iconColor: const Color(0xFF6C5CE7),
+                    isSelected: currentRoute == RoutePaths.profile,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      context.go(RoutePaths.profile);
+                    },
+                  ),
+                  SizedBox(height: 8.h),
                   _DrawerTile(
                     icon: Icons.menu_book_rounded,
                     title: 'Study Materials',

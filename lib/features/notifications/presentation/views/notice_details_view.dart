@@ -43,7 +43,6 @@ class NoticeDetailsView extends StatelessWidget {
             if (notice.imageUrl != null && notice.imageUrl!.isNotEmpty)
               Container(
                 width: double.infinity,
-                height: 220.h,
                 margin: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20.r),
@@ -55,9 +54,18 @@ class NoticeDetailsView extends StatelessWidget {
                       offset: const Offset(0, 4),
                     )
                   ],
-                  image: DecorationImage(
-                    image: NetworkImage(notice.imageUrl!),
-                    fit: BoxFit.cover,
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20.r),
+                  child: InteractiveViewer(
+                    child: Image.network(
+                      notice.imageUrl!,
+                      fit: BoxFit.contain, // Ensures the whole image is visible without cropping
+                      width: double.infinity,
+                      // Let height be determined by image aspect ratio if possible, 
+                      // but limit max height so it doesn't overflow screen
+                      height: 300.h, 
+                    ),
                   ),
                 ),
               ),
@@ -108,21 +116,84 @@ class NoticeDetailsView extends StatelessWidget {
                   SizedBox(height: 24.h),
                   Container(
                     width: double.infinity,
-                    padding: EdgeInsets.all(20.w),
                     decoration: BoxDecoration(
-                      color: isDark ? AppColors.darkSurface : Colors.white,
-                      borderRadius: BorderRadius.circular(20.r),
+                      color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFFAFAFA), // Paper-like color
+                      borderRadius: BorderRadius.circular(12.r),
                       border: Border.all(
-                        color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+                        color: isDark ? Colors.white10 : const Color(0xFFE0E0E0),
+                        width: 1,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.03),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    child: Text(
-                      notice.body,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        height: 1.6,
-                        color: isDark ? Colors.white70 : Colors.black87,
-                        fontSize: 15.sp,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Accent top bar (Letterhead style)
+                        Container(
+                          height: 6.h,
+                          decoration: BoxDecoration(
+                            color: color,
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(24.w),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'OFFICIAL NOTICE',
+                                style: TextStyle(
+                                  color: color,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 2.0,
+                                  fontSize: 11.sp,
+                                ),
+                              ),
+                              SizedBox(height: 16.h),
+                              Text(
+                                'From: Administration',
+                                style: TextStyle(
+                                  color: isDark ? Colors.white70 : Colors.black54,
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              SizedBox(height: 8.h),
+                              Divider(color: isDark ? Colors.white24 : Colors.black12),
+                              SizedBox(height: 16.h),
+                              Text(
+                                notice.body,
+                                style: theme.textTheme.bodyLarge?.copyWith(
+                                  height: 1.8, // More readable line height
+                                  color: isDark ? Colors.white70 : const Color(0xFF2C3E50),
+                                  fontSize: 15.sp,
+                                  fontFamily: 'Georgia', // Serif font for realistic letter feel (if available)
+                                ),
+                              ),
+                              SizedBox(height: 32.h),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  'Ascento Abacus\nManagement Team',
+                                  textAlign: TextAlign.right,
+                                  style: TextStyle(
+                                    color: isDark ? Colors.white54 : Colors.black54,
+                                    fontSize: 13.sp,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   SizedBox(height: 40.h),

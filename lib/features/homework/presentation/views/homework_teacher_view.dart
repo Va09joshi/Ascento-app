@@ -13,7 +13,9 @@ import 'package:ascento_abacus/features/users/presentation/providers/teachers_pr
 import 'package:ascento_abacus/core/network/dio_client.dart';
 import 'package:intl/intl.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:dio/dio.dart';
+import 'package:ascento_abacus/features/auth/presentation/controllers/auth_controller.dart';
 
 class HomeworkTeacherView extends ConsumerStatefulWidget {
   const HomeworkTeacherView({super.key});
@@ -145,27 +147,32 @@ class _CreateHomeworkDialogState extends ConsumerState<_CreateHomeworkDialog> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     
-    // Use myStudentsProvider for assigned classes/sections
-    final myStudentsAsync = ref.watch(myStudentsProvider);
+    final classesAsync = ref.watch(classesListProvider);
+    final sectionsAsync = ref.watch(sectionsListProvider);
     final subjectsAsync = ref.watch(subjectsListProvider);
+    final authState = ref.watch(authControllerProvider);
+    final user = authState.currentUser;
 
-    // Extract unique classes from the assigned sections
-    final uniqueClasses = <String, Map<String, dynamic>>{};
-    if (myStudentsAsync.value != null) {
-      for (var section in myStudentsAsync.value!) {
-        if (section['class_id'] != null && section['class_name'] != null) {
-          uniqueClasses[section['class_id']] = {
-            'id': section['class_id'],
-            'name': section['class_name']
-          };
-        }
+    final myStudentsAsync = ref.watch(myStudentsProvider);
+    final mySections = myStudentsAsync.valueOrNull ?? [];
+
+    final uniqueClasses = <String, Map<String, String>>{};
+    for (var s in mySections) {
+      if (s['class_id'] != null && s['class_name'] != null) {
+        uniqueClasses[s['class_id']] = {
+          'id': s['class_id'].toString(),
+          'name': s['class_name'].toString(),
+        };
       }
     }
-    final classItems = uniqueClasses.values.toList();
+    final teacherClasses = uniqueClasses.values.toList();
 
-    // Extract sections for the selected class
-    final sectionItems = (myStudentsAsync.value ?? [])
+    final sectionItems = mySections
         .where((s) => s['class_id'] == _selectedClassId)
+        .map((s) => {
+          'id': s['section_id']?.toString() ?? '',
+          'name': s['section_name']?.toString() ?? '',
+        })
         .toList();
 
     return AlertDialog(
@@ -197,9 +204,9 @@ class _CreateHomeworkDialogState extends ConsumerState<_CreateHomeworkDialog> {
                     isExpanded: true,
                     decoration: _inputDecoration('Class', isDark),
                     value: _selectedClassId,
-                    items: classItems.map((c) => DropdownMenuItem(
-                      value: c['id'] as String,
-                      child: Text(c['name'] as String, overflow: TextOverflow.ellipsis),
+                    items: teacherClasses.map((c) => DropdownMenuItem(
+                      value: c['id'],
+                      child: Text(c['name']!, overflow: TextOverflow.ellipsis),
                     )).toList(),
                     onChanged: (val) {
                       setState(() {
@@ -216,8 +223,8 @@ class _CreateHomeworkDialogState extends ConsumerState<_CreateHomeworkDialog> {
                     decoration: _inputDecoration('Section', isDark),
                     value: _selectedSectionId,
                     items: sectionItems.map((s) => DropdownMenuItem(
-                      value: s['section_id'] as String,
-                      child: Text(s['section_name'] as String, overflow: TextOverflow.ellipsis),
+                      value: s['id'],
+                      child: Text(s['name']!, overflow: TextOverflow.ellipsis),
                     )).toList(),
                     onChanged: (val) => setState(() => _selectedSectionId = val),
                   ),
@@ -427,9 +434,7 @@ class _HomeworkTeacherTile extends ConsumerWidget {
                 ),
               ),
               InkWell(
-                onTap: () {
-                  // View Submissions logic
-                },
+                onTap: () => _showSubmissionsBottomSheet(context, ref),
                 borderRadius: BorderRadius.circular(6.r),
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
@@ -447,6 +452,127 @@ class _HomeworkTeacherTile extends ConsumerWidget {
               )
             ],
           )
+        ],
+      ),
+
+    );
+  }
+
+  void _showSubmissionsBottomSheet(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _SubmissionsBottomSheet(homeworkId: item.id),
+    );
+  }
+}
+
+class _SubmissionsBottomSheet extends ConsumerStatefulWidget {
+  final String homeworkId;
+  const _SubmissionsBottomSheet({required this.homeworkId});
+  @override
+  ConsumerState<_SubmissionsBottomSheet> createState() => _SubmissionsBottomSheetState();
+}
+
+class _SubmissionsBottomSheetState extends ConsumerState<_SubmissionsBottomSheet> {
+  List<HomeworkSubmission>? _submissions;
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchSubmissions();
+  }
+
+  Future<void> _fetchSubmissions() async {
+    try {
+      final submissions = await ref.read(homeworkRepositoryProvider).getSubmissions(widget.homeworkId);
+      if (mounted) {
+        setState(() {
+          _submissions = submissions;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = e.toString();
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.75,
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkBackground : AppColors.background,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+      ),
+      child: Column(
+        children: [
+          Container(
+            margin: EdgeInsets.only(top: 12.h, bottom: 8.h),
+            height: 4.h, width: 40.w,
+            decoration: BoxDecoration(
+              color: isDark ? Colors.white24 : Colors.black26,
+              borderRadius: BorderRadius.circular(2.r),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(24.w),
+            child: Row(
+              children: [
+                Icon(Icons.grading_rounded, color: AppColors.primary, size: 28.r),
+                SizedBox(width: 12.w),
+                Text('Submissions', style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+          Expanded(
+            child: _isLoading 
+                ? const Center(child: CircularProgressIndicator())
+                : _error != null 
+                    ? Center(child: Text('Error: $_error', style: TextStyle(color: AppColors.error)))
+                    : _submissions!.isEmpty 
+                        ? const Center(child: Text('No submissions yet.'))
+                        : ListView.separated(
+                            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 8.h),
+                            itemCount: _submissions!.length,
+                            separatorBuilder: (_, __) => Divider(color: isDark ? Colors.white10 : Colors.black12),
+                            itemBuilder: (context, index) {
+                              final sub = _submissions![index];
+                              return ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                leading: CircleAvatar(
+                                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                                  child: Text(
+                                    sub.studentName?.substring(0, 1).toUpperCase() ?? 'S',
+                                    style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                title: Text(sub.studentName ?? 'Unknown Student', style: TextStyle(fontWeight: FontWeight.w600)),
+                                subtitle: Text('Submitted: ${sub.submittedAt.toIso8601String().split('T')[0]}'),
+                                trailing: TextButton.icon(
+                                  onPressed: () async {
+                                    final url = Uri.tryParse(sub.fileUrl);
+                                    if (url != null && await canLaunchUrl(url)) {
+                                      await launchUrl(url, mode: LaunchMode.externalApplication);
+                                    }
+                                  },
+                                  icon: const Icon(Icons.download_rounded, size: 16),
+                                  label: const Text('View'),
+                                  style: TextButton.styleFrom(foregroundColor: AppColors.primary),
+                                ),
+                              );
+                            },
+                          ),
+          ),
         ],
       ),
     );

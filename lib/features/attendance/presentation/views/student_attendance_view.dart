@@ -8,15 +8,34 @@ import 'package:ascento_abacus/shared/widgets/premium_data_table.dart';
 
 import 'package:ascento_abacus/shared/providers/feature_providers.dart';
 
-class StudentAttendanceView extends ConsumerWidget {
+class StudentAttendanceView extends ConsumerStatefulWidget {
   const StudentAttendanceView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<StudentAttendanceView> createState() => _StudentAttendanceViewState();
+}
+
+class _StudentAttendanceViewState extends ConsumerState<StudentAttendanceView> {
+  DateTime _currentDate = DateTime.now();
+
+  void _previousMonth() {
+    setState(() {
+      _currentDate = DateTime(_currentDate.year, _currentDate.month - 1);
+    });
+  }
+
+  void _nextMonth() {
+    setState(() {
+      _currentDate = DateTime(_currentDate.year, _currentDate.month + 1);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final now = DateTime.now();
-    final attendanceAsync = ref.watch(monthlyAttendanceProvider((month: now.month, year: now.year)));
+    final attendanceAsync = ref.watch(monthlyAttendanceProvider((month: _currentDate.month, year: _currentDate.year)));
     final summaryAsync = ref.watch(attendanceSummaryProvider);
 
     return Scaffold(
@@ -42,6 +61,74 @@ class StudentAttendanceView extends ConsumerWidget {
                 ),
               ),
               SizedBox(height: 24.h),
+              
+              // Today's Status Banner (Only show for current month)
+              if (_currentDate.month == now.month && _currentDate.year == now.year && attendanceAsync.valueOrNull != null)
+                Builder(builder: (context) {
+                  final today = DateTime(now.year, now.month, now.day);
+                  final todayRecord = attendanceAsync.valueOrNull!.cast<AttendanceRecord?>().firstWhere(
+                    (record) => record != null && record.date.year == today.year && record.date.month == today.month && record.date.day == today.day,
+                    orElse: () => null,
+                  );
+
+                  if (todayRecord == null) {
+                    return Container(
+                      margin: EdgeInsets.only(bottom: 24.h),
+                      padding: EdgeInsets.all(16.r),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(16.r),
+                        border: Border.all(color: Colors.blue.withValues(alpha: 0.2)),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.info_outline_rounded, color: Colors.blue, size: 28.r),
+                          SizedBox(width: 12.w),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Attendance Not Marked Yet', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue, fontSize: 16.sp)),
+                                Text('Your teacher has not marked attendance for today.', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87, fontSize: 13.sp)),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  final isPresent = todayRecord.status == AttendanceStatus.present;
+                  final color = isPresent ? AppColors.success : AppColors.error;
+                  final icon = isPresent ? Icons.check_circle_rounded : Icons.cancel_rounded;
+                  final title = isPresent ? 'You are Present Today!' : 'You are Absent Today';
+
+                  return Container(
+                    margin: EdgeInsets.only(bottom: 24.h),
+                    padding: EdgeInsets.all(16.r),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(16.r),
+                      border: Border.all(color: color.withValues(alpha: 0.2)),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(icon, color: color, size: 32.r),
+                        SizedBox(width: 16.w),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: color, fontSize: 18.sp)),
+                              SizedBox(height: 2.h),
+                              Text('Recorded on ${_formatDate(todayRecord.date)}', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87, fontSize: 13.sp)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
               
               // Statistics Cards
               Row(
@@ -81,6 +168,27 @@ class StudentAttendanceView extends ConsumerWidget {
                 ],
               ),
               SizedBox(height: 24.h),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    onPressed: _previousMonth,
+                    icon: Icon(Icons.chevron_left, color: isDark ? Colors.white : Colors.black),
+                    style: IconButton.styleFrom(backgroundColor: isDark ? AppColors.darkSurface : Colors.white),
+                  ),
+                  Text(
+                    '${_getMonthName(_currentDate.month)} ${_currentDate.year}',
+                    style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+                  ),
+                  IconButton(
+                    onPressed: _nextMonth,
+                    icon: Icon(Icons.chevron_right, color: isDark ? Colors.white : Colors.black),
+                    style: IconButton.styleFrom(backgroundColor: isDark ? AppColors.darkSurface : Colors.white),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16.h),
 
               PremiumDataTable<AttendanceRecord>(
                 title: 'Recent Records',
@@ -186,5 +294,10 @@ class StudentAttendanceView extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  String _getMonthName(int month) {
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    return months[month - 1];
   }
 }

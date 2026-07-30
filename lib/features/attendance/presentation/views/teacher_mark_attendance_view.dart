@@ -7,9 +7,12 @@ import 'package:ascento_abacus/shared/models/class_model.dart';
 import 'package:ascento_abacus/shared/models/section_model.dart';
 import 'package:ascento_abacus/shared/models/user_model.dart';
 import 'package:ascento_abacus/shared/models/feature_models.dart';
+import 'package:ascento_abacus/features/users/presentation/providers/teachers_provider.dart';
 import 'package:ascento_abacus/features/academics/presentation/providers/academics_provider.dart';
 import 'package:ascento_abacus/features/attendance/data/repositories/attendance_repository.dart';
 import 'package:ascento_abacus/core/widgets/custom_button.dart';
+
+import '../../../auth/presentation/controllers/auth_controller.dart';
 
 class TeacherMarkAttendanceView extends ConsumerStatefulWidget {
   const TeacherMarkAttendanceView({super.key});
@@ -47,9 +50,19 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
     final authState = ref.watch(authControllerProvider);
     final user = authState.currentUser;
 
-    final teacherSections = sectionsAsync.valueOrNull?.where((s) => s.teacherId == user?.id).toList() ?? [];
-    final teacherClassIds = teacherSections.map((s) => s.classId).toSet();
-    final teacherClasses = classesAsync.valueOrNull?.where((c) => teacherClassIds.contains(c.id)).toList() ?? [];
+    final myStudentsAsync = ref.watch(myStudentsProvider);
+    final mySections = myStudentsAsync.valueOrNull ?? [];
+
+    final uniqueClasses = <String, Map<String, String>>{};
+    for (var s in mySections) {
+      if (s['class_id'] != null && s['class_name'] != null) {
+        uniqueClasses[s['class_id']] = {
+          'id': s['class_id'].toString(),
+          'name': s['class_name'].toString(),
+        };
+      }
+    }
+    final teacherClasses = uniqueClasses.values.toList();
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -132,8 +145,8 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
                           ),
                           value: _selectedClassId,
                           items: teacherClasses.map((c) => DropdownMenuItem(
-                            value: c.id,
-                            child: Text(c.name, overflow: TextOverflow.ellipsis),
+                            value: c['id'],
+                            child: Text(c['name']!, overflow: TextOverflow.ellipsis),
                           )).toList(),
                           onChanged: (val) {
                             setState(() {
@@ -158,11 +171,11 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
                             ),
                           ),
                           value: _selectedSectionId,
-                          items: teacherSections
-                              .where((s) => s.classId == _selectedClassId)
+                          items: mySections
+                              .where((s) => s['class_id'] == _selectedClassId)
                               .map((s) => DropdownMenuItem(
-                            value: s.id,
-                            child: Text(s.name, overflow: TextOverflow.ellipsis),
+                            value: s['section_id']?.toString(),
+                            child: Text(s['section_name']?.toString() ?? '', overflow: TextOverflow.ellipsis),
                           )).toList(),
                           onChanged: (val) {
                             setState(() {
@@ -295,23 +308,31 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
                         },
                       ),
               ),
+              if (_selectedSectionId != null)
+                Container(
+                  padding: EdgeInsets.fromLTRB(24.w, 16.h, 24.w, 24.h),
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.darkSurface : AppColors.surface,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, -5),
+                      ),
+                    ],
+                  ),
+                  child: SafeArea(
+                    top: false,
+                    child: CustomButton(
+                      text: 'Submit Attendance',
+                      isLoading: _isSubmitting,
+                      onPressed: _submitAttendance,
+                    ),
+                  ),
+                ),
             ],
-      )
-
-
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: _selectedSectionId != null
-          ? Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24.w),
-        child: CustomButton(
-          text: 'Submit Attendance',
-          isLoading: _isSubmitting,
-          onPressed: _submitAttendance,
+          ),
         ),
-      )
-
-          : null,
     );
   }
 
@@ -326,6 +347,7 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
       }).toList();
       
       await ref.read(attendanceRepositoryProvider).markBulkAttendance(
+        _selectedClassId!,
         _selectedSectionId!,
         _selectedDate,
         records,

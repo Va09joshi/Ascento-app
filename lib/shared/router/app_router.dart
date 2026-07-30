@@ -421,11 +421,12 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
             name: RouteNames.notifications,
             pageBuilder: (context, state) {
               final authState = ref.watch(authControllerProvider);
-              final isStudent = authState.currentUser?.role == UserRole.student;
+              final userRole = authState.currentUser?.role;
+              final isReadOnly = userRole == UserRole.student || userRole == UserRole.teacher;
               
               return CustomTransitionPage(
                 key: state.pageKey,
-                child: NoticesManagementView(isReadOnly: isStudent),
+                child: NoticesManagementView(isReadOnly: isReadOnly),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
                       return FadeTransition(opacity: animation, child: child);

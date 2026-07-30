@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:ascento_abacus/core/theme/app_colors.dart';
+import 'package:ascento_abacus/core/widgets/app_shimmer.dart';
 import 'package:ascento_abacus/shared/models/feature_models.dart';
 
 class StudyModeView extends ConsumerStatefulWidget {
@@ -142,49 +143,48 @@ class _StudyModeViewState extends ConsumerState<StudyModeView> {
             });
           },
         ),
-        if (_isLoading && !_hasError)
+        if (_isLoading)
           Center(
             child: Container(
+              margin: EdgeInsets.all(24.w),
               padding: EdgeInsets.all(32.w),
+              constraints: const BoxConstraints(maxWidth: 600),
               decoration: BoxDecoration(
                 color: isDark ? AppColors.darkSurface : Colors.white,
                 borderRadius: BorderRadius.circular(16.r),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
-                    blurRadius: 24,
-                    offset: const Offset(0, 8),
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    width: 40.r,
-                    height: 40.r,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 3,
-                      color: AppColors.primary,
-                    ),
-                  ),
+                  // Title shimmer
+                  AppShimmer(width: 250.w, height: 24.h),
                   SizedBox(height: 16.h),
-                  Text(
-                    'Loading PDF...',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                      color: isDark ? Colors.white : AppColors.textPrimary,
-                    ),
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    'Please wait while the document loads',
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
-                    ),
-                  ),
+                  // Paragraph shimmer
+                  AppShimmer(width: double.infinity, height: 12.h),
+                  SizedBox(height: 8.h),
+                  AppShimmer(width: double.infinity, height: 12.h),
+                  SizedBox(height: 8.h),
+                  AppShimmer(width: double.infinity, height: 12.h),
+                  SizedBox(height: 8.h),
+                  AppShimmer(width: 200.w, height: 12.h),
+                  SizedBox(height: 32.h),
+                  // Image/block shimmer
+                  AppShimmer(width: double.infinity, height: 200.h, borderRadius: 8.r),
+                  SizedBox(height: 32.h),
+                  // Bottom paragraph shimmer
+                  AppShimmer(width: double.infinity, height: 12.h),
+                  SizedBox(height: 8.h),
+                  AppShimmer(width: double.infinity, height: 12.h),
+                  SizedBox(height: 8.h),
+                  AppShimmer(width: 150.w, height: 12.h),
                 ],
               ),
             ),

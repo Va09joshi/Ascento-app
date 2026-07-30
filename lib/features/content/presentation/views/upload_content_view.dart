@@ -10,7 +10,10 @@ import 'package:ascento_abacus/core/widgets/custom_textfield.dart';
 import 'package:ascento_abacus/shared/models/feature_models.dart';
 import 'package:ascento_abacus/features/content/data/repositories/content_repository.dart';
 import 'package:ascento_abacus/features/content/presentation/providers/content_provider.dart';
-
+import 'package:ascento_abacus/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:ascento_abacus/features/academics/presentation/providers/academics_provider.dart';
+import 'package:ascento_abacus/shared/models/user_model.dart';
+import 'package:ascento_abacus/features/users/presentation/providers/teachers_provider.dart';
 class UploadContentView extends ConsumerStatefulWidget {
   final ContentItem? content;
   const UploadContentView({super.key, this.content});
@@ -28,6 +31,8 @@ class _UploadContentViewState extends ConsumerState<UploadContentView> {
   bool _isLoading = false;
   String? _selectedFilePath;
   String? _selectedFileName;
+  String? _selectedClassId;
+  String? _selectedSectionId;
 
   bool get _isEdit => widget.content != null;
 
@@ -48,6 +53,8 @@ class _UploadContentViewState extends ConsumerState<UploadContentView> {
       _descriptionController.text = c.description;
       _urlController.text = c.publicUrl;
       _selectedType = c.type;
+      _selectedClassId = c.classId;
+      _selectedSectionId = c.sectionId;
     }
   }
 
@@ -127,6 +134,8 @@ class _UploadContentViewState extends ConsumerState<UploadContentView> {
         'type': _selectedType,
         'storage_path': storageUrl,
         'public_url': storageUrl,
+        if (_selectedClassId != null) 'class_id': _selectedClassId,
+        if (_selectedSectionId != null) 'section_id': _selectedSectionId,
       };
 
       if (_isEdit) {
@@ -160,6 +169,47 @@ class _UploadContentViewState extends ConsumerState<UploadContentView> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+
+    final authState = ref.watch(authControllerProvider);
+    final user = authState.currentUser;
+    final isTeacher = user?.role == UserRole.teacher;
+    final isAdmin = user?.role == UserRole.admin || user?.role == UserRole.superAdmin;
+    final classesAsync = ref.watch(classesListProvider);
+    final sectionsAsync = ref.watch(sectionsListProvider);
+    
+    List<DropdownMenuItem<String>> classDropdownItems = [];
+    List<DropdownMenuItem<String>> sectionDropdownItems = [];
+    
+    if (isTeacher) {
+      final myStudentsAsync = ref.watch(myStudentsProvider);
+      final mySections = myStudentsAsync.valueOrNull ?? [];
+
+      final uniqueClasses = <String, Map<String, String>>{};
+      for (var s in mySections) {
+        if (s['class_id'] != null && s['class_name'] != null) {
+          uniqueClasses[s['class_id']] = {
+            'id': s['class_id'].toString(),
+            'name': s['class_name'].toString(),
+          };
+        }
+      }
+      final teacherClasses = uniqueClasses.values.toList();
+
+      classDropdownItems = teacherClasses.map((c) => DropdownMenuItem(value: c['id'], child: Text(c['name']!))).toList();
+      sectionDropdownItems = mySections
+          .where((s) => s['class_id'] == _selectedClassId)
+          .map((s) => DropdownMenuItem(
+                value: s['section_id']?.toString(), 
+                child: Text(s['section_name']?.toString() ?? '')
+              ))
+          .toList();
+    } else if (isAdmin) {
+      classDropdownItems = (classesAsync.valueOrNull ?? []).map((c) => DropdownMenuItem(value: c.id, child: Text(c.name))).toList();
+      sectionDropdownItems = (sectionsAsync.valueOrNull ?? [])
+          .where((s) => s.classId == _selectedClassId)
+          .map((s) => DropdownMenuItem(value: s.id, child: Text(s.name)))
+          .toList();
+    }
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
@@ -211,6 +261,47 @@ class _UploadContentViewState extends ConsumerState<UploadContentView> {
                         hint: 'Brief description of the material...',
                         maxLines: 4,
                       ),
+                      if (isTeacher || isAdmin) ...[
+                        SizedBox(height: 20.h),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: DropdownButtonFormField<String>(
+                                isExpanded: true,
+                                decoration: const InputDecoration(labelText: 'Target Class (Optional)'),
+                                value: _selectedClassId,
+                                items: [
+                                  const DropdownMenuItem<String>(value: null, child: Text('All Classes')),
+                                  ...classDropdownItems,
+                                ],
+                                onChanged: (val) {
+                                  setState(() {
+                                    _selectedClassId = val;
+                                    _selectedSectionId = null;
+                                  });
+                                },
+                              ),
+                            ),
+                            SizedBox(width: 12.w),
+                            Expanded(
+                              child: DropdownButtonFormField<String>(
+                                isExpanded: true,
+                                decoration: const InputDecoration(labelText: 'Target Section (Optional)'),
+                                value: _selectedSectionId,
+                                items: [
+                                  const DropdownMenuItem<String>(value: null, child: Text('All Sections')),
+                                  ...sectionDropdownItems,
+                                ],
+                                onChanged: _selectedClassId == null ? null : (val) {
+                                  setState(() {
+                                    _selectedSectionId = val;
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ],
                   ),
                 ),

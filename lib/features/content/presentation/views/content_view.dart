@@ -21,6 +21,9 @@ class ContentView extends ConsumerStatefulWidget {
 }
 
 class _ContentViewState extends ConsumerState<ContentView> {
+  String _selectedFilter = 'All';
+  final List<String> _filters = ['All', 'PDF', 'Video', 'Image', 'Quiz', 'Worksheet'];
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -75,6 +78,34 @@ class _ContentViewState extends ConsumerState<ContentView> {
                 ],
               ),
             ),
+            SizedBox(
+              height: 40.h,
+              child: ListView.separated(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                scrollDirection: Axis.horizontal,
+                itemCount: _filters.length,
+                separatorBuilder: (_, __) => SizedBox(width: 8.w),
+                itemBuilder: (context, index) {
+                  final filter = _filters[index];
+                  final isSelected = _selectedFilter == filter;
+                  return ChoiceChip(
+                    label: Text(filter),
+                    selected: isSelected,
+                    onSelected: (selected) {
+                      setState(() => _selectedFilter = filter);
+                    },
+                    selectedColor: AppColors.primary.withValues(alpha: 0.15),
+                    backgroundColor: isDark ? AppColors.darkSurface : Colors.grey.shade100,
+                    side: BorderSide.none,
+                    labelStyle: TextStyle(
+                      color: isSelected ? AppColors.primary : (isDark ? Colors.white70 : Colors.black87),
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  );
+                },
+              ),
+            ),
+            SizedBox(height: 16.h),
             Expanded(
               child: contentAsync.when(
         loading: () => ListView.separated(
@@ -89,10 +120,14 @@ class _ContentViewState extends ConsumerState<ContentView> {
           icon: Icons.error_outline,
         ),
         data: (items) {
-          if (items.isEmpty) {
+          final filteredItems = _selectedFilter == 'All'
+              ? items
+              : items.where((i) => i.type.toLowerCase() == _selectedFilter.toLowerCase()).toList();
+
+          if (filteredItems.isEmpty) {
             return const EmptyStateWidget(
               title: 'No Materials Found',
-              subtitle: 'Study materials and resources will appear here.',
+              subtitle: 'Try changing your filter or upload new materials.',
               icon: Icons.auto_stories_rounded,
             );
           }
@@ -100,13 +135,13 @@ class _ContentViewState extends ConsumerState<ContentView> {
             onRefresh: () async => ref.refresh(contentListProvider),
             child: ListView.separated(
               padding: EdgeInsets.all(20.w),
-              itemCount: items.length,
+              itemCount: filteredItems.length,
               separatorBuilder: (_, __) => SizedBox(height: 16.h),
               itemBuilder: (context, index) => _ContentTile(
-                item: items[index],
+                item: filteredItems[index],
                 canManage: canManage,
-                onEdit: () => context.pushNamed(RouteNames.uploadContent, extra: items[index]),
-                onDelete: () => _confirmDelete(context, ref, items[index]),
+                onEdit: () => context.pushNamed(RouteNames.uploadContent, extra: filteredItems[index]),
+                onDelete: () => _confirmDelete(context, ref, filteredItems[index]),
               ),
             ),
           );
@@ -180,6 +215,19 @@ class _ContentTile extends StatelessWidget {
     required this.onDelete,
   });
 
+  Color _getPdfCoverColor(String id) {
+    final colors = [
+      Colors.red.shade400,
+      Colors.blue.shade400,
+      Colors.green.shade400,
+      Colors.orange.shade400,
+      Colors.purple.shade400,
+      Colors.teal.shade400,
+      Colors.indigo.shade400,
+    ];
+    return colors[id.hashCode.abs() % colors.length];
+  }
+
   IconData _getIconForType(String type) {
     switch (type.toLowerCase()) {
       case 'pdf': return Icons.picture_as_pdf_rounded;
@@ -245,38 +293,60 @@ class _ContentTile extends StatelessWidget {
                     ),
                   )
                 else if (item.type.toLowerCase() == 'pdf') ...[
-                  // Simulated blurred logo on the right
-                  Positioned(
-                    right: 20.w,
-                    top: 10.h,
-                    child: Opacity(
-                      opacity: 0.3,
-                      child: Icon(Icons.calculate_rounded, size: 60.r, color: Colors.white),
-                    ),
-                  ),
-                  // Simulated blurred document preview on the left
-                  Positioned(
-                    left: 24.w,
-                    top: 16.h,
-                    bottom: 16.h,
+                  // Full-width simulated PDF cover style
+                  Positioned.fill(
                     child: Container(
-                      width: 40.w,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.8),
-                        borderRadius: BorderRadius.circular(2.r),
-                        boxShadow: const [
-                          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(2, 2)),
-                        ],
+                        color: isDark ? AppColors.darkSurface : Colors.grey.shade100,
                       ),
-                      padding: EdgeInsets.all(4.r),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Stack(
                         children: [
-                          Container(height: 4.h, width: 20.w, color: Colors.grey.shade300),
-                          SizedBox(height: 4.h),
-                          Container(height: 2.h, width: 30.w, color: Colors.grey.shade200),
-                          SizedBox(height: 2.h),
-                          Container(height: 2.h, width: 25.w, color: Colors.grey.shade200),
+                          // Top bar (simulating PDF viewer)
+                          Positioned(
+                            top: 0, left: 0, right: 0,
+                            child: Container(
+                              height: 12.h,
+                              color: _getPdfCoverColor(item.id),
+                            ),
+                          ),
+                          // Document content simulation
+                          Center(
+                            child: Container(
+                              margin: EdgeInsets.only(top: 20.h, bottom: 8.h),
+                              width: 50.w,
+                              decoration: BoxDecoration(
+                                color: isDark ? AppColors.darkBorder : Colors.white,
+                                borderRadius: BorderRadius.circular(2.r),
+                                boxShadow: const [
+                                  BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(1, 1)),
+                                ],
+                              ),
+                              padding: EdgeInsets.all(6.r),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(height: 4.h, width: double.infinity, color: isDark ? Colors.white30 : Colors.grey.shade300),
+                                  SizedBox(height: 4.h),
+                                  Container(height: 2.h, width: 30.w, color: isDark ? Colors.white24 : Colors.grey.shade200),
+                                  SizedBox(height: 2.h),
+                                  Container(height: 2.h, width: 25.w, color: isDark ? Colors.white24 : Colors.grey.shade200),
+                                  SizedBox(height: 4.h),
+                                  Container(height: 12.h, width: double.infinity, color: isDark ? Colors.white12 : Colors.grey.shade100),
+                                  SizedBox(height: 2.h),
+                                  Container(height: 2.h, width: 30.w, color: isDark ? Colors.white24 : Colors.grey.shade200),
+                                ],
+                              ),
+                            ),
+                          ),
+                          // Large faded icon in the background
+                          Positioned(
+                            right: -10.w,
+                            bottom: -10.h,
+                            child: Opacity(
+                              opacity: 0.1,
+                              child: Icon(Icons.picture_as_pdf_rounded, size: 80.r, color: _getPdfCoverColor(item.id)),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -382,6 +452,24 @@ class _ContentTile extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       SizedBox(height: 8.h),
+                      if (item.className != null) ...[
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(4.r),
+                          ),
+                          child: Text(
+                            '${item.className}${item.sectionName != null ? ' - ${item.sectionName}' : ''}',
+                            style: TextStyle(
+                              color: AppColors.primary,
+                              fontSize: 10.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 4.h),
+                      ],
                       Align(
                         alignment: Alignment.centerRight,
                         child: Text(

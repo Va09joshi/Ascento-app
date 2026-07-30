@@ -395,14 +395,27 @@ class StudentDashboardView extends ConsumerWidget {
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
-                child: Text(
-                  user?.name.isNotEmpty == true ? user!.name[0].toUpperCase() : 'V',
-                  style: TextStyle(
-                    fontSize: 24.sp,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF1E293B),
-                  ),
-                ),
+                child: user?.avatarUrl != null && user!.avatarUrl!.isNotEmpty
+                    ? ClipOval(
+                        child: Image.network(
+                          user.avatarUrl!,
+                          fit: BoxFit.cover,
+                          width: 60.w,
+                          height: 60.h,
+                          errorBuilder: (_, __, ___) => Text(
+                            user.name.isNotEmpty == true ? user.name[0].toUpperCase() : 'V',
+                            style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B)),
+                          ),
+                        ),
+                      )
+                    : Text(
+                        user?.name.isNotEmpty == true ? user!.name[0].toUpperCase() : 'V',
+                        style: TextStyle(
+                          fontSize: 24.sp,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF1E293B),
+                        ),
+                      ),
               ),
               SizedBox(width: 16.w),
               Expanded(
