@@ -70,9 +70,190 @@ class _HomeworkStudentViewState extends ConsumerState<HomeworkStudentView> {
         },
       ),
     );
+    );
   }
 }
 
+class _HomeworkSubmissionSheet extends StatefulWidget {
+  final HomeworkItem item;
+  final Future<void> Function(PlatformFile) onSubmit;
+
+  const _HomeworkSubmissionSheet({required this.item, required this.onSubmit});
+
+  @override
+  State<_HomeworkSubmissionSheet> createState() => _HomeworkSubmissionSheetState();
+}
+
+class _HomeworkSubmissionSheetState extends State<_HomeworkSubmissionSheet> {
+  PlatformFile? _selectedFile;
+  bool _isSubmitting = false;
+
+  Future<void> _pickFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
+    );
+    if (result != null && result.files.isNotEmpty) {
+      setState(() => _selectedFile = result.files.first);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+      ),
+      padding: EdgeInsets.only(
+        left: 24.w,
+        right: 24.w,
+        top: 12.h,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24.h,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Drag handle
+          Center(
+            child: Container(
+              width: 40.w,
+              height: 4.h,
+              decoration: BoxDecoration(
+                color: isDark ? Colors.white24 : Colors.black12,
+                borderRadius: BorderRadius.circular(2.r),
+              ),
+            ),
+          ),
+          SizedBox(height: 24.h),
+          
+          Text(
+            'Submit Homework',
+            style: TextStyle(
+              fontSize: 20.sp,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : AppColors.textPrimary,
+            ),
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            widget.item.title,
+            style: TextStyle(
+              fontSize: 14.sp,
+              color: isDark ? Colors.white70 : AppColors.textMuted,
+            ),
+          ),
+          SizedBox(height: 32.h),
+
+          // File Picker Area
+          GestureDetector(
+            onTap: _isSubmitting ? null : _pickFile,
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(vertical: 32.h, horizontal: 16.w),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.black12 : Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(16.r),
+                border: Border.all(
+                  color: _selectedFile != null ? AppColors.primary : (isDark ? AppColors.darkBorder : Colors.grey.shade300),
+                  width: _selectedFile != null ? 2 : 1,
+                  style: BorderStyle.solid,
+                ),
+              ),
+              child: Column(
+                children: [
+                  Icon(
+                    _selectedFile != null ? Icons.description_rounded : Icons.cloud_upload_rounded,
+                    size: 48.r,
+                    color: _selectedFile != null ? AppColors.primary : Colors.grey,
+                  ),
+                  SizedBox(height: 16.h),
+                  if (_selectedFile != null) ...[
+                    Text(
+                      _selectedFile!.name,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      'Tap to change file',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: isDark ? Colors.white54 : Colors.black54,
+                      ),
+                    ),
+                  ] else ...[
+                    Text(
+                      'Tap to browse files',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white70 : Colors.black87,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      'Supported formats: PDF, JPG, PNG',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: isDark ? Colors.white54 : Colors.black54,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          
+          SizedBox(height: 32.h),
+          
+          // Submit Button
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: (_selectedFile == null || _isSubmitting)
+                  ? null
+                  : () async {
+                      setState(() => _isSubmitting = true);
+                      await widget.onSubmit(_selectedFile!);
+                      if (context.mounted) Navigator.of(context).pop();
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
+                padding: EdgeInsets.symmetric(vertical: 16.h),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                elevation: 0,
+              ),
+              child: _isSubmitting
+                  ? SizedBox(
+                      width: 24.r,
+                      height: 24.r,
+                      child: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                    )
+                  : Text(
+                      'Submit Assignment',
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 class _HomeworkStudentTile extends ConsumerStatefulWidget {
   final HomeworkItem item;
   const _HomeworkStudentTile({required this.item});
@@ -84,39 +265,38 @@ class _HomeworkStudentTile extends ConsumerStatefulWidget {
 class _HomeworkStudentTileState extends ConsumerState<_HomeworkStudentTile> {
   bool _isUploading = false;
 
-  Future<void> _submitHomework() async {
-    try {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
-      );
-
-      if (result == null || result.files.isEmpty) return;
-      final file = result.files.first;
-      
-      setState(() => _isUploading = true);
-
-      // 1. Upload to storage via ContentRepository
-      final fileUrl = await ref.read(contentRepositoryProvider).uploadDocument(file.path!);
-
-      // 2. Submit homework record
-      await ref.read(homeworkRepositoryProvider).submitHomework(widget.item.id, fileUrl);
-      
-      ref.invalidate(homeworkListProvider);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Homework submitted successfully!'), backgroundColor: AppColors.success),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Submission failed: $e'), backgroundColor: AppColors.error),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isUploading = false);
-    }
+  Future<void> _openSubmissionSheet() async {
+    final result = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => _HomeworkSubmissionSheet(
+        item: widget.item,
+        onSubmit: (file) async {
+          setState(() => _isUploading = true);
+          try {
+            // Upload to storage
+            final fileUrl = await ref.read(contentRepositoryProvider).uploadDocument(file.path!);
+            // Submit homework
+            await ref.read(homeworkRepositoryProvider).submitHomework(widget.item.id, fileUrl);
+            ref.invalidate(homeworkListProvider);
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Homework submitted successfully!'), backgroundColor: AppColors.success),
+              );
+            }
+          } catch (e) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Submission failed: $e'), backgroundColor: AppColors.error),
+              );
+            }
+          } finally {
+            if (mounted) setState(() => _isUploading = false);
+          }
+        },
+      ),
+    );
   }
 
   @override
@@ -208,8 +388,8 @@ class _HomeworkStudentTileState extends ConsumerState<_HomeworkStudentTile> {
               child: _isUploading
                   ? AppShimmer(width: double.infinity, height: 48.h, borderRadius: 12.r)
                   : CustomButton(
-                      text: 'Upload & Submit',
-                      onPressed: _submitHomework,
+                      text: 'Submit Homework',
+                      onPressed: _openSubmissionSheet,
                     ),
             ),
           if (widget.item.submissionUrl != null)
