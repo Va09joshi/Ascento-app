@@ -11,6 +11,8 @@ import 'package:ascento_abacus/shared/providers/feature_providers.dart';
 import 'package:ascento_abacus/shared/models/user_model.dart';
 import 'package:ascento_abacus/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:ascento_abacus/features/profile/presentation/widgets/edit_profile_dialog.dart';
+import 'package:ascento_abacus/shared/router/app_router.dart';
+import 'package:ascento_abacus/shared/router/route_names.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProfileView extends ConsumerWidget {
