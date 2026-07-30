@@ -20,6 +20,12 @@ class ProfileView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen(authControllerProvider, (previous, next) {
+      if (previous?.currentUser != null && next.currentUser == null) {
+        ref.read(routerProvider).go(RoutePaths.login);
+      }
+    });
+
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final authState = ref.watch(authControllerProvider);
@@ -228,10 +234,7 @@ class ProfileView extends ConsumerWidget {
                 isSecondary: true,
                 isLoading: authState.isLoading,
                 onPressed: () {
-                  final router = ref.read(routerProvider);
-                  ref.read(authControllerProvider.notifier).logout(() {
-                    router.go(RoutePaths.login);
-                  });
+                  ref.read(authControllerProvider.notifier).logout();
                 },
               ),
               SizedBox(height: 24.h),
@@ -359,10 +362,7 @@ class ProfileView extends ConsumerWidget {
               isSecondary: true,
               isLoading: authState.isLoading,
               onPressed: () {
-                final router = ref.read(routerProvider);
-                ref.read(authControllerProvider.notifier).logout(() {
-                  router.go(RoutePaths.login);
-                });
+                ref.read(authControllerProvider.notifier).logout();
               },
             ),
           ],

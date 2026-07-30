@@ -151,11 +151,10 @@ class AuthController extends StateNotifier<AuthUIState> {
   }
 
   // 6. Logout Session
-  Future<void> logout(VoidCallback onDone) async {
+  Future<void> logout() async {
     state = state.copyWith(isLoading: true);
     await _authService.endSession();
     state = const AuthUIState();
-    onDone();
   }
 }
 
