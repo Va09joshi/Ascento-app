@@ -587,30 +587,84 @@ class _SubmissionsBottomSheetState extends ConsumerState<_SubmissionsBottomSheet
                         : ListView.separated(
                             padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 8.h),
                             itemCount: _submissions!.length,
-                            separatorBuilder: (_, __) => Divider(color: isDark ? Colors.white10 : Colors.black12),
+                            separatorBuilder: (_, __) => const SizedBox.shrink(),
                             itemBuilder: (context, index) {
                               final sub = _submissions![index];
-                              return ListTile(
-                                contentPadding: EdgeInsets.zero,
-                                leading: CircleAvatar(
-                                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                                  child: Text(
-                                    sub.studentName?.substring(0, 1).toUpperCase() ?? 'S',
-                                    style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
-                                  ),
+                              return Container(
+                                margin: EdgeInsets.only(bottom: 12.h),
+                                padding: EdgeInsets.all(16.w),
+                                decoration: BoxDecoration(
+                                  color: isDark ? Colors.black12 : Colors.grey.shade50,
+                                  borderRadius: BorderRadius.circular(16.r),
+                                  border: Border.all(color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05)),
                                 ),
-                                title: Text(sub.studentName ?? 'Unknown Student', style: TextStyle(fontWeight: FontWeight.w600)),
-                                subtitle: Text('Submitted: ${sub.submittedAt.toIso8601String().split('T')[0]}'),
-                                trailing: TextButton.icon(
-                                  onPressed: () async {
-                                    final url = Uri.tryParse(sub.fileUrl);
-                                    if (url != null && await canLaunchUrl(url)) {
-                                      await launchUrl(url, mode: LaunchMode.externalApplication);
-                                    }
-                                  },
-                                  icon: const Icon(Icons.download_rounded, size: 16),
-                                  label: const Text('View'),
-                                  style: TextButton.styleFrom(foregroundColor: AppColors.primary),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 48.w,
+                                      height: 48.h,
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primary.withValues(alpha: 0.15),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        sub.studentName?.substring(0, 1).toUpperCase() ?? 'S',
+                                        style: TextStyle(
+                                          color: AppColors.primary,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18.sp,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 16.w),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            sub.studentName ?? 'Unknown Student',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 15.sp,
+                                              color: isDark ? Colors.white : AppColors.textPrimary,
+                                            ),
+                                          ),
+                                          SizedBox(height: 4.h),
+                                          Row(
+                                            children: [
+                                              Icon(Icons.access_time_rounded, size: 14.sp, color: isDark ? Colors.white54 : Colors.black54),
+                                              SizedBox(width: 4.w),
+                                              Text(
+                                                'Submitted ${sub.submittedAt.toIso8601String().split('T')[0]}',
+                                                style: TextStyle(
+                                                  color: isDark ? Colors.white54 : Colors.black54,
+                                                  fontSize: 12.sp,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(width: 12.w),
+                                    ElevatedButton.icon(
+                                      onPressed: () async {
+                                        final url = Uri.tryParse(sub.fileUrl);
+                                        if (url != null && await canLaunchUrl(url)) {
+                                          await launchUrl(url, mode: LaunchMode.externalApplication);
+                                        }
+                                      },
+                                      icon: Icon(Icons.download_rounded, size: 16.sp, color: Colors.white),
+                                      label: const Text('View', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.primary,
+                                        elevation: 0,
+                                        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               );
                             },

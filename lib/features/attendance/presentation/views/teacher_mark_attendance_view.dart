@@ -347,16 +347,72 @@ class _TeacherMarkAttendanceViewState extends ConsumerState<TeacherMarkAttendanc
                                                   ],
                                                 ),
                                               ),
-                                              Switch(
-                                                value: isPresent,
-                                                activeColor: AppColors.success,
-                                                inactiveThumbColor: AppColors.error,
-                                                inactiveTrackColor: AppColors.error.withValues(alpha: 0.3),
-                                                onChanged: (val) {
+                                              GestureDetector(
+                                                onTap: () {
                                                   setState(() {
-                                                    _attendanceState[student.id] = val;
+                                                    _attendanceState[student.id] = !isPresent;
                                                   });
                                                 },
+                                                child: AnimatedContainer(
+                                                  duration: const Duration(milliseconds: 200),
+                                                  width: 72.w,
+                                                  height: 36.h,
+                                                  decoration: BoxDecoration(
+                                                    color: isPresent ? AppColors.success.withValues(alpha: 0.15) : AppColors.error.withValues(alpha: 0.15),
+                                                    borderRadius: BorderRadius.circular(20.r),
+                                                    border: Border.all(
+                                                      color: isPresent ? AppColors.success.withValues(alpha: 0.3) : AppColors.error.withValues(alpha: 0.3),
+                                                    ),
+                                                  ),
+                                                  child: Stack(
+                                                    children: [
+                                                      AnimatedAlign(
+                                                        duration: const Duration(milliseconds: 200),
+                                                        curve: Curves.easeOut,
+                                                        alignment: isPresent ? Alignment.centerRight : Alignment.centerLeft,
+                                                        child: Container(
+                                                          width: 32.w,
+                                                          height: 32.h,
+                                                          margin: EdgeInsets.all(2.w),
+                                                          decoration: BoxDecoration(
+                                                            color: isPresent ? AppColors.success : AppColors.error,
+                                                            shape: BoxShape.circle,
+                                                            boxShadow: [
+                                                              BoxShadow(
+                                                                color: (isPresent ? AppColors.success : AppColors.error).withValues(alpha: 0.4),
+                                                                blurRadius: 4,
+                                                                offset: const Offset(0, 2),
+                                                              )
+                                                            ],
+                                                          ),
+                                                          alignment: Alignment.center,
+                                                          child: Text(
+                                                            isPresent ? 'P' : 'A',
+                                                            style: TextStyle(
+                                                              color: Colors.white,
+                                                              fontWeight: FontWeight.bold,
+                                                              fontSize: 14.sp,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Align(
+                                                        alignment: isPresent ? Alignment.centerLeft : Alignment.centerRight,
+                                                        child: Padding(
+                                                          padding: EdgeInsets.symmetric(horizontal: 10.w),
+                                                          child: Text(
+                                                            isPresent ? 'A' : 'P',
+                                                            style: TextStyle(
+                                                              color: isPresent ? AppColors.error : AppColors.success,
+                                                              fontWeight: FontWeight.bold,
+                                                              fontSize: 12.sp,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
                                               ),
                                             ],
                                           ),
