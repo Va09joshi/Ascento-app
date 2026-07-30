@@ -646,7 +646,7 @@ class _SubmissionsBottomSheetState extends ConsumerState<_SubmissionsBottomSheet
                                               SizedBox(width: 4.w),
                                               Expanded(
                                                 child: Text(
-                                                  'Submitted ${sub.submittedAt.toIso8601String().split('T')[0]}',
+                                                  'Submitted ${DateFormat('MMM dd, yyyy').format(sub.submittedAt)}',
                                                   style: TextStyle(
                                                     color: isDark ? Colors.white54 : Colors.black54,
                                                     fontSize: 12.sp,
