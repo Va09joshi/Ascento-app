@@ -433,28 +433,71 @@ class _HomeworkTeacherTile extends ConsumerWidget {
                   fontSize: 12.sp,
                 ),
               ),
-              InkWell(
-                onTap: () => _showSubmissionsBottomSheet(context, ref),
-                borderRadius: BorderRadius.circular(6.r),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                  child: Row(
-                    children: [
-                      Icon(Icons.grading, size: 16.sp, color: isDark ? Colors.white70 : Colors.black87),
-                      SizedBox(width: 4.w),
-                      Text(
-                        'Submissions',
-                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13.sp, color: isDark ? Colors.white70 : Colors.black87),
+              Row(
+                children: [
+                  InkWell(
+                    onTap: () => _showSubmissionsBottomSheet(context, ref),
+                    borderRadius: BorderRadius.circular(6.r),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                      child: Row(
+                        children: [
+                          Icon(Icons.grading, size: 16.sp, color: isDark ? Colors.white70 : Colors.black87),
+                          SizedBox(width: 4.w),
+                          Text(
+                            'Submissions',
+                            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13.sp, color: isDark ? Colors.white70 : Colors.black87),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              )
+                  IconButton(
+                    onPressed: () => _confirmDelete(context, ref, item),
+                    icon: Icon(Icons.delete_outline_rounded, color: AppColors.error, size: 20.sp),
+                    tooltip: 'Delete Homework',
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
+              ),
             ],
-          )
+          ),
         ],
       ),
+    );
+  }
 
+  void _confirmDelete(BuildContext context, WidgetRef ref, HomeworkItem item) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Homework'),
+        content: Text('Are you sure you want to delete "${item.title}"? This will remove all associated submissions.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('Cancel', style: TextStyle(color: AppColors.textMuted)),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                await ref.read(homeworkRepositoryProvider).deleteHomework(item.id);
+                ref.invalidate(homeworkListProvider);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Homework deleted successfully')));
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                }
+              }
+            },
+            child: Text('Delete', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
     );
   }
 

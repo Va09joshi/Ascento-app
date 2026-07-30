@@ -45,7 +45,16 @@ class _HomeworkStudentViewState extends ConsumerState<HomeworkStudentView> {
           icon: Icons.error_outline,
         ),
         data: (items) {
-          if (items.isEmpty) {
+          final now = DateTime.now();
+          final visibleItems = items.where((item) {
+            // Remove from UI if pending and overdue by more than 7 days
+            if (item.status == HomeworkStatus.pending && item.dueDate.isBefore(now.subtract(const Duration(days: 7)))) {
+              return false;
+            }
+            return true;
+          }).toList();
+
+          if (visibleItems.isEmpty) {
             return const EmptyStateWidget(
               title: 'No Homework',
               subtitle: 'All caught up!',
@@ -54,9 +63,9 @@ class _HomeworkStudentViewState extends ConsumerState<HomeworkStudentView> {
           }
           return ListView.separated(
             padding: EdgeInsets.all(20.w),
-            itemCount: items.length,
+            itemCount: visibleItems.length,
             separatorBuilder: (_, __) => SizedBox(height: 16.h),
-            itemBuilder: (context, index) => _HomeworkStudentTile(item: items[index]),
+            itemBuilder: (context, index) => _HomeworkStudentTile(item: visibleItems[index]),
           );
         },
       ),
@@ -196,10 +205,12 @@ class _HomeworkStudentTileState extends ConsumerState<_HomeworkStudentTile> {
           if (widget.item.status == HomeworkStatus.pending && widget.item.submissionUrl == null)
             SizedBox(
               width: double.infinity,
-              child: CustomButton(
-                text: _isUploading ? 'Uploading...' : 'Upload & Submit',
-                onPressed: _isUploading ? null : _submitHomework,
-              ),
+              child: _isUploading
+                  ? AppShimmer(width: double.infinity, height: 48.h, borderRadius: 12.r)
+                  : CustomButton(
+                      text: 'Upload & Submit',
+                      onPressed: _submitHomework,
+                    ),
             ),
           if (widget.item.submissionUrl != null)
             Container(

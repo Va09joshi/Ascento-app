@@ -41,6 +41,18 @@ class HomeworkRepository {
     }
   }
 
+  Future<void> deleteHomework(String homeworkId) async {
+    try {
+      final response = await _dioClient.delete('${ApiEndpoints.homework}/$homeworkId');
+      if (response.data['success'] != true) {
+        throw Exception(response.data['message'] ?? 'Failed to delete homework');
+      }
+    } catch (e) {
+      AppLogger.error('Failed to delete homework', e);
+      rethrow;
+    }
+  }
+
   Future<void> submitHomework(String homeworkId, String fileUrl) async {
     try {
       final response = await _dioClient.post(

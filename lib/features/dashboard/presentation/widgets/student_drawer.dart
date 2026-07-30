@@ -7,6 +7,7 @@ import 'package:ascento_abacus/features/auth/presentation/controllers/auth_contr
 import 'package:ascento_abacus/shared/models/user_model.dart';
 import 'package:ascento_abacus/shared/router/route_names.dart';
 import 'package:ascento_abacus/shared/router/app_router.dart';
+import 'package:shimmer/shimmer.dart';
 
 class StudentDrawer extends ConsumerWidget {
   const StudentDrawer({super.key});
@@ -63,6 +64,18 @@ class StudentDrawer extends ConsumerWidget {
                               fit: BoxFit.cover,
                               width: 36.r,
                               height: 36.r,
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Shimmer.fromColors(
+                                  baseColor: Colors.white.withValues(alpha: 0.2),
+                                  highlightColor: Colors.white.withValues(alpha: 0.5),
+                                  child: Container(
+                                    width: 36.r,
+                                    height: 36.r,
+                                    color: Colors.white,
+                                  ),
+                                );
+                              },
                               errorBuilder: (context, error, stackTrace) =>
                                   const Icon(Icons.person, color: Colors.white),
                             ),

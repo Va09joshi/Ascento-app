@@ -11,6 +11,7 @@ import 'package:ascento_abacus/shared/providers/feature_providers.dart';
 import 'package:ascento_abacus/shared/models/user_model.dart';
 import 'package:ascento_abacus/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:ascento_abacus/features/profile/presentation/widgets/edit_profile_dialog.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ProfileView extends ConsumerWidget {
   const ProfileView({super.key});
@@ -75,6 +76,18 @@ class ProfileView extends ConsumerWidget {
                             ? Image.network(
                                 profile.user.avatarUrl!,
                                 fit: BoxFit.cover,
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Shimmer.fromColors(
+                                    baseColor: Colors.white.withValues(alpha: 0.2),
+                                    highlightColor: Colors.white.withValues(alpha: 0.5),
+                                    child: Container(
+                                      width: 56.r,
+                                      height: 56.r,
+                                      color: Colors.white,
+                                    ),
+                                  );
+                                },
                                 errorBuilder: (_, __, ___) => const Icon(Icons.person, color: Colors.white, size: 26),
                               )
                             : Image.asset(
@@ -265,6 +278,18 @@ class ProfileView extends ConsumerWidget {
                           ? Image.network(
                               user.avatarUrl!,
                               fit: BoxFit.cover,
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Shimmer.fromColors(
+                                  baseColor: Colors.white.withValues(alpha: 0.2),
+                                  highlightColor: Colors.white.withValues(alpha: 0.5),
+                                  child: Container(
+                                    width: 56.r,
+                                    height: 56.r,
+                                    color: Colors.white,
+                                  ),
+                                );
+                              },
                               errorBuilder: (_, __, ___) => const Icon(Icons.person, color: Colors.white, size: 26),
                             )
                           : Image.asset(
