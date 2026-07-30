@@ -153,68 +153,108 @@ class _NotificationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final color = _typeColor();
 
     return Padding(
-      padding: EdgeInsets.only(bottom: 12.h),
+      padding: EdgeInsets.only(bottom: 16.h),
       child: InkWell(
         onTap: () => context.push(RoutePaths.noticeDetails, extra: item),
-        borderRadius: BorderRadius.circular(16.r),
-        child: AppCard(
-          color: item.isRead ? null : AppColors.primary.withValues(alpha: 0.04),
+        borderRadius: BorderRadius.circular(20.r),
+        child: Container(
+          padding: EdgeInsets.all(16.r),
+          decoration: BoxDecoration(
+            color: item.isRead 
+                ? (isDark ? AppColors.darkSurface : Colors.white)
+                : color.withValues(alpha: isDark ? 0.15 : 0.08),
+            borderRadius: BorderRadius.circular(20.r),
+            border: Border.all(
+              color: item.isRead
+                  ? (isDark ? AppColors.darkBorder : AppColors.border)
+                  : color.withValues(alpha: 0.3),
+            ),
+            boxShadow: item.isRead ? null : [
+              BoxShadow(
+                color: color.withValues(alpha: 0.1),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              )
+            ],
+          ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(12.r),
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
+                  color: color.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(_typeIcon(), color: color, size: 20),
+                child: Icon(_typeIcon(), color: color, size: 24.r),
               ),
-              SizedBox(width: 14.w),
+              SizedBox(width: 16.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
                           child: Text(
                             item.title,
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: item.isRead
-                                  ? FontWeight.w500
-                                  : FontWeight.bold,
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: item.isRead ? FontWeight.w600 : FontWeight.bold,
+                              color: isDark ? Colors.white : Colors.black87,
+                              letterSpacing: -0.3,
                             ),
                           ),
                         ),
-                        if (!item.isRead)
+                        if (!item.isRead) ...[
+                          SizedBox(width: 8.w),
                           Container(
-                            width: 8,
-                            height: 8,
+                            width: 10.r,
+                            height: 10.r,
+                            margin: EdgeInsets.only(top: 4.h),
                             decoration: BoxDecoration(
                               color: color,
                               shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 4, spreadRadius: 1)
+                              ],
                             ),
                           ),
+                        ],
                       ],
                     ),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 6.h),
                     Text(
                       item.body,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: item.isRead ? Colors.grey : null,
-                        height: 1.4,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: isDark 
+                            ? (item.isRead ? Colors.white54 : Colors.white70) 
+                            : (item.isRead ? Colors.black54 : Colors.black87),
+                        height: 1.5,
                       ),
                     ),
-                    SizedBox(height: 6.h),
-                    Text(
-                      _timeAgo(),
-                      style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+                    SizedBox(height: 12.h),
+                    Row(
+                      children: [
+                        Icon(Icons.access_time_rounded, size: 14.r, color: color.withValues(alpha: 0.8)),
+                        SizedBox(width: 6.w),
+                        Text(
+                          _timeAgo(),
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                            color: color.withValues(alpha: 0.8),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
