@@ -644,14 +644,13 @@ class _SubmissionsBottomSheetState extends ConsumerState<_SubmissionsBottomSheet
                                             children: [
                                               Icon(Icons.access_time_rounded, size: 14.sp, color: isDark ? Colors.white54 : Colors.black54),
                                               SizedBox(width: 4.w),
-                                              Expanded(
+                                              Flexible(
                                                 child: Text(
-                                                  'Submitted ${DateFormat('MMM dd, yyyy').format(sub.submittedAt)}',
+                                                  DateFormat('MMM dd, yyyy').format(sub.submittedAt),
                                                   style: TextStyle(
                                                     color: isDark ? Colors.white54 : Colors.black54,
                                                     fontSize: 12.sp,
                                                   ),
-                                                  overflow: TextOverflow.ellipsis,
                                                 ),
                                               ),
                                             ],
