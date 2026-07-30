@@ -238,9 +238,7 @@ class NavigationShell extends ConsumerWidget {
                     onTap: () {
                       Navigator.of(innerContext).pop();
                       ref.read(authControllerProvider.notifier).logout(() {
-                        if (context.mounted) {
-                          context.go(RoutePaths.login);
-                        }
+                        ref.read(routerProvider).go(RoutePaths.login);
                       });
                     },
                   );
