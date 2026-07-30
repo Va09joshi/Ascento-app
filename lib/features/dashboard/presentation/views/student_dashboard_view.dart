@@ -673,6 +673,19 @@ void _showNoticePopup(BuildContext context, NotificationItem notice, bool isDark
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    if (notice.imageUrl != null && notice.imageUrl!.isNotEmpty) ...[
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12.r),
+                        child: Image.network(
+                          notice.imageUrl!,
+                          width: double.infinity,
+                          height: 140.h,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                        ),
+                      ),
+                      SizedBox(height: 12.h),
+                    ],
                     Text(
                       notice.title,
                       style: TextStyle(
@@ -684,7 +697,7 @@ void _showNoticePopup(BuildContext context, NotificationItem notice, bool isDark
                     SizedBox(height: 8.h),
                     Text(
                       notice.body,
-                      maxLines: 4,
+                      maxLines: notice.imageUrl != null && notice.imageUrl!.isNotEmpty ? 3 : 5,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 14.sp,
